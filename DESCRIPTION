@@ -1,0 +1,10 @@
+Package: opera
+Type: Package
+Title: Online prediction by experts aggregation
+Version: 1.11
+Date: 2014-01-Hour
+Author: Pierre Gaillard
+Maintainer: Pierre Gaillard <pierre-p.gaillard@edf.fr>
+Description: opera (Online Prediction by ExpeRts Aggregation)
+License: Property of EDF R&D and CNRS
+Depends: splines
