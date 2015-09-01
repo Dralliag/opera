@@ -1,8 +1,8 @@
+
 gamMixture <-
 function(y, experts, z, lambda, nknots = 5, degree = 3, loss.type = 'squareloss',
                        href = 1, period = 1, uniform = F, knots = NULL, tau = 0.5) {
   # création de la matrice de design
-  warning('gamMixture is beta. I may be unstable')
   
   if (is.null(knots)) {
     if (!uniform) {

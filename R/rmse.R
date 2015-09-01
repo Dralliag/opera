@@ -1,3 +1,27 @@
+#' Root Mean Square Error
+#' 
+#'  The
+#' function \code{rmse} computes the root mean square error of a sequence of
+#' predictions. It is an equivalent way of running
+#' \code{sqrt(mean(loss(x,y,loss.type='squareloss')))} (see
+#' \code{\link{loss}}).
+#' 
+#' 
+#' @param x A vector containing the sequence of
+#' predictions to be evaluated.
+#' @param y  A vector containing the sequence of
+#' observations to be predicted.
+#' @param awake A vector specifying the
+#' activation coefficients of the predictions in \code{x}. Its entries lie in
+#' \code{[0,1]}.
+#' @param na.rm logical. Should missing values (including NaN) be removed?
+#' @return  The root mean square error of the sequence of prediction
+#' \code{x}.
+#' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
+#' @seealso 
+#' \code{\link{mape}}, \code{\link{mae}}, \code{\link{loss}}
+#' @keywords ~kwd1 ~kwd2
+#' @export rmse
 rmse <-
 function (x,y, awake=NULL, na.rm=TRUE) 
 {

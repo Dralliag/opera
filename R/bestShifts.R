@@ -1,3 +1,39 @@
+#' best sequence of experts oracle
+#' 
+#'  The
+#' function \code{bestShifts} computes for all number m of stwitches the
+#' sequence of experts with at most $m$ shifts that would have performed the
+#' best to predict the sequence of observations in \code{y}.
+#' 
+#' 
+#' @param y  vector that contains the observations
+#' to be predicted.
+#' @param experts A matrix containing the
+#' experts forecasts. Each column corresponds to the predictions proposed by an
+#' expert to predict \code{Y}. It has as many columns as there are experts.
+#' @param awake A matrix specifying the
+#' activation coefficients of the experts. Its entries lie in \code{[0,1]}.
+#' Needed if some experts are specialists and do not always form and suggest
+#' prediction.  If the expert number \code{k} at instance \code{t} does not
+#' form any prediction of observation \code{Y_t}, we can put
+#' \code{awake[t,k]=0} so that the mixture does not consider expert \code{k} in
+#' the mixture to predict \code{Y_t}.
+#' @param loss.type A string specifying
+#' the loss function considered to evaluate the performance. It can be
+#' "squareloss", "mae", "mape", or "pinballloss". See \code{\link{loss}} for
+#' more details.
+#' @return  %% Returns a matrix of dimension \code{c(T,N,3)} where
+#' \code{T} is the number of instance to be predicted (i.e., the length of the
+#' sequence \code{y}) and \code{N} is the number of experts.  A matrix \code{L}
+#' of dimension \code{c(T,N,3)} where the third dimension is the type of loss
+#' (1:squareloss, 2:mae, 3:mape), and the value of $L(m,k,l)$ is the loss
+#' (determined by \code{l}) suffered by the best sequence of expert with at
+#' most $m-1$ shifts and finishing with expert number $k$.
+#' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
+#' @seealso 
+#' \code{\link{bestConvex}}, \code{\link{bestShiftsDay}}, \code{\link{loss}}
+#' @keywords ~kwd1 ~kwd2
+#' @export bestShifts
 bestShifts <-
 function(y, experts, awake=NULL, loss.type = 'squareloss')
 {
@@ -6,8 +42,9 @@ function(y, experts, awake=NULL, loss.type = 'squareloss')
     INF <- exp(700)
     # m-1 shifts, expert
     
-    if (is.null(awake)) {awake = matrix(1, nrow = T, ncol = N)} # Activation 1 si non spécifiée
-    awake = as.matrix(awake)
+    if (is.null(awake)) {awake = matrix(1, nrow = T, ncol = N)} # Full activation if unspecified
+
+    awake <- as.matrix(awake)
     idx.na <- which(is.na(experts))
     awake[idx.na] <- 0
     experts[idx.na] <- 0

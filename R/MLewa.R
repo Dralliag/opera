@@ -1,3 +1,4 @@
+
 MLewa <-
 function(y, experts, awake = NULL, 
                   loss.type='squareloss', loss.gradient = TRUE,
@@ -9,7 +10,7 @@ function(y, experts, awake = NULL,
    
    # Experts are always active if awake is unspecified
    if (is.null(awake)) {awake = matrix(1, nrow = T, ncol = N)} 
-   awake = as.matrix(awake)
+   awake <- as.matrix(awake)
    idx.na <- which(is.na(experts))
    awake[idx.na] <- 0
    experts[idx.na] <- 0
@@ -17,8 +18,8 @@ function(y, experts, awake = NULL,
    R <- rep(0,N)
    
    # weight assigned to each expert
-   weights <- matrix(0,ncol=N,nrow=T)
-   prediction <- rep(0,T)
+   weights <- matrix(0, ncol = N, nrow = T)
+   prediction <- rep(0, T)
    
    w <- rep(1,N)/N
    wop <- rep(1,N)/N
@@ -49,7 +50,7 @@ function(y, experts, awake = NULL,
       w <- truncate1(exp(eta*R)) 
       
       # If it is time to update...
-      h <- (((t-1)%%period)+1)
+      h <- (((t - 1) %% period) + 1)
       if (h == href) {
          wop <- w
          etaop[t+1,] <- eta
