@@ -6,4 +6,4 @@
  - faire une fonction plot et une fonction predict
  - faire une vignette ou des slides
  - commenter le code en anglais
- 
+  - ridge version séquentielle ? 
