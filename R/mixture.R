@@ -63,18 +63,6 @@
 #' form any prediction of observation \code{Y_t}, we can put
 #' \code{awake[t,k]=0} so that the mixture does not consider expert \code{k} in
 #' the mixture to predict \code{Y_t}.
-#' @param href A number in \code{[1,period]}
-#' specifying the instant in the day when the aggregation rule can update its
-#' weights.  It should lie in the interval \code{c(1,period)}.
-#' @param period The number of instants in
-#' each day.
-#' @param delay A positive number that indicates the number of instants before
-#' the mixture has access to the true observations in \code{y}.  If \code{delay
-#' > 0}, \code{y.ETR} can not be \code{NULL}.
-#' @param y.ETR A vector containing real time estimations of \code{y} to be
-#' used at each instant \code{t} instead of \code{y_t} to predict instants
-#' \code{t+1,...,t+delay}.
-
 #' @return  \item{weights }{ A matrix of dimension \code{c(T,N)}, with
 #' \code{T} the number of instances to be predicted and \code{N} the number of
 #' experts.  Each row contains the convex combination to form the predictions }
@@ -137,19 +125,19 @@
 #' cat('MLpol mixture, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
 #' @export mixture
+
 mixture <-
 function(y, experts, 
-  aggregationRule = "MLpol",  w0 = NULL,
-  awake = NULL, href = 1, period = 1, delay = 0, y.ETR = NULL)
+  aggregationRule = "MLpol",  w0 = NULL, awake = NULL)
 {
   if (is.character(aggregationRule)) {
     aggregationRule = list(name = aggregationRule)
   }
   if (aggregationRule$name == "Ridge") {
     if (is.null(aggregationRule$lambda)) {
-      return(ridgeCalib(y = y, experts = experts, href = href, period = period, w0 = w0, delay = delay, y.ETR = y.ETR))
+      return(ridgeCalib(y = y, experts = experts, w0 = w0))
     } else {
-      return(ridgeHour(y, experts, aggregationRule$lambda, href, period, w0, delay, y.ETR))
+      return(ridgeHour(y, experts, aggregationRule$lambda, w0))
     }
   } else {
 
@@ -160,34 +148,28 @@ function(y, experts,
     if (aggregationRule$name == "MLpol" || aggregationRule$name == "MLprod") {
       if (!is.null(w0)) { stop(paste(aggregationRule$name, "cannot handle non-uniform prior weight vector"))}
       algo <- eval(parse(text = aggregationRule$name))
-      return(algo(y, experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, period = period, href = href, delay = delay, y.ETR = y.ETR, tau = aggregationRule$tau))
+      return(algo(y, experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, tau = aggregationRule$tau))
     }
 
     if (aggregationRule$name == "EWA") {
       if (is.null(aggregationRule$eta)) {
-        return(ewaCalib(y = y, experts = experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0, href = href, period = period, delay = delay, y.ETR = y.ETR))
+        return(ewaCalib(y = y, experts = experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
       } else {
-        return(ewaHour(y = y, experts = experts, eta = aggregationRule$eta, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0, href = href, period = period, delay = delay, y.ETR = y.ETR))
+        return(ewaHour(y = y, experts = experts, eta = aggregationRule$eta, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
       }
     }
 
     if ((aggregationRule$name == "BOA")|| aggregationRule$name == "MLewa") {
       if (!is.null(w0)) { stop(paste(aggregationRule$name, "cannot handle non-uniform prior weight vector"))}
-      if ((delay > 0) || (!is.null(y.ETR))) {
-        stop(paste(aggregationRule$name, "cannot handle delayed signal"))
-      }
-      algo <- eval(parse(text = aggregationRule$name))
-      return(algo(y, experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, period = period, href = href))
+        algo <- eval(parse(text = aggregationRule$name))
+      return(algo(y, experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient))
     }
 
     if ((aggregationRule$name == "FS")) {
-      if (!is.null(y.ETR) || (delay > 0)) {
-        warning("Fixed-share aggregation rule cannot handle delayed signal well")
-      }
       if (is.null(aggregationRule$eta) || is.null(aggregationRule$alpha)) {
-        return(fixedshareCalib(y = y, experts = experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0, href = href, period = period))
+        return(fixedshareCalib(y = y, experts = experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
       } else {
-        return(fixedshareHour(y = y, experts = experts, eta = aggregationRule$eta, alpha = aggregationRule$alpha, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0, href = href, period = period))
+        return(fixedshareHour(y = y, experts = experts, eta = aggregationRule$eta, alpha = aggregationRule$alpha, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
       }
     }
 
@@ -206,7 +188,7 @@ function(y, experts,
       if (is.null(aggregationRule$knots)){ aggregationRule$knots = NULL}
       if (is.null(aggregationRule$tau)){ aggregationRule$tau = 0.5}
 
-      return(gamMixture(y = y, experts = experts, z = , aggregationRule$lambda, nknots = aggregationRule$nknots, degree = aggregationRule$degree, loss.type = aggregationRule$loss.type, href = href, period = period, uniform = aggregationRule$uniform, knots = aggregationRule$knots, tau = aggregationRule$tau))
+      return(gamMixture(y = y, experts = experts, z = , aggregationRule$lambda, nknots = aggregationRule$nknots, degree = aggregationRule$degree, loss.type = aggregationRule$loss.type, uniform = aggregationRule$uniform, knots = aggregationRule$knots, tau = aggregationRule$tau))
 
     }
 
@@ -215,7 +197,7 @@ function(y, experts,
         stop("pinball cannot handle automatic calibration")
       }
       if (is.null(aggregationRule$tau)){ aggregationRule$tau = 0.5}
-      pinballHour(y = y, experts = experts, lambda = aggregationRule$lambda, href = href, period = period, w0 = w0, tau = aggregationRule$tau)
+      pinballHour(y = y, experts = experts, lambda = aggregationRule$lambda, w0 = w0, tau = aggregationRule$tau)
     }
 
 
