@@ -30,24 +30,24 @@ function(y, experts, grideta = 1, awake = NULL,
   weights <- matrix(0, ncol = N, nrow = T)    # Matrix of weights formed by the mixture
   prediction <- rep(0, T)                     # Predictions formed by the mixture
   
-  pred.eta.nonop <- matrix(0, ncol = neta, nrow = T) # Prediction of mixture algorithm with different learning rates eta
-
   for(t in 1:T){
     # Display the state of progress of the algorithm
     if (!(t %% floor(T/10)) && trace) cat(floor(10 * t/T)*10, '% -- ')
 
-    # Weights, prediction forme by EWA(eta[t]) where eta[t] is the learning rate calibrated online
+    # Weights, prediction formed by EWA(eta[t]) where eta[t] is the learning rate calibrated online
     weights[t,] <- weta[,besteta] * awake[t,] / sum(weta[,besteta] * awake[t,])
     prediction[t] <- experts[t,] %*% weights[t,]
     eta[t] <- grideta[besteta]
 
     # Weights, predictions formed by each EWA(eta) for eta in the grid "grideta"
-    pred.eta[t,] <- experts[t,] %*% t(t(weta * awake[t,]) / apply(weta * awake[t,],2,sum))
-    lpred <- loss(pred.eta[t,], y[t], loss.type)
-    cumulativeLoss <- cumulativeLoss + lpred
-    
+    pred <- experts[t,] %*% t(t(weta * awake[t,]) / apply(weta * awake[t,],2,sum))
+    cumulativeLoss <- cumulativeLoss + loss(pred, y[t], loss.type) # cumulative loss without gradient trick
+    lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient)) # gradient loss suffered by each eta on the grid
+    lexp <- lossPred(experts[t,], y[t], pred, loss.type, loss.gradient) # gradient loss suffered by each expert
+
+
     # Regret update
-    R <- R + awake[t,] * t(lpred.ETR - t(lexp.ETR))
+    R <- R + awake[t,] * t(lpred - t(lexp))
 
     # Update of the best parameter
     besteta <- order(cumulativeLoss)[1]
@@ -62,7 +62,6 @@ function(y, experts, grideta = 1, awake = NULL,
         for (k in 1:length(neweta)) {
           perfneweta <- ewa(y[1:t], matrix(experts[1:t,],ncol=N), neweta[k], matrix(awake[1:t,],ncol=N), 
                                   loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0)
-          pred.eta <- cbind(pred.eta, c(perfneweta$prediction, rep(0, (T-t))))          
           cumulativeLoss <- c(cumulativeLoss, perfneweta$cumulativeLoss)
           R[,besteta+k] <- perfneweta$regret
         }
@@ -78,12 +77,10 @@ function(y, experts, grideta = 1, awake = NULL,
         grideta <- c(neweta[k],grideta)
         perfneweta <- ewa(y[1:t], matrix(experts[1:t,],ncol=N), neweta[k], matrix(awake[1:t,],ncol=N), 
           loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0)
-        pred.eta <- cbind(c(perfneweta$prediction, rep(0, (T-t))), pred.eta)
         cumulativeLoss <- c(perfneweta$cumulativeLoss,cumulativeLoss)
         R[,besteta-k] <- perfneweta$regret
       }
     }
-
     weta <- truncate1(exp(t(t(matrix(R, ncol=neta)) * grideta)))
   }
   l <-  mean(loss(prediction, y, loss.type=loss.type))
