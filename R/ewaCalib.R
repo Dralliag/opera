@@ -85,7 +85,7 @@ function(y, experts, grideta = 1, awake = NULL,
   }
 
   # Next weights
-  weights[t,] <- wpar[,bestpar[1],bestpar[2]] * awake[t,] / sum(wpar[,bestpar[1],bestpar[2]] * awake[t,])
+  w <- weta[,besteta]  / sum(weta[,besteta])
   
   # Losses 
   l <-  mean(loss(prediction, y, loss.type=loss.type))
@@ -98,5 +98,5 @@ function(y, experts, grideta = 1, awake = NULL,
   return(list(weights = weights, prediction = prediction, 
               eta = eta, grid = grideta, 
               loss = l, gridloss = mloss, 
-              weights.forecast = w )))
+              weights.forecast = w)))
 }
