@@ -88,6 +88,5 @@ function(y, experts, awake=NULL, loss.type = 'squareloss')
       }
       L[1,,] <- L[1,,] + instanceLoss
     }
-  save(L,file = "bestShifts.rdata")
   return(L)
 }

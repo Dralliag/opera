@@ -1,9 +1,9 @@
 
 
- - BOA: Ajouter les poids initiaux pour BOA (et partout où il faut) : DONE
  - BOA: vérifier pourquoi cela fonctionne mal
  - ajouter prochain poids
  - faire une fonction plot et une fonction predict
  - faire une vignette ou des slides
  - commenter le code en anglais
   - ridge version séquentielle ? 
+  - oracle linéaire pour pertes autres que la perte carrée ? 

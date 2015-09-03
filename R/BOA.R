@@ -27,7 +27,7 @@ BOA <-
       pred <- experts[t, ] %*% p
 
       weights[t, ] <- p
-      prediction[t] <- experts[t, ] %*% p
+      prediction[t] <- pred
 
       lpred <- lossPred(pred, y[t], pred, loss.type = loss.type,
                         loss.gradient = loss.gradient)
