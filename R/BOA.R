@@ -1,12 +1,14 @@
 
 BOA <-
   function (y, experts, awake = NULL, loss.type = "squareloss",
-            loss.gradient = TRUE)
+            loss.gradient = TRUE, w0 = NULL)
   {
+
     experts <- as.matrix(experts)
     N <- ncol(experts)
     T <- nrow(experts)
 
+    if (is.null(w0)) {w0 <- rep(1,N)} # Uniform intial weight vector if unspecified
     # Experts are always active if awake is unspecified
     if (is.null(awake)) {awake = matrix(1, nrow = T, ncol = N)} 
     awake <- as.matrix(awake)
@@ -17,9 +19,8 @@ BOA <-
     R <- rep(0, N)
     weights <- matrix(0, ncol = N, nrow = T)
     prediction <- rep(0, T)
-    w <- rep(1, N)/N
-    etaop <- matrix(exp(350), ncol = N, nrow = T + 1)
-    eta <- rep(exp(350), N)
+    w <- w0
+    eta <- matrix(exp(350), ncol = N, nrow = T + 1)
     
     for (t in 1:T) {
       p <- awake[t, ] * w / sum(awake[t, ] * w)      
@@ -35,12 +36,12 @@ BOA <-
       if (t == 1) {
         r <- awake[t, ] * (lpred - lexp)
       } else {
-        r <- awake[t, ] * (lpred - lexp) - eta * (awake[t, ] * (lpred - lexp))^2
+        r <- awake[t, ] * (lpred - lexp) - eta[t,] * (awake[t, ] * (lpred - lexp))^2
       }  
       R <- R + r
-      eta = sqrt(log(N)/(log(N)/eta^2 + (awake[t, ] * (lpred - lexp))^2))
-      w <- truncate1(exp(eta * R))
-      etaop[t + 1, ] <- eta
+      eta[t+1,] = sqrt(log(N)/(log(N)/eta[t,]^2 + (awake[t, ] * (lpred - lexp))^2))
+      w <- truncate1(exp(log(w0) + eta[t+1,] * R))
     }
-    return(list(weights = weights, prediction = prediction, eta = etaop, weights.forecast =  w/sum(w)))
+    return(list(weights = weights, prediction = prediction, 
+      eta = eta, weights.forecast =  w/sum(w)))
   }

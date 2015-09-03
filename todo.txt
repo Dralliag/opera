@@ -1,6 +1,6 @@
 
 
- - BOA: Ajouter les poids initiaux pour BOA (et partout où il faut)
+ - BOA: Ajouter les poids initiaux pour BOA (et partout où il faut) : DONE
  - BOA: vérifier pourquoi cela fonctionne mal
  - ajouter prochain poids
  - faire une fonction plot et une fonction predict
