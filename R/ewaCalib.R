@@ -83,6 +83,11 @@ function(y, experts, grideta = 1, awake = NULL,
     }
     weta <- truncate1(exp(t(t(matrix(R, ncol=neta)) * grideta)))
   }
+
+  # Next weights
+  weights[t,] <- wpar[,bestpar[1],bestpar[2]] * awake[t,] / sum(wpar[,bestpar[1],bestpar[2]] * awake[t,])
+  
+  # Losses 
   l <-  mean(loss(prediction, y, loss.type=loss.type))
   mloss <- cumulativeLoss / T
   if (loss.type == 'squareloss') {
@@ -92,5 +97,6 @@ function(y, experts, grideta = 1, awake = NULL,
   if (trace) cat('\n')
   return(list(weights = weights, prediction = prediction, 
               eta = eta, grid = grideta, 
-              loss = l, gridloss = mloss, last.weights = weta[,besteta] / sum(weta[,besteta] )))
+              loss = l, gridloss = mloss, 
+              weights.forecast = w )))
 }

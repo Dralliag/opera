@@ -43,5 +43,6 @@ function(y, experts, eta, alpha, awake = NULL,
    w <- w / sum(w)
 
    # Renvoi de la matrice de poids 
-   return(list(weights = weights, prediction = pred, cumulativeLoss = cumulativeLoss, lastweight = w))
+   return(list(weights = weights, prediction = pred, 
+      cumulativeLoss = cumulativeLoss, weights.forecast = w))
 }

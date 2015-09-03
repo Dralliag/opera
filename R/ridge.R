@@ -21,5 +21,5 @@ function(y, experts, lambda, w0 = NULL) {
   w[1,] = w0
   
   prediction <- apply(experts * w, 1, sum)
-  return(list(weights = w, prediction = prediction, last.weights = solve(At,bt) ))
+  return(list(weights = w, prediction = prediction, weights.forecast = solve(At,bt) ))
 }

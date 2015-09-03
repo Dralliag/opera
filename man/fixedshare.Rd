@@ -77,7 +77,7 @@ Fixed-share aggregation rule
     outputted by the aggregation rule.
   }
    \item{cumulatedloss }{the cumulated loss suffered by the aggregation rules}
-   \item{lastweights }{the last weights returned by the aggregation rule if all experts were
+   \item{weights.forecast }{the last weights returned by the aggregation rule if all experts were
    active. It is usefull if we want to relaunch the aggregation rule with this weight vector
    as prior.}
 }

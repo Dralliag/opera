@@ -69,5 +69,5 @@ fixedshareHour <-
       if (h == href) {wop <- w} else {wop <- alpha/N * sum(wop) + (1-alpha) * wop}
     }
     # Renvoi de la matrice de poids 
-    return(list(weights = weights, prediction = prediction, cumulativeLoss = cumulativeLoss, lastweight = w))
+    return(list(weights = weights, prediction = prediction, cumulativeLoss = cumulativeLoss, weights.forecast = w))
   }

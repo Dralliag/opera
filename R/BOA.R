@@ -42,5 +42,5 @@ BOA <-
       w <- truncate1(exp(eta * R))
       etaop[t + 1, ] <- eta
     }
-    return(list(weights = weights, prediction = prediction, eta = etaop, last.weights =  w/sum(w)))
+    return(list(weights = weights, prediction = prediction, eta = etaop, weights.forecast =  w/sum(w)))
   }

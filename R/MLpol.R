@@ -95,5 +95,5 @@ MLpol <-
       }
     }    
     w = eta * pmax(R,0) / sum(eta * pmax(R,0))
-    return(list(weights = weights, prediction = prediction, eta = etaop, last.weights = w))
+    return(list(weights = weights, prediction = prediction, eta = etaop, weights.forecast = w))
   }

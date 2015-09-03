@@ -76,10 +76,11 @@ function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
     At <- At + experts[t,] %*% t(experts[t,])
     bt <- bt + y[t] * experts[t,]
 
-    # Mise à jour de la grille
-    bestlambda <- order(cumulativeLoss)[1]
+    # Grid update
+    # **************
+    bestlambda <- order(cumulativeLoss)[1] # find the best smoothing rate lambda in the grid
 
-    # On aumente la grille si on est sur une extrémité
+    # Expand the grid if the best parameter lies on an extremity
     if (bestlambda == nlambda) { 
       if (trace) cat(' + ')
       newlambda <- gridlambda[bestlambda] * gamma^(1:3)
@@ -89,8 +90,7 @@ function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
         perfnewlambda <- tryCatch(
           ridge(y[1:t], matrix(experts[1:t,],ncol=N), newlambda[k], w0 = w0), 
           error = function(e) {list(prediction = rep(0, T))})
-        signal <-  y[1:t]
-        newcumulativeLoss <- sum((perfnewlambda$prediction - signal)^2)
+        newcumulativeLoss <- sum((perfnewlambda$prediction - y[1:t])^2)
         cumulativeLoss <- c(cumulativeLoss, newcumulativeLoss)
         pred.lambda <- cbind(pred.lambda, c(perfnewlambda$prediction, rep(0, (T-t))))
       }
@@ -105,8 +105,7 @@ function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
         perfnewlambda <- tryCatch(
           ridge(y[1:t], matrix(experts[1:t,],ncol = N), newlambda[k], w0 = NULL), 
           error = function(e) {list(prediction = rep(0, T))})
-        signal <-  y[1:t]
-        newcumulativeLoss <- sum((perfnewlambda$prediction - signal)^2)
+        newcumulativeLoss <- sum((perfnewlambda$prediction - y[1:t])^2)
         cumulativeLoss <- c(newcumulativeLoss, cumulativeLoss)
         pred.lambda <- cbind(c(perfnewlambda$prediction, rep(0, (T-t))), pred.lambda)
       }
@@ -122,5 +121,5 @@ function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
   if (trace) cat('\n')
   return(list(weights = weights, prediction = prediction, 
               lambda = lambda, grid = gridlambda, 
-              loss = l, gridloss = rmse, last.weights = wlambda[,bestlambda]))
+              loss = l, gridloss = rmse, weights.forecast = wlambda[,bestlambda]))
 }

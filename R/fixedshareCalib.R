@@ -41,11 +41,6 @@
 #' then similar to gradient descent aggregation rule.
 #' @param w0 prior weights vector of the
 #' experts.
-#' @param href A number in \code{[1,period]}
-#' specifying the instant in the day when the aggregation rule can update its
-#' weights.  It should lie in the intervall \code{c(1,period)}.
-#' @param period The number of instants in
-#' each day.
 #' @param trace A boolean. If TRUE, the
 #' evolution of the aggregation rule is displayed. Usefull if the code is too
 #' long.
@@ -67,7 +62,7 @@
 #' @keywords ~kwd1 ~kwd2
 fixedshareCalib <-
 function(y, experts, grideta = 1, gridalpha = 10^(-4:-1), awake = NULL,
-                            loss.type = 'squareloss', loss.gradient = TRUE, w0 = NULL, href = 1, period = 1, trace = F)
+                            loss.type = 'squareloss', loss.gradient = TRUE, w0 = NULL, trace = F, gamma = 2)
 {
    experts <- as.matrix(experts)
    
@@ -82,116 +77,104 @@ function(y, experts, grideta = 1, gridalpha = 10^(-4:-1), awake = NULL,
    awake[idx.na] <- 0
    experts[idx.na] <- 0
    
-   # Grille du paramètre eta et alpha, on commence par le milieu de la grille
-   neta <- length(grideta)
-   nalpha <-length(gridalpha)
-   bestpar <- c(floor(neta)/2,floor(nalpha)/2)+1
+   neta <- length(grideta)       # Number of learning rates in the grid
+   nalpha <-length(gridalpha)    # Number of mixing rates in the grid
+   bestpar <- c(floor(neta)/2,floor(nalpha)/2)+1 # We start with the parameters in the middle of the grids
    par <- NULL
    
    cumulativeLoss <- array(0, dim = c(neta, nalpha))
    
-   # Poids et regret
-   wpar <- array(w0, dim = c(N,neta,nalpha))
-   wparop <- array(w0, dim = c(N,neta,nalpha))
-   
+
+   wpar <- array(w0, dim = c(N,neta,nalpha))   # Weight array (in 3 dimensions) assigned by each algorithm FixedShare(eta,alpha) 
    weights <- matrix(0, ncol = N, nrow = T)    # Matrix of weights formed by the mixture
-   prediction <- rep(0, T)                # Prévisions du mélange
-   
-   test = rep(0, T)
+   prediction <- rep(0, T)                     # Predictions formed by the mixture
    
    for(t in 1:T){
-      # Affichage de l'avancement de l'aggregation rulee
+      # Display the state of progress of the algorithm
       if (!(t %% floor(T/10)) && trace) cat(floor(10 * t/T)*10, '% -- ')
       
-      # Poids prévisions et pertes opérationnels
-      weights[t,] <- wparop[,bestpar[1],bestpar[2]] * awake[t,] / sum(wparop[,bestpar[1],bestpar[2]] * awake[t,])
+      # Weights, prediction forme by FixedShare(eta[t],alpha[t]) where par[t,] = c(eta[t],alpha[t]) are the parameters calibrated online
+      weights[t,] <- wpar[,bestpar[1],bestpar[2]] * awake[t,] / sum(wpar[,bestpar[1],bestpar[2]] * awake[t,])
       prediction[t] <- experts[t,] %*% weights[t,]
       par <- rbind(par, data.frame(eta = grideta[bestpar[1]],
                                    alpha = gridalpha[bestpar[2]]))
       
-      # boucle sur les paramètres alpha
+      # Loop over the mixing rates alpha in the grid "gridalpha"
       for (k in 1:nalpha) {
          
-         # Prévision et pertes opérationnelles pour chaque (eta,alpha) de la grille
-         waux <-  t(t(wparop[,,k] * awake[t,]) / apply(as.matrix(wparop[,,k]*awake[t,]), 2, sum))
-         predop <- experts[t,] %*% waux
-         lpredop <- loss(predop, y[t], loss.type)
-         cumulativeLoss[,k] <- cumulativeLoss[,k] + lpredop
-         
-         # Prévision et pertes non opérationnelles des algo et des experts
-         waux <- t(t(awake[t,] * wpar[,,k]) / apply(as.matrix(awake[t,] * wpar[,,k]), 2, sum))
+         # Weights, prediction, and losses formed by FixedShare(eta,alpha) for (eta,alpha) in the grid
+         waux <-  t(t(wpar[,,k] * awake[t,]) / apply(as.matrix(wpar[,,k]*awake[t,]), 2, sum))
          pred <- experts[t,] %*% waux
+         cumulativeLoss[,k] <- cumulativeLoss[,k] + loss(pred, y[t], loss.type) # Non gradient cumulative losses
          lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient))
          lexp <- lossPred(experts[t,], y[t], pred, loss.type, loss.gradient)
          
-         # Mise à jour des regrets et des poids
+         # Regret update
          R <- t(t(log(wpar[,,k]))/grideta) + awake[t,] * t(lpred - t(lexp))
-         v <- truncate1(exp(t(t(matrix(R, ncol=neta)) * grideta)))
-         v <- t(t(v) / apply(v,2,sum)) # on renormalise chaque colonne
          
-         # Mise à jour des poids
+         # Weight update
+         v <- truncate1(exp(t(t(matrix(R, ncol=neta)) * grideta)))
+         v <- t(t(v) / apply(v,2,sum)) # Renormalization of each column
          wpar[,,k] <- gridalpha[k]/N + (1-gridalpha[k]) * v
       }
       
+      # Grid update
+      # ***************
+      # find the best parameter in the grid
+      bestpar <- which(cumulativeLoss == min(cumulativeLoss), arr.ind = TRUE)[1,]  
       
-      # Si c'est l'heure de mise à jour...
-      h <- (((t - 1) %% period) + 1)
-      if (h == href) {
-         # Mise à jour de la grille
-         bestpar <- which(cumulativeLoss == min(cumulativeLoss), arr.ind = TRUE)[1,]
-         # On augmente la grille si on est à une extrémité
-         if (bestpar[1] == neta) {
-            if (trace) cat(' + ')
-            neweta <- grideta[neta] * 2^(1:3)
-            grideta <- c(grideta, neweta)
-            neta <- neta + length(neweta)
-            wparaux <- wpar
-            wpar <- array(dim = c(N,neta,nalpha))
-            wpar[,1:bestpar[1],] <- wparaux
-            for (j in 1:length(neweta)) {
-               cumulativeLoss <- rbind(cumulativeLoss, 0)
-               for (k in 1:nalpha) {
-                  perfnewpar <- fixedshareHour(y[1:t], matrix(experts[1:t,],ncol=N), neweta[j], gridalpha[k], 
-                                             awake =  matrix(awake[1:t,],ncol=N),
-                                             loss.type = loss.type, loss.gradient = loss.gradient, 
-                                             href = href, period = period, w0 = w0)
-                  cumulativeLoss[bestpar[1]+j,k] <- perfnewpar$cumulativeLoss
-                  wpar[,bestpar[1]+j,k] <- perfnewpar$lastweight
-               }
+      # Expand the grid if the best parameter lies on an extremity (only for the first component)
+      if (bestpar[1] == neta) {
+         if (trace) cat(' + ')
+         neweta <- grideta[neta] * gamma^(1:3)
+         grideta <- c(grideta, neweta)
+         neta <- neta + length(neweta)
+         wparaux <- wpar
+         wpar <- array(dim = c(N,neta,nalpha))
+         wpar[,1:bestpar[1],] <- wparaux
+         for (j in 1:length(neweta)) {
+            cumulativeLoss <- rbind(cumulativeLoss, 0)
+            for (k in 1:nalpha) {
+               perfnewpar <- fixedshare(y[1:t], matrix(experts[1:t,],ncol=N), neweta[j], gridalpha[k], 
+                                          awake =  matrix(awake[1:t,],ncol=N),
+                                          loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0)
+               cumulativeLoss[bestpar[1]+j,k] <- perfnewpar$cumulativeLoss
+               wpar[,bestpar[1]+j,k] <- perfnewpar$weights.forecast
             }
          }
-         if (bestpar[1] == 1) {
-            if (trace) cat(' - ')
-            neweta <- grideta[1] / 2^(1:3)
-            neta <- neta + length(neweta)
-            bestpar[1] <- bestpar[1] + length(neweta)
-            wparaux <- wpar
-            wpar <- array(dim = c(N,neta,nalpha))
-            wpar[,bestpar[1]:neta,] <- wparaux
-            for (j in 1:length(neweta)) {
-               grideta <- c(neweta[j], grideta)
-               cumulativeLoss <- rbind(0, cumulativeLoss)
-               for (k in 1:nalpha) {
-                  perfnewpar <- fixedshareHour(y[1:t], matrix(experts[1:t,],ncol=N),
-                                             neweta[j], gridalpha[k],
-                                             awake = matrix(awake[1:t,],ncol=N),
-                                             loss.type = loss.type, loss.gradient = loss.gradient,
-                                             href = href, period = period, w0 = w0)
-                  cumulativeLoss[1,k] <- perfnewpar$cumulativeLoss
-                  wpar[,bestpar[1]-j,k] <- perfnewpar$lastweight
-               }
+      }
+      if (bestpar[1] == 1) {
+         if (trace) cat(' - ')
+         neweta <- grideta[1] / gamma^(1:3)
+         neta <- neta + length(neweta)
+         bestpar[1] <- bestpar[1] + length(neweta)
+         wparaux <- wpar
+         wpar <- array(dim = c(N, neta, nalpha))
+         wpar[,bestpar[1]:neta,] <- wparaux
+         for (j in 1:length(neweta)) {
+            grideta <- c(neweta[j], grideta)
+            cumulativeLoss <- rbind(0, cumulativeLoss)
+            for (k in 1:nalpha) {
+               perfnewpar <- fixedshare(y[1:t], matrix(experts[1:t,],ncol=N),
+                                          neweta[j], gridalpha[k],
+                                          awake = matrix(awake[1:t,],ncol=N),
+                                          loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0)
+               cumulativeLoss[1, k] <- perfnewpar$cumulativeLoss
+               wpar[, bestpar[1]-j, k] <- perfnewpar$weights.forecast
             }
-         }
-         wparop <- wpar
-      } else {
-         for (k in 1:nalpha) {
-            wparop[,,k] <- gridalpha[k]/N + (1-gridalpha[k]) * wparop[,,k]
          }
       }
    }
-  l <-  mean(loss(prediction,y,loss.type=loss.type))
-   mloss <- cumulativeLoss / T
-   if (loss.type == 'squareloss') {
+
+   # Next weights
+   w <- wpar[,bestpar[1],bestpar[2]]  / sum(wpar[,bestpar[1],bestpar[2]])
+   
+   # Losses
+   l <-  mean(loss(prediction, y ,loss.type = loss.type)) # Average loss suffered by the algorithm
+   mloss <- cumulativeLoss / T         # Average loss of each learning rate on the grid
+   
+   # If the considered loss is the squared loss, we return the rmse by taking the square root
+   if (loss.type == 'squareloss') {    
       mloss <- sqrt(mloss)
       l <- sqrt(l)
    }
@@ -199,7 +182,7 @@ function(y, experts, grideta = 1, gridalpha = 10^(-4:-1), awake = NULL,
    colnames(mloss) = gridalpha
    
    if (trace) cat('\n')
-   return(list(weights = weights, prediction = prediction, 
+   return(list(weights = weights, prediction = prediction,
                par = par, grideta = grideta, gridalpha = gridalpha,
-               loss = l, gridloss = mloss))
+               loss = l, gridloss = mloss, weights.forecast = w))
 }
