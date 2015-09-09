@@ -47,7 +47,7 @@ function(y, experts, awake=NULL, loss.type='squareloss', niter = 1,...)
    # if there are no NA and if awake is null 
    # we can perform an exact resolution for the square loss
    idx.na <- which(is.na(experts))
-   if (length(idx.na) == 0 && is.null(awake) && loss.type="squareloss") {
+   if (length(idx.na) == 0 && is.null(awake) && loss.type == "squareloss") {
       y.na = is.na(y)
       y = y[!y.na]
       x = experts[!y.na,]
@@ -94,5 +94,9 @@ function(y, experts, awake=NULL, loss.type='squareloss', niter = 1,...)
       weights = matrix(best_p, ncol = N)
       weights = weights / apply(weights,1,sum)
    }
-   return(list(loss = bestLoss, weights = weights, prediction = experts %*% t(weights)))
+   res = list(loss = bestLoss, weights = weights, prediction = experts %*% t(weights))
+   if (loss.type == "squareloss") {
+      res$rmse = sqrt(squareloss)
+   }
+   return(res)
 }

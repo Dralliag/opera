@@ -7,3 +7,4 @@
  - commenter le code en anglais
   - ridge version séquentielle ? 
   - oracle linéaire pour pertes autres que la perte carrée ? 
+  - gamMixture (gérer les href,...)

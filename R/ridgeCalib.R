@@ -28,7 +28,7 @@
 #' \item{loss}{ The error suffered by the aggregation rule determined by
 #' \code{loss.type}.  If \code{loss.type = 'squareloss'}, the \link{rmse} is
 #' computed.  } \item{gridloss}{ A vector of the same length as grid containing
-#' the errors suffered by the \code{ridgeHour} aggregation rule if it
+#' the errors suffered by the \code{ridge} aggregation rule if it
 #' had picked the fixed learning rates in \code{grid}.  }
 #' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
 #' @keywords ~kwd1 ~kwd2

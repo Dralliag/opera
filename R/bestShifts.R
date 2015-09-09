@@ -1,9 +1,7 @@
 #' best sequence of experts oracle
 #' 
 #'  The
-#' function \code{bestShifts} computes for all number m of stwitches the
-#' sequence of experts with at most $m$ shifts that would have performed the
-#' best to predict the sequence of observations in \code{y}.
+#' function \code{bestShifts} 
 #' 
 #' 
 #' @param y  vector that contains the observations
@@ -22,13 +20,7 @@
 #' the loss function considered to evaluate the performance. It can be
 #' "squareloss", "mae", "mape", or "pinballloss". See \code{\link{loss}} for
 #' more details.
-#' @return  %% Returns a matrix of dimension \code{c(T,N,3)} where
-#' \code{T} is the number of instance to be predicted (i.e., the length of the
-#' sequence \code{y}) and \code{N} is the number of experts.  A matrix \code{L}
-#' of dimension \code{c(T,N,3)} where the third dimension is the type of loss
-#' (1:squareloss, 2:mae, 3:mape), and the value of $L(m,k,l)$ is the loss
-#' (determined by \code{l}) suffered by the best sequence of expert with at
-#' most $m-1$ shifts and finishing with expert number $k$.
+#' @return  %% 
 #' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
 #' @seealso 
 #' \code{\link{bestConvex}}, \code{\link{bestShiftsDay}}, \code{\link{loss}}
@@ -88,5 +80,12 @@ function(y, experts, awake=NULL, loss.type = 'squareloss')
       }
       L[1,,] <- L[1,,] + instanceLoss
     }
-  return(L)
+    loss.experts = L[,,loss.number] / T
+    loss = apply(loss.experts,1,min)
+    res = list(loss = loss)
+    if (loss.type == "squareloss") {
+      res = list(loss = loss,
+        rmse = square(loss))
+    }
+  return(res)
 }

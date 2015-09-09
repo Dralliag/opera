@@ -1,10 +1,10 @@
 #' Fixed-share aggregation rule with automatic tunning of the parameters
 #' 
 #'  The
-#' function \code{fixedshareCalib} performs \code{fixedshareHour}
+#' function \code{fixedshareCalib} performs \code{fixedshare}
 #' aggregation rule with automatic calibration of the learning parameter
 #' \code{eta} and \code{alpha} by performing an optimization on a finite grid.
-#' See \code{fixedshare} and \code{fixedshareHour} for more
+#' See \code{fixedshare} for more
 #' details.
 #' 
 #' 
@@ -56,7 +56,7 @@
 #' \item{loss}{the error suffered by the aggregation rule determined by
 #' \code{loss.type}.  If \code{loss.type = 'squareloss'}, the \link{rmse} is
 #' computed.} \item{gridloss}{errors suffered by the
-#' \code{fixedshareHour} aggregation rule if it had picked the fixed
+#' \code{fixedshare} aggregation rule if it had picked the fixed
 #' learning rates in \code{gridalpha} and \code{grideta}}
 #' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
 #' @keywords ~kwd1 ~kwd2

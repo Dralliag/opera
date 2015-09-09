@@ -98,5 +98,5 @@ function(y, experts, grideta = 1, awake = NULL,
   return(list(weights = weights, prediction = prediction, 
               eta = eta, grid = grideta, 
               loss = l, gridloss = mloss, 
-              weights.forecast = w)))
+              weights.forecast = w))
 }

@@ -137,7 +137,7 @@ function(y, experts,
     if (is.null(aggregationRule$lambda)) {
       return(ridgeCalib(y = y, experts = experts, w0 = w0))
     } else {
-      return(ridgeHour(y, experts, aggregationRule$lambda, w0))
+      return(ridge(y, experts, aggregationRule$lambda, w0))
     }
   } else {
 
@@ -155,7 +155,7 @@ function(y, experts,
       if (is.null(aggregationRule$eta)) {
         return(ewaCalib(y = y, experts = experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
       } else {
-        return(ewaHour(y = y, experts = experts, eta = aggregationRule$eta, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
+        return(ewa(y = y, experts = experts, eta = aggregationRule$eta, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
       }
     }
 
@@ -169,7 +169,7 @@ function(y, experts,
       if (is.null(aggregationRule$eta) || is.null(aggregationRule$alpha)) {
         return(fixedshareCalib(y = y, experts = experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
       } else {
-        return(fixedshareHour(y = y, experts = experts, eta = aggregationRule$eta, alpha = aggregationRule$alpha, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
+        return(fixedshare(y = y, experts = experts, eta = aggregationRule$eta, alpha = aggregationRule$alpha, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
       }
     }
 
