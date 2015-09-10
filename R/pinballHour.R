@@ -1,38 +1,4 @@
- #' Follow the penalized leader aggregation rule for pinball loss
-#' 
-#'  The
-#' function \code{pinballHour} is a mixing aggregation rule for quantile
-#' regression.  At each instance, it forms the mixture by performing a convex
-#' minimisation. It chooses the mixture that minimizes among the past a
-#' penalized criterion based on cumulated pinball loss.
-#' 
-#' 
-#' @param y  A vector containing the observations
-#' to be predicted.
-#' @param experts A matrix containing the
-#' experts forecasts. Each column corresponds to the predictions proposed by an
-#' expert to predict \code{Y}. It has as many columns as there are experts.
-#' @param lambda A positive penalty
-#' coefficient.
-#' @param href A number in \code{[1,period]}
-#' specifying the instant in the day when the aggregation rule can update its
-#' weights.  It should lie in the interval \code{c(1,period)}.
-#' @param period The number of instants in
-#' each day.
-#' @param w0 A vector containing the prior
-#' weights of the experts.
-#' @param tau A number in \code{[0,1]}
-#' describing the quantile to be predicted. Used only if \code{loss.type =
-#' "pinballloss"}.
-#' @return  \item{weights}{ A matrix of dimension \code{c(T,N)}, with
-#' \code{T} the number of instances to be predicted and \code{N} the number of
-#' experts.  Each row contains the convex combination to form the predictions.
-#' } \item{prediction}{ A vector of length \code{T} that contains the quantiles
-#' predictions outputted by the aggregation rule.  }
-#' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
-#' @seealso 
-#' \code{\link{loss}}
-#' @keywords ~kwd1 ~kwd2
+ # Follow the penalized leader aggregation rule for pinball loss
 
 pinballHour <-
 function(y, experts, lambda, href = 1, period = 1, w0 = NULL, tau = 0.5) {

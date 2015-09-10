@@ -101,18 +101,22 @@ oracle <-
     }
     
     if (oracle$name == "expert") {
-     if (!is.null(awake)) {stop("Sorry, sleeping not allowed for best expert oracle.")} 
-     loss.experts = apply(apply(experts, 2, function (x) {loss(x,y)}), 2, mean)
-     best.loss = min(loss.experts)
-     weigths =  (loss.experts == best.loss) / sum(loss.experts == best.loss)
-     best.expert = which(weights > 0)[1]
-     res = list(loss = best.loss,
-      weights = weights, 
-      prediction = experts[,best.expert])
+      if (!is.null(awake)) {stop("Sleeping not allowed for best expert oracle.")} 
+      if (!is.null(oracle$lambda)) {warning("unused lambda parameter")} 
+      if (!is.null(oracle$niter)) {warning("unused niter parameter")} 
+      
+
+      loss.experts = apply(apply(experts, 2, function (x) {loss(x,y)}), 2, mean)
+      best.loss = min(loss.experts)
+      weights =  (loss.experts == best.loss) / sum(loss.experts == best.loss)
+      best.expert = which(weights > 0)[1]
+      res = list(loss = best.loss,
+                 weights = weights, 
+                 prediction = experts[,best.expert])
       if (oracle$loss.type == "squareloss") {
-        res$rmse = sqrt(loss)
+        res$rmse = sqrt(res$loss)
       }
-     return(res)
+      return(res)
     }
     
     stop('oracle parameter is wrong')

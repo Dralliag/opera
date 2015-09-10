@@ -24,7 +24,7 @@
 #' @keywords ~kwd1 ~kwd2
 #' @export loss
 loss <-
-function(x,y,loss.type = 'squareloss', tau = 0.1) {
+function(x,y,loss.type = 'squareloss', tau = 0.5) {
    if (loss.type == 'squareloss')
       l <- (x-y)^2
    else if (loss.type == 'mae')

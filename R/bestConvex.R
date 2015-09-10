@@ -19,14 +19,22 @@ function(y, experts, awake=NULL, loss.type='squareloss', niter = 1,...)
       A <- cbind(1,diag(nrow(Q)))
       b <- c(1, rep(0,nrow(Q)))
       m <- 1
-      res <- quadprog::solve.QP(Dmat = Q, dvec = c, Amat = A, bvec = b, meq = m)
-      weights = res$solution
-      bestLoss = lossConv(weights,y,experts)
-   }
-   else {
-      if (is.null(awake)) {
-         awake = as.matrix(array(1,dim(experts)))
+      res <- tryCatch({
+        quadprog::solve.QP(Dmat = Q, dvec = c, Amat = A, bvec = b, meq = m)},
+        error = function(e) {
+          NULL
+        })
+      if (!is.null(res)) {
+        weights = matrix(res$solution, ncol = N)
+        prediction = experts %*% t(weights)
+        bestLoss = mean(loss(x = prediction, y))
       }
+   } 
+   else {
+     res = NULL
+   }
+   if (is.null(res)) {
+      if (is.null(awake)) {awake = as.matrix(array(1,dim(experts)))}
       awake[idx.na] <- 0
       experts[idx.na] <- 0
       
@@ -42,7 +50,7 @@ function(y, experts, awake=NULL, loss.type='squareloss', niter = 1,...)
          # Optimisation convexe avec choix aléatoire de la condition initiale   
          p <- runif(N,0,1)
          p <- p/sum(p)
-         w <- optim(p,lossp, gr = NULL, lower = 1e-20, ...)
+         w <- optim(p,lossp, gr = NULL, lower = 1e-20, method = "L-BFGS-B", ...)
          # Projection sur le simplex
          w <- pmax(w$par,0)
          l <- lossp(w)
@@ -50,14 +58,16 @@ function(y, experts, awake=NULL, loss.type='squareloss', niter = 1,...)
             bestLoss = l
             best_p = w  
          }
-         print(c(i, l))  
+         #print(c(i, l))  
       }
       weights = matrix(best_p, ncol = N)
       weights = weights / apply(weights,1,sum)
+      pond <- awake %*% t(weights)
+      prediction <- ((experts* awake) %*% t(weights)) / pond
    }
-   res = list(loss = bestLoss, weights = weights, prediction = experts %*% t(weights))
+   res = list(loss = bestLoss, weights = weights, prediction = prediction)
    if (loss.type == "squareloss") {
-      res$rmse = sqrt(loss)
+      res$rmse = sqrt(res$loss)
    }
    return(res)
 }

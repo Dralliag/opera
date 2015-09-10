@@ -8,3 +8,4 @@
   - ridge version séquentielle ? 
   - oracle linéaire pour pertes autres que la perte carrée ? 
   - gamMixture (gérer les href,...)
+  - vérifier pinball loss et paramètre tau

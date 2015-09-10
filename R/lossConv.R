@@ -37,7 +37,8 @@ function(p,y,experts,awake=NULL,loss.type = 'squareloss') {
    experts <- as.matrix(experts)
    N <- ncol(experts)  # Number of experts
    T <- nrow(experts)  # Number of instants
-
+   
+   p <- matrix(p, nrow = N)
    # Experts are always active if awake is unspecified
    if (is.null(awake)) {awake = matrix(1, nrow = T, ncol = N)} 
    awake <- as.matrix(awake)
@@ -48,10 +49,10 @@ function(p,y,experts,awake=NULL,loss.type = 'squareloss') {
    pond <- awake %*% p
    pred <- ((experts* awake) %*% p) / pond
    if (loss.type == 'squareloss')
-      l = sqrt(sum((pred-y)^2 * abs(pond)) / sum(abs(pond)))
+      l = mean((pred-y)^2)
    else if (loss.type == 'mae')
-      l = sum(abs(pred-y) * abs(pond)) / sum(abs(pond))
+      l = mean(abs(pred-y)) 
    else 
-      l = sum(abs(pred-y)/y * abs(pond)) / sum(abs(pond))
+      l = mean(abs(pred-y)/y) 
    return(l)
 }
