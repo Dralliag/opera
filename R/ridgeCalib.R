@@ -1,37 +1,4 @@
-#' Ridge aggregation rule with automatic calibration of smoothing parameters
-#' 
-#' The function \code{ridgeCalib} performs ridge aggregation rule with
-#' automatic calibration of the smoothing parameter \code{lambda} by performing
-#' an optimization on a finite grid. 
-#' 
-#' 
-#' @param y  A vector containing the observations
-#' to be predicted.
-#' @param experts A matrix containing the
-#' experts forecasts. Each column corresponds to the predictions proposed by an
-#' expert to predict \code{Y}. It has as many columns as there are experts.
-#' @param gridlambda A vector containing the initial possible values of the
-#' smoothing parameter \code{lambda}.
-#' @param w0 A vector containing the prior
-#' weights of the experts.
-#' @param trace  A boolean. If TRUE, the
-#' evolution of the aggregation rule is displayed. Usefull if the code is too
-#' long.
-#' @return  \item{weights}{ A matrix of dimension \code{c(T,N)}, with
-#' \code{T} the number of instances to be predicted and \code{N} the number of
-#' experts.  Each row contains the convex combination to form the predictions.
-#' } \item{prediction}{ A vector of length \code{T} that contains the quantiles
-#' predictions outputted by the aggregation rule.  } \item{lambda}{ A vector of
-#' length \code{T} containing the sequence of penalty coefficient chosen by the
-#' aggregation rule.  } \item{grid}{ A vector containing the final grid of
-#' potential penalty coefficient considered by the aggregation rule.  }
-#' \item{loss}{ The error suffered by the aggregation rule determined by
-#' \code{loss.type}.  If \code{loss.type = 'squareloss'}, the \link{rmse} is
-#' computed.  } \item{gridloss}{ A vector of the same length as grid containing
-#' the errors suffered by the \code{ridge} aggregation rule if it
-#' had picked the fixed learning rates in \code{grid}.  }
-#' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
-#' @keywords ~kwd1 ~kwd2
+# Ridge aggregation rule with automatic calibration of smoothing parameters
 ridgeCalib <-
 function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
 {

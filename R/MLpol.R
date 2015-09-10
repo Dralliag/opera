@@ -49,11 +49,11 @@ function(y, experts, awake = NULL,
     R <- R + r
     
     # Update the learning rate
-    eta[t+1,] <- 1/(1/eta + r^2)   
+    eta[t+1,] <- 1/(1/eta[t,] + r^2)   
 
   } 
   # We check if there is at least one expert with positive weight
-  if (max(awake[T+1,] * R) > 0) {
+  if (max(R) > 0) {
     w <- eta[T+1,] * pmax(R,0) / sum(eta[T+1,] * pmax(R,0))
   } else {
     w <- rep(1/N,N)

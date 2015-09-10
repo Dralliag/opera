@@ -25,7 +25,7 @@
 #' each instance a small probability \code{alpha} to have a rupture in the
 #' sequence and that the best expert may change. Fixed-share aggregation rule
 #' can thus compete with the best sequence of experts that can change a few
-#' times (see \code{\link{bestShifts}}), while \code{ewa} can only
+#' times (see \code{\link{oracle}}), while \code{ewa} can only
 #' compete with the best fixed expert. The mixing rate is either chosen by the user either calibrated online.}
 #'    \item{"Ridge"}{Ridge regression. It minimizes at
 #' each instance a penalized criterion.  It forms at each instance linear

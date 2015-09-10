@@ -1,31 +1,4 @@
-#' best sequence of experts oracle
-#' 
-#'  The
-#' function \code{bestShifts} 
-#' 
-#' 
-#' @param y  vector that contains the observations
-#' to be predicted.
-#' @param experts A matrix containing the
-#' experts forecasts. Each column corresponds to the predictions proposed by an
-#' expert to predict \code{Y}. It has as many columns as there are experts.
-#' @param awake A matrix specifying the
-#' activation coefficients of the experts. Its entries lie in \code{[0,1]}.
-#' Needed if some experts are specialists and do not always form and suggest
-#' prediction.  If the expert number \code{k} at instance \code{t} does not
-#' form any prediction of observation \code{Y_t}, we can put
-#' \code{awake[t,k]=0} so that the mixture does not consider expert \code{k} in
-#' the mixture to predict \code{Y_t}.
-#' @param loss.type A string specifying
-#' the loss function considered to evaluate the performance. It can be
-#' "squareloss", "mae", "mape", or "pinballloss". See \code{\link{loss}} for
-#' more details.
-#' @return  %% 
-#' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
-#' @seealso 
-#' \code{\link{bestConvex}}, \code{\link{bestShiftsDay}}, \code{\link{loss}}
-#' @keywords ~kwd1 ~kwd2
-#' @export bestShifts
+# best sequence of experts oracle
 bestShifts <-
 function(y, experts, awake=NULL, loss.type = 'squareloss')
 {
@@ -85,7 +58,7 @@ function(y, experts, awake=NULL, loss.type = 'squareloss')
     res = list(loss = loss)
     if (loss.type == "squareloss") {
       res = list(loss = loss,
-        rmse = square(loss))
+        rmse = sqrt(loss))
     }
   return(res)
 }

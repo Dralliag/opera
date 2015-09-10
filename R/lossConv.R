@@ -29,7 +29,6 @@
 #' @note The function \code{lossConv} is for instance used
 #' to compute the best convex combination in hindsight.
 #' @seealso \code{\link{loss}},
-#' \code{\link{bestConvex}}
 #' @keywords ~kwd1 ~kwd2
 #' @export lossConv
 lossConv <-

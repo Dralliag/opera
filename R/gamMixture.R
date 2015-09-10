@@ -13,7 +13,7 @@ function(y, experts, z, lambda, nknots = 5, degree = 3, loss.type = 'squareloss'
   } else {
     nknots = length(knots)
   }
-  B = bs(z, knots=knots, degree = degree, intercept=T)
+  B = splines::bs(z, knots=knots, degree = degree, intercept=T)
   X = matrix(apply(experts,2,function(a){a*B}),nrow=length(z))
   
   N = ncol(experts)

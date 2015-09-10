@@ -28,7 +28,7 @@
 #' the loss function considered to evaluate the performance.  It can be
 #' "squareloss", "mae", "mape", or "pinballloss". See \code{\link{loss}} for
 #' more details. If "pinballloss" is chosen, an additional parameter \code{tau} in \code{[0,1]} is required. }
-#'    \item{lambda}{For "linear" oracle. A possible $\ell_2$ regularization parameter for computing the linear oracle (if the design matrix is not identifiable)}
+#'    \item{lambda}{For "linear" oracle. A possible $L_2$ regularization parameter for computing the linear oracle (if the design matrix is not identifiable)}
 #'    \item{niter}{For "convex" oracle. Number of optimization steps to process in order to approximate the best convex combination rule if it is hard to compute in a straighforward way.}
 #' }
 #' @param awake A matrix specifying the
@@ -38,6 +38,8 @@
 #' form any prediction of observation \code{Y_t}, we can put
 #' \code{awake[t,k]=0} so that the mixture does not consider expert \code{k} in
 #' the mixture to predict \code{Y_t}.
+#' @param ... If oracle = "convex". Additional parameters
+#' that are passed to \code{\link{optim}} function is order to perform convex optimization.
 #'
 #' @return
 #' \item{loss}{ The average loss suffered by the oracle. For the "shifting" oracle,
@@ -54,7 +56,7 @@
 #' \item{rmse}{If loss.type is the square loss (default) only.
 #' The root mean square error (i.e., it is the square root of \code{loss}.}
 #' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
-
+#' @export oracle
 oracle <-
   function(y, experts, oracle = "convex", awake = NULL, ...)
   {
@@ -107,9 +109,9 @@ oracle <-
      res = list(loss = best.loss,
       weights = weights, 
       prediction = experts[,best.expert])
-    if (loss.type == "squareloss") {
-      res$rmse = sqrt(squareloss)
-    }
+      if (oracle$loss.type == "squareloss") {
+        res$rmse = sqrt(loss)
+      }
      return(res)
     }
     
