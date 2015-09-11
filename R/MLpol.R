@@ -42,15 +42,14 @@ function(y, experts, awake = NULL,
                  loss.type = loss.type, loss.gradient = loss.gradient)
     lexp <- lossPred(experts[t,], y[t], pred, tau = tau,
                 loss.type = loss.type, loss.gradient = loss.gradient)
-    
-    
+
     # Update the regret and the weight
     r <- awake[t,] * (lpred - lexp)
     R <- R + r
     
+
     # Update the learning rate
     eta[t+1,] <- 1/(1/eta[t,] + r^2)   
-
   } 
   # We check if there is at least one expert with positive weight
   if (max(R) > 0) {
@@ -60,5 +59,7 @@ function(y, experts, awake = NULL,
   }
 
   return(list(weights = weights, prediction = prediction,
-              weights.forecast = w))
+              weights.forecast = w,
+              eta = eta,
+              loss = mean(loss(prediction, y, loss.type, tau))))
 }

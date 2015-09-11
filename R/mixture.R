@@ -149,33 +149,27 @@
 #' @export mixture
 
 mixture <-
-function(y, experts, 
-  aggregationRule = "MLpol",  w0 = NULL, awake = NULL)
-{
-  if (is.character(aggregationRule)) {
-    aggregationRule = list(name = aggregationRule)
-  } else {
-    if (!is.list(aggregationRule)) {
-      stop("Bad type for aggregationRule: it must be either a list or a character.")
+  function(y, experts, 
+           aggregationRule = "MLpol",  w0 = NULL, awake = NULL)
+  {
+    # test possible warning and errors
+    if (is.character(aggregationRule)) {
+      aggregationRule = list(name = aggregationRule)
+    } else {
+      if (!is.list(aggregationRule)) {
+        stop("Bad type for aggregationRule: it must be either a list or a character.")
+      }
     }
-  }
-  if (is.null(aggregationRule$name)){
+    if (is.null(aggregationRule$name)){
       aggregationRule$name  = "MLpol"
       warning("Aggregation rule MLpol is chosen")
-  }
-  
-  if (is.null(aggregationRule$gamma)) {
-    aggregationRule$gamma = 2
-  }
-
-  if (aggregationRule$name == "Ridge") {
-    if (is.null(aggregationRule$lambda)) {
-      return(ridgeCalib(y = y, experts = experts, w0 = w0, gamma = aggregationRule$gamma))
-    } else {
-      return(ridge(y, experts, aggregationRule$lambda, w0))
     }
-  } else {
-
+    if (is.null(aggregationRule$gamma)) {
+      aggregationRule$gamma = 2
+    }
+    if (!is.null(w0) && (aggregationRule$name == "MLpol")) {
+      stop(paste(aggregationRule$name, "cannot handle non-uniform prior weight vector"))
+    }
     if (is.null(aggregationRule$loss.type)) {aggregationRule$loss.type = "squareloss"}
     if (is.null(aggregationRule$loss.gradient)) {aggregationRule$loss.gradient = TRUE} 
     if (!is.null(aggregationRule$tau) && aggregationRule$loss.type != "pinballloss") {
@@ -183,11 +177,28 @@ function(y, experts,
     }
     if (is.null(aggregationRule$tau)) {aggregationRule$tau = 0.5}
 
-    if (aggregationRule$name == "MLpol" || aggregationRule$name == "MLprod") {
-      if (!is.null(w0)) { stop(paste(aggregationRule$name, "cannot handle non-uniform prior weight vector"))}
+    if (aggregationRule$loss.type != "squareloss" && aggregationRule$name == "Ridge") {
+      stop("Square loss is require for Ridge aggregationRule.")
+    }
+    
+    if (aggregationRule$name == "Ridge") {
+      if (is.null(aggregationRule$lambda)) {
+        return(ridgeCalib(y = y, experts = experts, w0 = w0, gamma = aggregationRule$gamma))
+      } else {
+        return(ridge(y, experts, aggregationRule$lambda, w0))
+      }
+    } 
+    
+    if (aggregationRule$name == "MLpol") {
+      return(MLpol(y, experts, awake = awake, loss.type = aggregationRule$loss.type, 
+                  loss.gradient = aggregationRule$loss.gradient, tau = aggregationRule$tau))
+    }
+
+    if ((aggregationRule$name == "BOA") || (aggregationRule$name == "MLewa") || (aggregationRule$name == "MLprod")) {
       algo <- eval(parse(text = aggregationRule$name))
       return(algo(y, experts, awake = awake, loss.type = aggregationRule$loss.type, 
-                  loss.gradient = aggregationRule$loss.gradient, tau = aggregationRule$tau))
+                  loss.gradient = aggregationRule$loss.gradient,
+                  tau = aggregationRule$tau, w0 = w0))
     }
 
     if (aggregationRule$name == "EWA") {
@@ -198,30 +209,25 @@ function(y, experts,
                         tau = aggregationRule$tau, gamma = aggregationRule$gamma))
       } else {
         return(ewa(y = y, experts = experts, eta = aggregationRule$eta, 
-                  awake = awake, loss.type = aggregationRule$loss.type, 
-                  loss.gradient = aggregationRule$loss.gradient, w0 = w0,
-                  tau = aggregationRule$tau))
+                   awake = awake, loss.type = aggregationRule$loss.type, 
+                   loss.gradient = aggregationRule$loss.gradient, w0 = w0,
+                   tau = aggregationRule$tau))
       }
     }
+    
 
-    if ((aggregationRule$name == "BOA")|| aggregationRule$name == "MLewa") {
-      if (!is.null(w0)) { stop(paste(aggregationRule$name, "cannot handle non-uniform prior weight vector"))}
-        algo <- eval(parse(text = aggregationRule$name))
-      return(algo(y, experts, awake = awake, loss.type = aggregationRule$loss.type, 
-                  loss.gradient = aggregationRule$loss.gradient))
-    }
-
+    
     if ((aggregationRule$name == "FS")) {
       if (is.null(aggregationRule$eta) || is.null(aggregationRule$alpha)) {
         return(fixedshareCalib(y = y, experts = experts, awake = awake, 
-          loss.type = aggregationRule$loss.type, 
-          loss.gradient = aggregationRule$loss.gradient, w0 = w0,
-          tau = aggregationRule$tau, gamma = aggregationRule$gamma))
+                               loss.type = aggregationRule$loss.type, 
+                               loss.gradient = aggregationRule$loss.gradient, w0 = w0,
+                               tau = aggregationRule$tau, gamma = aggregationRule$gamma))
       } else {
         return(fixedshare(y = y, experts = experts, eta = aggregationRule$eta, alpha = aggregationRule$alpha, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
       }
     }
-
+    
     if ((aggregationRule$name == "gamMixture")) {
       warning("This aggregation rule is not stable in the current version")
       if (is.null(aggregationRule$lambda)) {
@@ -236,11 +242,11 @@ function(y, experts,
       if (is.null(aggregationRule$uniform)){ aggregationRule$uniform = FALSE}
       if (is.null(aggregationRule$knots)){ aggregationRule$knots = NULL}
       if (is.null(aggregationRule$tau)){ aggregationRule$tau = 0.5}
-
+      
       return(gamMixture(y = y, experts = experts, z = , aggregationRule$lambda, nknots = aggregationRule$nknots, degree = aggregationRule$degree, loss.type = aggregationRule$loss.type, uniform = aggregationRule$uniform, knots = aggregationRule$knots, tau = aggregationRule$tau))
-
+      
     }
-
+    
     if ((aggregationRule$name == "pinball")) {
       if (is.null(aggregationRule$lambda)) {
         stop("pinball cannot handle automatic calibration")
@@ -248,8 +254,4 @@ function(y, experts,
       if (is.null(aggregationRule$tau)){ aggregationRule$tau = 0.5}
       pinballHour(y = y, experts = experts, lambda = aggregationRule$lambda, w0 = w0, tau = aggregationRule$tau)
     }
-
-
   }
-
-}

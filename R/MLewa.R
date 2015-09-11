@@ -1,7 +1,8 @@
 
 MLewa <-
 function(y, experts, awake = NULL, 
-                  loss.type='squareloss', loss.gradient = TRUE, w0 = NULL)
+                  loss.type='squareloss', loss.gradient = TRUE, 
+                  w0 = NULL, tau =0.5)
 {
    experts <- as.matrix(experts)
    N <- ncol(experts)
@@ -36,9 +37,11 @@ function(y, experts, awake = NULL,
 
       # observe losses
       lpred <- lossPred(pred, y[t], pred, 
-                         loss.type = loss.type, loss.gradient = loss.gradient)
+                         loss.type = loss.type, loss.gradient = loss.gradient,
+                         tau = tau)
       lexp <- lossPred(experts[t,], y[t], pred, 
-                        loss.type = loss.type, loss.gradient = loss.gradient)
+                        loss.type = loss.type, loss.gradient = loss.gradient,
+                        tau = tau)
       
       # update regret and weights
       r <- awake[t,] * (lpred - lexp)
@@ -49,5 +52,6 @@ function(y, experts, awake = NULL,
    w = w / sum(w)
 
    return(list(weights = weights, prediction = prediction, eta = eta,
-              weights.forecast =  w))
+              weights.forecast =  w, 
+              loss = mean(loss(prediction, y, loss.type, tau))))
 }

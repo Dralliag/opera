@@ -1,7 +1,7 @@
 
 BOA <-
   function (y, experts, awake = NULL, loss.type = "squareloss",
-            loss.gradient = TRUE, w0 = NULL)
+            loss.gradient = TRUE, w0 = NULL, tau  = 0.5)
   {
 
     experts <- as.matrix(experts)
@@ -30,10 +30,11 @@ BOA <-
       prediction[t] <- pred
 
       lpred <- lossPred(pred, y[t], pred, loss.type = loss.type,
-                        loss.gradient = loss.gradient)
+                        loss.gradient = loss.gradient, tau = tau)
       lexp <- lossPred(experts[t, ], y[t], pred, loss.type = loss.type,
-                       loss.gradient = loss.gradient)
-      if (t == 1) {
+                       loss.gradient = loss.gradient, tau = tau)
+
+      if (max(eta[t,])>exp(300)) { # if some losses still have not been observed
         r <- awake[t, ] * (lpred - lexp)
       } else {
         r <- awake[t, ] * (lpred - lexp) - eta[t,] * (awake[t, ] * (lpred - lexp))^2
@@ -43,5 +44,6 @@ BOA <-
       w <- truncate1(exp(log(w0) + eta[t+1,] * R))
     }
     return(list(weights = weights, prediction = prediction, 
-      eta = eta, weights.forecast =  w/sum(w)))
+      eta = eta, weights.forecast =  w/sum(w),
+      loss = mean(loss(prediction, y, loss.type, tau))))
   }
