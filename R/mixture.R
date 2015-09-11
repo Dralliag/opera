@@ -49,7 +49,9 @@
 #'    \item{loss.type}{(not possible for "ridge", "pinball", and "gamMixture") a string specifying
 #' the loss function considered to evaluate the performance.  It can be
 #' "squareloss", "mae", "mape", or "pinballloss". See \code{\link{loss}} for
-#' more details. If "pinballloss" is chosen, an additional parameter \code{tau} in \code{[0,1]} is required. }   
+#' more details. If "pinballloss" is chosen, the quantile to be predicted can be set 
+#' with parameter \code{tau} in \code{(0,1)} is possible (the default value is 0.5 to predict the median).
+#' }
 #'    \item{loss.gradient}{A boolean. If
 #' TRUE (default) the aggregation rule will not be directly applied to the loss
 #' function at hand but to a gradient version of it.  The aggregation rule is
@@ -63,14 +65,30 @@
 #' form any prediction of observation \code{Y_t}, we can put
 #' \code{awake[t,k]=0} so that the mixture does not consider expert \code{k} in
 #' the mixture to predict \code{Y_t}.
-#' @return  \item{weights }{ A matrix of dimension \code{c(T,N)}, with
+#' @return  
+#' \item{weights }{ A matrix of dimension \code{c(T,N)}, with
 #' \code{T} the number of instances to be predicted and \code{N} the number of
 #' experts.  Each row contains the convex combination to form the predictions }
 #' \item{prediction }{ A vector of length \code{T} that contains the
 #' predictions outputted by the aggregation rule.  } \item{cumulativeLoss }{ The
 #' cumulated loss suffered by the aggregation rule.  } \item{regret }{ An array
 #' that contains the cumulated regret suffered by the aggregation rule against
-#' each expert.  }
+#' each expert.}
+#' \item{loss}{ The average loss (as stated by parameter \code{loss.type}) suffered
+#' by the aggregation rule.}
+#' \item{weights.forecast}{ The weights formed by the aggregation rule to perform the
+#' next prediction}
+#' Possible optional returned parameters are:
+#' \describe{
+#'  \item{rmse}{Root mean square error suffered by the aggregation rule 
+#'  (returned if loss.type = "squareloss")}
+#'  \item{eta}{Sequence of learning rates \code{eta} chosen by the aggregation rule}
+#'  \item{grid.eta}{Grid of learning rates used to perform online calibration of the 
+#'  learning rate (eta)}
+#'  \item{grid.loss}{Average losses suffered by all learning rates over the optimized grid
+#'  \code{grid.eta}.}
+#'  \item{grid.rmse}{Similar to \code{grid.loss} with RMSEs.}
+#' }
 #' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
 #' @keywords ~kwd1 ~kwd2
 #' @examples
@@ -103,13 +121,17 @@
 #' 
 #' 
 #' # EWA with fixed learning rate
-#' mod = mixture(y=Y, experts=X, aggregationRule = list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=FALSE), awake=awake) 
+#' mod = mixture(y=Y, experts=X, 
+#'          aggregationRule=list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=FALSE), 
+#'          awake=awake) 
 #' # plot weights assigned to both experts (when an expert is not available its weight is 0)
 #' matplot(mod$weights, type='l', main='EWA with fixed learning rate', col=2:3) 
 #' cat('EWA mixture, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
 #' # ewa algorithm with gradient loss function
-#' mod = mixture(y=Y, experts=X, aggregationRule = list(name = "EWA", eta=1, loss.type='squareloss', loss.gradient=TRUE), awake=awake) 
+#' mod = mixture(y=Y, experts=X, 
+#'          aggregationRule=list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=TRUE), 
+#'          awake=awake) 
 #' matplot(mod$weights, type='l', main='EWA with gradient losses', col=2:3) 
 #' cat('EWA mixture with gradient losses, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
@@ -132,42 +154,69 @@ function(y, experts,
 {
   if (is.character(aggregationRule)) {
     aggregationRule = list(name = aggregationRule)
+  } else {
+    if (!is.list(aggregationRule)) {
+      stop("Bad type for aggregationRule: it must be either a list or a character.")
+    }
   }
+  if (is.null(aggregationRule$name)){
+      aggregationRule$name  = "MLpol"
+      warning("Aggregation rule MLpol is chosen")
+  }
+  
+  if (is.null(aggregationRule$gamma)) {
+    aggregationRule$gamma = 2
+  }
+
   if (aggregationRule$name == "Ridge") {
     if (is.null(aggregationRule$lambda)) {
-      return(ridgeCalib(y = y, experts = experts, w0 = w0))
+      return(ridgeCalib(y = y, experts = experts, w0 = w0, gamma = aggregationRule$gamma))
     } else {
       return(ridge(y, experts, aggregationRule$lambda, w0))
     }
   } else {
 
     if (is.null(aggregationRule$loss.type)) {aggregationRule$loss.type = "squareloss"}
-    if (is.null(aggregationRule$loss.gradient)) {aggregationRule$loss.gradient = TRUE}
+    if (is.null(aggregationRule$loss.gradient)) {aggregationRule$loss.gradient = TRUE} 
+    if (!is.null(aggregationRule$tau) && aggregationRule$loss.type != "pinballloss") {
+      warning("Unused parameter tau (loss.type != 'pinballloss')")
+    }
     if (is.null(aggregationRule$tau)) {aggregationRule$tau = 0.5}
 
     if (aggregationRule$name == "MLpol" || aggregationRule$name == "MLprod") {
       if (!is.null(w0)) { stop(paste(aggregationRule$name, "cannot handle non-uniform prior weight vector"))}
       algo <- eval(parse(text = aggregationRule$name))
-      return(algo(y, experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, tau = aggregationRule$tau))
+      return(algo(y, experts, awake = awake, loss.type = aggregationRule$loss.type, 
+                  loss.gradient = aggregationRule$loss.gradient, tau = aggregationRule$tau))
     }
 
     if (aggregationRule$name == "EWA") {
       if (is.null(aggregationRule$eta)) {
-        return(ewaCalib(y = y, experts = experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
+        return(ewaCalib(y = y, experts = experts, 
+                        awake = awake, loss.type = aggregationRule$loss.type, 
+                        loss.gradient = aggregationRule$loss.gradient, w0 = w0, 
+                        tau = aggregationRule$tau, gamma = aggregationRule$gamma))
       } else {
-        return(ewa(y = y, experts = experts, eta = aggregationRule$eta, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
+        return(ewa(y = y, experts = experts, eta = aggregationRule$eta, 
+                  awake = awake, loss.type = aggregationRule$loss.type, 
+                  loss.gradient = aggregationRule$loss.gradient, w0 = w0,
+                  tau = aggregationRule$tau))
       }
     }
 
     if ((aggregationRule$name == "BOA")|| aggregationRule$name == "MLewa") {
       if (!is.null(w0)) { stop(paste(aggregationRule$name, "cannot handle non-uniform prior weight vector"))}
         algo <- eval(parse(text = aggregationRule$name))
-      return(algo(y, experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient))
+      return(algo(y, experts, awake = awake, loss.type = aggregationRule$loss.type, 
+                  loss.gradient = aggregationRule$loss.gradient))
     }
 
     if ((aggregationRule$name == "FS")) {
       if (is.null(aggregationRule$eta) || is.null(aggregationRule$alpha)) {
-        return(fixedshareCalib(y = y, experts = experts, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
+        return(fixedshareCalib(y = y, experts = experts, awake = awake, 
+          loss.type = aggregationRule$loss.type, 
+          loss.gradient = aggregationRule$loss.gradient, w0 = w0,
+          tau = aggregationRule$tau, gamma = aggregationRule$gamma))
       } else {
         return(fixedshare(y = y, experts = experts, eta = aggregationRule$eta, alpha = aggregationRule$alpha, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
       }

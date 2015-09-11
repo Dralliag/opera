@@ -1,6 +1,6 @@
 ewa <-
 function(y, experts, eta, awake = NULL, loss.type = 'squareloss', 
-                loss.gradient = TRUE, w0 = NULL)
+                loss.gradient = TRUE, w0 = NULL, tau = 0.5)
 {
   experts <- as.matrix(experts)
   
@@ -27,17 +27,17 @@ function(y, experts, eta, awake = NULL, loss.type = 'squareloss',
     
     # Prévision et perte non loss.gradient de l'algo
     pred[t] <- experts[t,] %*% weights[t,]
-    cumulativeLoss <- cumulativeLoss + loss(pred[t],y[t],loss.type)
+    cumulativeLoss <- cumulativeLoss + loss(pred[t],y[t],loss.type,tau = tau)
     
     # Perte de l'algo et des experts (peut être loss.gradient)
-    lpred <- lossPred(pred[t], y[t], pred[t], loss.type, loss.gradient)
-    lexp <- lossPred(experts[t,], y[t], pred[t], loss.type, loss.gradient)
+    lpred <- lossPred(pred[t], y[t], pred[t], loss.type, loss.gradient, tau = tau)
+    lexp <- lossPred(experts[t,], y[t], pred[t], loss.type, loss.gradient, tau = tau)
     
     # Mise à jour du vecteur de regret
     R <- R + awake[t,] * (lpred - lexp)
   }
   w = t(truncate1(exp(eta*R))) / sum(t(truncate1(exp(eta*R))))
   
-  return(list(weights = weights, prediction = pred, cumulativeLoss = cumulativeLoss, regret = R,
+  return(list(weights = weights, prediction = pred, loss = cumulativeLoss/T, regret = R,
               weights.forecast =  w))
 }

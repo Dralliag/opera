@@ -1,6 +1,6 @@
 # best convex oracle
 bestConvex <-
-function(y, experts, awake=NULL, loss.type='squareloss', niter = 1,...)
+function(y, experts, awake=NULL, loss.type='squareloss', niter = 1, tau = 0.5, ...)
 {
    experts <- as.matrix(experts)
    N <- ncol(experts)
@@ -34,12 +34,13 @@ function(y, experts, awake=NULL, loss.type='squareloss', niter = 1,...)
      res = NULL
    }
    if (is.null(res)) {
+      warning("The best convex oracle is only approximated (using optim).")
       if (is.null(awake)) {awake = as.matrix(array(1,dim(experts)))}
       awake[idx.na] <- 0
       experts[idx.na] <- 0
       
       lossp <- function(p)   {
-         return(lossConv(p, y, experts, awake, loss.type)) 
+         return(lossConv(p, y, experts, awake, loss.type, tau)) 
       }
       
       best_p <- rep(0,N)

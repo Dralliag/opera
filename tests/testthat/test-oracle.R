@@ -68,7 +68,6 @@ test_that("Best linear oracle is ok", {
 })
 
 test_that("Quantile oracles are ok", {
-  
   set.seed(1)
   # test of quantile oracles
   quantiles = seq(0.1,0.9,by = 0.1)
@@ -86,17 +85,20 @@ test_that("Quantile oracles are ok", {
   m = oracle(y = Y,experts = X[,c(1,K)], oracle = list(name = "convex", loss.type="pinballloss", tau = quantiles[i]))
   expect_less_than(abs(sum(X[1,c(1,K)] * m$weights) - X[1,i]), 0.1)
   expect_equal(m$loss,mean(loss(m$prediction,Y,loss.type = "pinballloss",tau = quantiles[i])))
+  expect_warning(oracle(y = Y,experts = X[,c(1,K)], oracle = list(name = "convex", loss.type="pinballloss", tau = quantiles[i])))
   
   # best linear oracle (with singular matrix)
-  m = oracle(y = Y,experts = X[,c(1,K)], oracle = list(name = "linear", loss.type="pinballloss", tau = quantiles[i]))
+  m = oracle(y = Y,experts = X[,c(1,K)], oracle = list(name = "linear", loss.type="pinballloss", tau = quantiles[i], niter = 10))
   expect_less_than(abs(sum(X[1,c(1,K)] * m$weights) - X[1,i]), 0.1)
   expect_equal(m$loss,mean(loss(m$prediction,Y,loss.type = "pinballloss",tau = quantiles[i])))
+  expect_warning(oracle(y = Y,experts = X[,c(1,K)], oracle = list(name = "linear", loss.type="pinballloss", tau = quantiles[i])))
+  
   
   # best linear oracle (with direct computation using rq)
   X[n,] = 1
   Y[n] = 1
   i = sample(1:K,1) 
-  m = oracle(y = Y,experts = X[,c(1,K)], oracle = list(name = "linear", loss.type="pinballloss", tau = quantiles[i], niter = 10))
+  m = oracle(y = Y,experts = X[,c(1,K)], oracle = list(name = "linear", loss.type="pinballloss", tau = quantiles[i]))
   expect_less_than(abs(sum(X[1,c(1,K)] * m$weights) - X[1,i]), 0.1)
   expect_equal(m$loss,mean(loss(m$prediction,Y,loss.type = "pinballloss",tau = quantiles[i])))
 })

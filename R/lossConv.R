@@ -23,6 +23,8 @@
 #' the loss function considered to evaluate the performance. It can be
 #' "squareloss", "mae", "mape", or "pinballloss". See \code{\link{loss}} for
 #' more details.
+#' @param tau Quantile to be predicted if loss.type = "pinballloss" 
+#' (default value 0.5 to predict the median).
 #' @return  The average errors suffered by the mixture. Note that if
 #' \code{loss.type = "squareloss"}, the \code{rmse} is returned.  Note also
 #' that the instance are weighted according to the number of activated experts.
@@ -32,7 +34,7 @@
 #' @keywords ~kwd1 ~kwd2
 #' @export lossConv
 lossConv <-
-function(p,y,experts,awake=NULL,loss.type = 'squareloss') {
+function(p,y,experts,awake=NULL,loss.type = 'squareloss',tau = 0.5) {
 
    experts <- as.matrix(experts)
    N <- ncol(experts)  # Number of experts
@@ -48,11 +50,6 @@ function(p,y,experts,awake=NULL,loss.type = 'squareloss') {
 
    pond <- awake %*% p
    pred <- ((experts* awake) %*% p) / pond
-   if (loss.type == 'squareloss')
-      l = mean((pred-y)^2)
-   else if (loss.type == 'mae')
-      l = mean(abs(pred-y)) 
-   else 
-      l = mean(abs(pred-y)/y) 
+   l = mean(loss(pred,y,loss.type = loss.type,tau = tau))
    return(l)
 }
