@@ -18,8 +18,12 @@ function(y, experts, lambda, w0 = NULL) {
     At = At + experts[t,] %*% t(experts[t,])
     bt = bt + y[t] * experts[t,]
   }
-  w[1,] = w0
+  #w[1,] = w0
   
+  weights.forecast = solve(At,bt)
   prediction <- apply(experts * w, 1, sum)
-  return(list(weights = w, prediction = prediction, weights.forecast = solve(At,bt) ))
+  l <- mean(loss(prediction,y))
+  return(list(weights = w, prediction = prediction, 
+    weights.forecast = weights.forecast,
+    loss =  l))
 }

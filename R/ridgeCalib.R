@@ -2,13 +2,13 @@
 ridgeCalib <-
 function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
 {
+
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
   T <- nrow(experts)  # Number of instants
   
   if (is.null(w0)) {w0 <- matrix(1/N, ncol = N)} # Uniform intial weight vector if unspecified
-  if (sum(is.na(experts)) > 0) {warning("There are not allowed NA's in expert advice")}
   
   # Smoothing parameter grid 
   nlambda <- length(gridlambda)
@@ -24,7 +24,7 @@ function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
   pred.lambda <- matrix(0, ncol = nlambda, nrow = T) # Prediction of mixture algorithm with different learning rates eta
 
   At <- diag(0, N)
-  bt <- matrix(t(w0) %*% gridlambda, nrow = N, ncol = nlambda)
+  bt <- rep(0, N)
 
   for(t in 1:T){
     # Display the state of progress of the algorithm
@@ -56,7 +56,7 @@ function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
       for (k in 1:length(newlambda)) {
         perfnewlambda <- tryCatch(
           ridge(y[1:t], matrix(experts[1:t,],ncol=N), newlambda[k], w0 = w0), 
-          error = function(e) {list(prediction = rep(0, T))})
+          error = function(e) {list(prediction = rep(0, t))})
         newcumulativeLoss <- sum((perfnewlambda$prediction - y[1:t])^2)
         cumulativeLoss <- c(cumulativeLoss, newcumulativeLoss)
         pred.lambda <- cbind(pred.lambda, c(perfnewlambda$prediction, rep(0, (T-t))))
@@ -70,23 +70,30 @@ function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
       for (k in 1:length(newlambda)) {
         gridlambda <- c(newlambda[k],gridlambda)
         perfnewlambda <- tryCatch(
-          ridge(y[1:t], matrix(experts[1:t,],ncol = N), newlambda[k], w0 = NULL), 
-          error = function(e) {list(prediction = rep(0, T))})
+          ridge(y[1:t], matrix(experts[1:t,],ncol = N), newlambda[k], w0 = w0), 
+          error = function(e) {list(prediction = rep(NA, t))})
         newcumulativeLoss <- sum((perfnewlambda$prediction - y[1:t])^2)
         cumulativeLoss <- c(newcumulativeLoss, cumulativeLoss)
-        pred.lambda <- cbind(c(perfnewlambda$prediction, rep(0, (T-t))), pred.lambda)
+        pred.lambda <- cbind(c(perfnewlambda$prediction, rep(NA, (T-t))), pred.lambda)
       }
     }
     wlambda <- matrix(0,nrow = N, ncol = nlambda)
     for (k in 1:nlambda) {
-      wlambda[,k] = tryCatch(solve(gridlambda[k]*diag(1,N) + At,bt),
-                               error = function(e) {0})
+      wlambda[,k] = tryCatch(solve(gridlambda[k]*diag(1,N) + At, matrix(gridlambda[k]*w0, nrow=N) + bt),
+                               error = function(e) {NA})
     }
+    # the smoothing parameter has to big large enough
+    # in order to have invertible design matrix
+    lambda.min = which(!(is.na(wlambda[1,])))[1]
+    bestlambda = max(lambda.min, bestlambda)
   }
-  l <- rmse(prediction,y)
-  rmse <- sqrt(cumulativeLoss / T)
+  l <- mean(loss(prediction,y))
+  grid.loss <- cumulativeLoss / T
+  l.rmse <- sqrt(l)
+  grid.rmse <- sqrt(grid.loss)
   if (trace) cat('\n')
   return(list(weights = weights, prediction = prediction, 
-              lambda = lambda, grid = gridlambda, 
-              loss = l, gridloss = rmse, weights.forecast = wlambda[,bestlambda]))
+              lambda = lambda, grid.lambda = gridlambda, 
+              loss = l, grid.loss = grid.loss, weights.forecast = wlambda[,bestlambda],
+              rmse = l.rmse, grid.rmse = grid.rmse))
 }
