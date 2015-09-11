@@ -62,6 +62,9 @@ test_that("Best linear oracle is ok", {
   expect_equal(m$rmse, 0)
   expect_error(oracle(y = Y, experts = X, oracle = "linear", awake = awake), 
                "Sleeping or missing values not allowed for best linear oracle.")
+  
+  m = oracle(y = Y, experts = X, oracle = list(name = "linear", loss.type = "mape"))
+  expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = "mape")))
 })
 
 test_that("Quantile oracles are ok", {

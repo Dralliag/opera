@@ -91,9 +91,6 @@ oracle <-
     }
     
     if (oracle$name == "linear") {
-      if (oracle$loss.type != "squareloss" && oracle$loss.type != "pinballloss") {
-        stop('Sorry, the linear oracle is only implemented for square loss and pinball loss yet.')
-      }
       return(bestLinear(y, experts, lambda = oracle$lambda, loss.type = oracle$loss.type, tau = oracle$tau))
     }
     
