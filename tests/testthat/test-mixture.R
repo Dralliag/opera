@@ -36,6 +36,35 @@ test_that("EWA is ok", {
   
 })
 
+# Test of Fixed-share
+test_that("Fixed-share is ok", {
+  w0 = c(0.3,0.7)
+  possible_loss_type = c("mape", "mae", "squareloss", "pinballloss")
+  i.loss = sample(1:4,1)
+  tau = runif(1)
+  m = mixture(y = Y, experts = X, aggregationRule = list(name = "FS", loss.type = possible_loss_type[i.loss], tau = tau),
+              w0 = w0)
+  expect_true(abs(m$weights.forecast[1]-0.6)<1e-1)
+  expect_equal(m$loss, mean(loss(m$prediction,Y,loss.type = possible_loss_type[i.loss], tau = tau)))
+  expect_identical(m$weights[1,],w0)
+  
+  eta = 2
+  alpha = 0.01
+  m.fixed = mixture(y = Y, experts = X, 
+                    aggregationRule = list(name = "FS", eta = eta, alpha = alpha, loss.type = possible_loss_type[i.loss], tau = tau), 
+                    w0 = w0)
+  idx.eta  = which(m$grid.eta == eta)
+  idx.alpha = which(m$grid.alpha == alpha)
+  expect_equal(m$grid.loss[idx.eta,idx.alpha], mean(loss(m.fixed$prediction,Y, loss.type = possible_loss_type[i.loss], tau =tau)))
+  expect_equal(m.fixed$loss, m$grid.loss[idx.eta,idx.alpha])
+  expect_identical(m.fixed$weights[1,],w0)
+  
+  m = mixture(y = Y, experts = X, aggregationRule = "FS", awake = awake)
+  expect_true(abs(m$weights.forecast[1]-0.6)<1e-1)
+  expect_equal(m$loss, mean(loss(m$prediction,Y)))
+  
+})
+
 # Test of Ridge
 test_that("Ridge is ok", {
   w0 = c(0.5,0.5)
@@ -60,37 +89,36 @@ test_that("MLpol, MLprod, MLewa, and BOA are ok", {
   tau = runif(1)
   m = mixture(y = Y, experts = X, 
               aggregationRule = list(name = "MLpol", loss.type = possible_loss_type[i.loss], tau = tau))
-  expect_true(abs(m$weights.forecast[1]-0.6)<1e-1)
+  expect_true(abs(m$weights.forecast[1]-0.6)<2e-1)
   expect_equal(m$loss, mean(loss(m$prediction,Y,loss.type = possible_loss_type[i.loss], tau = tau)))
   
   w0 = c(0.3, 0.7)
   m = mixture(y = Y, experts = X, 
               aggregationRule = list(name = "MLprod", loss.type = possible_loss_type[i.loss], tau = tau),
               w0 = w0)
-  expect_true(abs(m$weights.forecast[1]-0.6)<1e-1)
+  expect_true(abs(m$weights.forecast[1]-0.6)<2e-1)
   expect_equal(m$loss, mean(loss(m$prediction,Y,loss.type = possible_loss_type[i.loss], tau = tau)))
   expect_identical(m$weights[1,],w0)
   
   m = mixture(y = Y, experts = X, 
               aggregationRule = list(name = "MLewa", loss.type = possible_loss_type[i.loss], tau = tau),
               w0 = w0)
-  expect_true(abs(m$weights.forecast[1]-0.6)<1e-1)
+  expect_true(abs(m$weights.forecast[1]-0.6)<2e-1)
   expect_equal(m$loss, mean(loss(m$prediction,Y,loss.type = possible_loss_type[i.loss], tau = tau)))
   expect_identical(m$weights[1,],w0)
   
   m = mixture(y = Y, experts = X, 
               aggregationRule = list(name = "BOA", loss.type = possible_loss_type[i.loss], tau = tau),
               w0 = w0)
-  expect_true(abs(m$weights.forecast[1]-0.6)<1e-1)
+  expect_true(abs(m$weights.forecast[1]-0.6)<2e-1)
   expect_equal(m$loss, mean(loss(m$prediction,Y,loss.type = possible_loss_type[i.loss], tau = tau)))
   expect_identical(m$weights[1,],w0)
   
   
   m = mixture(y = Y, experts = X, aggregationRule = "BOA", awake = awake)
-  expect_true(abs(m$weights.forecast[1]-0.6)<1e-1)
+  expect_true(abs(m$weights.forecast[1]-0.6)<2e-1)
   expect_equal(m$loss, mean(loss(m$prediction,Y)))
 })
-
 
 
 
@@ -113,6 +141,16 @@ test_that("Quantile mixture are ok", {
   expect_equal(m$loss,mean(loss(m$prediction,Y,loss.type = "pinballloss", tau = quantiles[i])))
   expect_less_than(abs(sum(X[1,c(1,K)] * m$weights.forecast) - X[1,i]), 0.4)
   
+  # Fixed share
+  m = mixture(y = Y, experts = X, 
+              aggregationRule = list(name = "FS", loss.type = "pinballloss", loss.gradient = FALSE, eta = 10e-1, alpha = 0.01, tau = quantiles[i]))
+  expect_equal(m$loss,mean(loss(m$prediction,Y,loss.type = "pinballloss", tau = quantiles[i])))
+  expect_less_than(abs(sum(X[1,] * m$weights.forecast) - X[1,i]), 0.4)
+  
+  m = mixture(y = Y, experts = X[,c(1,K)], 
+              aggregationRule = list(name = "FS", loss.type = "pinballloss", tau = quantiles[i], gamma = 10))
+  expect_equal(m$loss,mean(loss(m$prediction,Y,loss.type = "pinballloss", tau = quantiles[i])))
+  expect_less_than(abs(sum(X[1,c(1,K)] * m$weights.forecast) - X[1,i]), 0.4)
   
   m = mixture(y = Y, experts = X, 
               aggregationRule = list(name = "MLpol", loss.type = "pinballloss", loss.gradient = FALSE,
@@ -157,6 +195,4 @@ test_that("Quantile mixture are ok", {
               aggregationRule = list(name = "BOA", loss.type = "pinballloss", tau = quantiles[i]))
   expect_equal(m$loss,mean(loss(m$prediction,Y,loss.type = "pinballloss", tau = quantiles[i])))
   expect_less_than(abs(sum(X[1,c(1,K)] * m$weights.forecast) - X[1,i]), 0.8)
-  
-  
 })

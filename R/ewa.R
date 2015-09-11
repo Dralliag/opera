@@ -38,6 +38,7 @@ function(y, experts, eta, awake = NULL, loss.type = 'squareloss',
   }
   w = t(truncate1(exp(eta*R))) / sum(t(truncate1(exp(eta*R))))
   
-  return(list(weights = weights, prediction = pred, loss = cumulativeLoss/T, regret = R,
+  return(list(weights = weights, prediction = pred, 
+              loss = cumulativeLoss/T, regret = R,
               weights.forecast =  w))
 }

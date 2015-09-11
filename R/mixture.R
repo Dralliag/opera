@@ -215,8 +215,6 @@ mixture <-
       }
     }
     
-
-    
     if ((aggregationRule$name == "FS")) {
       if (is.null(aggregationRule$eta) || is.null(aggregationRule$alpha)) {
         return(fixedshareCalib(y = y, experts = experts, awake = awake, 
@@ -224,7 +222,9 @@ mixture <-
                                loss.gradient = aggregationRule$loss.gradient, w0 = w0,
                                tau = aggregationRule$tau, gamma = aggregationRule$gamma))
       } else {
-        return(fixedshare(y = y, experts = experts, eta = aggregationRule$eta, alpha = aggregationRule$alpha, awake = awake, loss.type = aggregationRule$loss.type, loss.gradient = aggregationRule$loss.gradient, w0 = w0))
+        return(fixedshare(y = y, experts = experts, eta = aggregationRule$eta, alpha = aggregationRule$alpha, awake = awake, loss.type = aggregationRule$loss.type, 
+                          loss.gradient = aggregationRule$loss.gradient, w0 = w0,
+                          tau = aggregationRule$tau))
       }
     }
     
