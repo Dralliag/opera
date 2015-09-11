@@ -31,7 +31,9 @@
 #' with parameter \code{tau} in \code{(0,1)} is possible (the default value is 0.5 to predict the median).
 #' }
 #'    \item{lambda}{For "linear" oracle. A possible $L_2$ regularization parameter for computing the linear oracle (if the design matrix is not identifiable)}
-#'    \item{niter}{For "convex" oracle. Number of optimization steps to process in order to approximate the best convex combination rule if it is hard to compute in a straighforward way.}
+#'    \item{niter}{For "convex" and "linear" oracle (if direct computation of the oracle is not possible). 
+#'      Number of optimization steps to process in order to approximate the oracle. 
+#'      (default value is 3).}
 #' }
 #' @param awake A matrix specifying the
 #' activation coefficients of the experts. Its entries lie in \code{[0,1]}.
@@ -62,21 +64,23 @@
 oracle <-
   function(y, experts, oracle = "convex", awake = NULL, ...)
   {
-    if (is.character(oracle)) {
-      oracle = list(name = oracle)
+    if (is.character(oracle)) {oracle = list(name = oracle)}
+    if (is.null(oracle$loss.type)) {oracle$loss.type = "squareloss"}
+    if (!is.null(oracle$tau) && oracle$loss.type != "pinballloss") {
+      warning("Unused parameter tau (loss.type != 'pinballloss')")
     }
-    if (is.null(oracle$loss.type)) {
-      oracle$loss.type = "squareloss"
-    }
-    if (is.null(oracle$tau)) {
-      oracle$tau = 0.5
-    }
-    
+    if (is.null(oracle$tau)) {oracle$tau = 0.5}
+    if (!is.null(oracle$lambda) && oracle$name != "linear") {
+      warning("Unused lambda parameter (oracle != linear)")}
+    if (is.null(oracle$lambda)) oracle$lambda = 0
+    if (!is.null(oracle$niter) && oracle$name!= "convex" && oracle$name != "linear") {
+      warning("Unused niter parameter (oracle should be convex or linear)")} 
+    if (is.null(oracle$niter)) oracle$niter = 3
+    if ((!is.null(awake) || sum(is.na(experts)>0)) && oracle$name != "convex" && oracle$name != "shifting") {
+      stop(paste("Sleeping or missing values not allowed for best", oracle$name, "oracle."))}  
+
     # if we are looking for the best convex combination of experts
     if (oracle$name == "convex") {
-      if (is.null(oracle$niter)) {
-        oracle$niter = 1
-      }
       return(
         bestConvex(
           y, experts, awake = awake,
@@ -87,16 +91,10 @@ oracle <-
     }
     
     if (oracle$name == "linear") {
-      if (!is.null(awake)) {
-        stop('Sleeping not allowed for linear oracle!')
+      if (oracle$loss.type != "squareloss" && oracle$loss.type != "pinballloss") {
+        stop('Sorry, the linear oracle is only implemented for square loss and pinball loss yet.')
       }
-      if (oracle$loss.type != "squareloss") {
-        stop('Sorry, the linear oracle is only implemented for square loss yet.')
-      }
-      if (is.null(oracle$lambda)) {
-        oracle$lambda = 0
-      }
-      return(bestLinear(y,experts,lambda = oracle$lambda))
+      return(bestLinear(y, experts, lambda = oracle$lambda, loss.type = oracle$loss.type, tau = oracle$tau))
     }
     
     if (oracle$name == "shifting") {
@@ -107,11 +105,7 @@ oracle <-
     }
     
     if (oracle$name == "expert") {
-      if (!is.null(awake)) {stop("Sleeping not allowed for best expert oracle.")} 
-      if (!is.null(oracle$lambda)) {warning("unused lambda parameter")} 
-      if (!is.null(oracle$niter)) {warning("unused niter parameter")} 
       
-      #browser()
       loss.experts = apply(apply(experts, 2, function (x) {
         loss(x,y,loss.type = oracle$loss.type,tau = oracle$tau)}), 2, mean)
       best.loss = min(loss.experts)

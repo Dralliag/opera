@@ -9,6 +9,6 @@ Copyright: EDF R&D 2015
 Description: This package implements, for regression-oriented time-series, online predictions by combining a finite set of forecasts provided by the user.
 License: GPL (>= 2)
 Depends: R (>= 3.1.0)
-Imports: splines, quadprog
+Imports: splines, quadprog, quantreg
 Suggests: testthat
 
