@@ -32,6 +32,8 @@ function(x,y,loss.type = 'squareloss', tau = 0.5) {
    else if (loss.type == 'mape')
       l <- abs(x-y)/y
    else if (loss.type == 'pinballloss')
-      l <- (tau - (y>x)) * (x - y)
+      l <- (tau - (y<x)) * (y-x)
+   else
+     stop("loss.type should be one of these: 'mae', 'mape', 'squareloss', 'pinballloss'")
    return(l)
 }

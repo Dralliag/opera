@@ -27,7 +27,9 @@
 #'    \item{loss.type}{(not possible for "linear" oracle which is currently restrained to square loss) a string specifying
 #' the loss function considered to evaluate the performance.  It can be
 #' "squareloss", "mae", "mape", or "pinballloss". See \code{\link{loss}} for
-#' more details. If "pinballloss" is chosen, an additional parameter \code{tau} in \code{[0,1]} is required. }
+#' more details. If "pinballloss" is chosen, the quantile to be predicted can be set 
+#' with parameter \code{tau} in \code{(0,1)} is possible (the default value is 0.5 to predict the median).
+#' }
 #'    \item{lambda}{For "linear" oracle. A possible $L_2$ regularization parameter for computing the linear oracle (if the design matrix is not identifiable)}
 #'    \item{niter}{For "convex" oracle. Number of optimization steps to process in order to approximate the best convex combination rule if it is hard to compute in a straighforward way.}
 #' }
@@ -66,6 +68,9 @@ oracle <-
     if (is.null(oracle$loss.type)) {
       oracle$loss.type = "squareloss"
     }
+    if (is.null(oracle$tau)) {
+      oracle$tau = 0.5
+    }
     
     # if we are looking for the best convex combination of experts
     if (oracle$name == "convex") {
@@ -75,7 +80,8 @@ oracle <-
       return(
         bestConvex(
           y, experts, awake = awake,
-          loss.type = oracle$loss.type, niter = oracle$niter, ...
+          loss.type = oracle$loss.type, niter = oracle$niter, 
+          tau = oracle$tau,...
         )
       )
     }
@@ -105,8 +111,9 @@ oracle <-
       if (!is.null(oracle$lambda)) {warning("unused lambda parameter")} 
       if (!is.null(oracle$niter)) {warning("unused niter parameter")} 
       
-
-      loss.experts = apply(apply(experts, 2, function (x) {loss(x,y)}), 2, mean)
+      #browser()
+      loss.experts = apply(apply(experts, 2, function (x) {
+        loss(x,y,loss.type = oracle$loss.type,tau = oracle$tau)}), 2, mean)
       best.loss = min(loss.experts)
       weights =  (loss.experts == best.loss) / sum(loss.experts == best.loss)
       best.expert = which(weights > 0)[1]

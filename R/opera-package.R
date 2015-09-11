@@ -61,13 +61,17 @@
 #' 
 #' 
 #' # EWA with fixed learning rate
-#' mod = mixture(y=Y, experts=X, aggregationRule=list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=FALSE), awake=awake) 
+#' mod = mixture(y=Y, experts=X, 
+#'                aggregationRule=list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=FALSE), 
+#'                awake=awake)
 #' # plot weights assigned to both experts (when an expert is not available its weight is 0)
 #' matplot(mod$weights, type='l', main='EWA with fixed learning rate', col=2:3) 
 #' cat('EWA mod, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
 #' # EWA algorithm with gradient loss function
-#' mod = mixture(y=Y, experts=X, aggregationRule=list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=TRUE), awake=awake)
+#' mod = mixture(y=Y, experts=X, 
+#'                aggregationRule=list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=TRUE), 
+#'                awake=awake)
 #' matplot(mod$weights, type='l', main='EWA with gradient losses', col=2:3) 
 #' cat('EWA mod with gradient losses, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
@@ -87,7 +91,8 @@
 #' #                 TIME-SERIES WITH BREAKS
 #' # -----------------------------------------------------------------
 #' 
-#' # We now assume that there is a break in the time series and that experts are swaped after alpha*T instances
+#' # We now assume that there is a break in the time series and 
+#' # that experts are swaped after alpha*T instances
 #' alpha = 1/2
 #' X[floor(alpha*T):T,] = X[floor(alpha*T):T,2:1]
 #' awake[floor(alpha*T):T,] = awake[floor(alpha*T):T,2:1]
@@ -99,7 +104,9 @@
 #' 
 #' 
 #' # EWA with fixed learning rate
-#' mod = mixture(y=Y, experts=X, aggregationRule=list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=FALSE), awake=awake) 
+#' mod = mixture(y=Y, experts=X, 
+#'                aggregationRule=list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=FALSE), 
+#'                awake=awake) 
 #' # plot weights assigned to both experts (when an expert is not available its weight is 0)
 #' matplot(mod$weights, type='l', main='EWA with fixed learning rate', col=2:3) 
 #' cat('EWA mod, rmse :', rmse(mod$prediction,Y), '\n')

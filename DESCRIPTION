@@ -5,8 +5,10 @@ Version: 0.01
 Date: 2015-09-10
 Author: Pierre Gaillard
 Maintainer: Pierre Gaillard <pierre@gaillard.me>
+Copyright: EDF R&D 2015
 Description: This package implements, for regression-oriented time-series, online predictions by combining a finite set of forecasts provided by the user.
 License: GPL (>= 2)
 Depends: R (>= 3.1.0)
 Imports: splines, quadprog
+Suggests: testthat
 
