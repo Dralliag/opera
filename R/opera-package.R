@@ -17,7 +17,7 @@
 #' @name opera-package
 #' @aliases opera-package opera
 #' @docType package
-#' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
+#' @author Pierre Gaillard <pierre@gaillard.me>
 #' @references Prediction, Learning, and Games. N. Cesa-Bianchi and G. Lugosi.
 #' \cr
 #' 

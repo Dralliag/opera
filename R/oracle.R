@@ -1,4 +1,4 @@
-#' Compute an aggregation rule
+#' Compute oracle predictions
 #'
 #' The function \code{oracle} performs a strategie that cannot be defined online
 #' (in contrast to \link{mixture}). It requires in advance the knowledge of the whole
@@ -59,7 +59,7 @@
 #' predictions of the oracle.  }
 #' \item{rmse}{If loss.type is the square loss (default) only.
 #' The root mean square error (i.e., it is the square root of \code{loss}.}
-#' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
+#' @author Pierre Gaillard <pierre@gaillard.me>
 #' @export oracle
 oracle <-
   function(y, experts, oracle = "convex", awake = NULL, ...)

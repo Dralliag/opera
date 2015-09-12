@@ -7,7 +7,7 @@
 # 
 # @param x A number to be truncate1d
 # @return  The truncated value of \code{x}
-# @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
+# @author Pierre Gaillard <pierre@gaillard.me>
 # @keywords ~kwd1 ~kwd2
 
 truncate1 <- 

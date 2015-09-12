@@ -88,7 +88,7 @@
 #'  \code{grid.eta}.}
 #'  \item{grid.rmse}{Similar to \code{grid.loss} with RMSEs.}
 #' }
-#' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
+#' @author Pierre Gaillard <pierre@gaillard.me>
 #' @keywords ~kwd1 ~kwd2
 #' @examples
 #' 

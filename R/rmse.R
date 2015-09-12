@@ -17,9 +17,7 @@
 #' @param na.rm logical. Should missing values (including NaN) be removed?
 #' @return  The root mean square error of the sequence of prediction
 #' \code{x}.
-#' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
-#' @seealso 
-#' \code{\link{mape}}, \code{\link{mae}}, \code{\link{loss}}
+#' @author Pierre Gaillard <pierre@gaillard.me>
 #' @keywords ~kwd1 ~kwd2
 #' @export rmse
 rmse <-

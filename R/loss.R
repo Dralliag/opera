@@ -1,4 +1,4 @@
-#' Error suffered by a sequence of prediction
+#' Errors suffered by a sequence of predictions
 #' 
 #'  The
 #' function \code{loss} computes the sequence of instantaneous losses suffered
@@ -18,9 +18,7 @@
 #' "pinball"}.
 #' @return  A vector of length \code{T} containing the sequence of
 #' instantaneous losses suffered by the prediction \code{x}.
-#' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
-#' @seealso 
-#' \code{\link{mape}}, \code{\link{rmse}}, \code{\link{lossConv}}
+#' @author Pierre Gaillard <pierre@gaillard.me>
 #' @keywords ~kwd1 ~kwd2
 #' @export loss
 loss <-
