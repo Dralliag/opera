@@ -35,10 +35,6 @@
 #'    \item{"MLpol"}{Polynomial Potential aggregation rule
 #' with different learning rates for each expert.  The learning rates are
 #' calibrated using theoretical values. There are similar aggregation rules like "BOA" (Bernstein online Aggregation see [Wintenberger, 2014] "MLewa", and "MLprod" (see [Gaillard, Erven, and Stoltz, 2014])}
-#'    \item{"pinball"}{ It performs a mixing aggregation rule for quantile
-#' regression.  At each instance, it forms the mixture by performing a convex
-#' minimisation. It chooses the mixture that minimizes among the past a
-#' penalized criterion based on cumulated pinball loss.}
 #'    \item{"gamMixture"}{#'  Fits a general additive model (GAM) on the data
 #' to form weight vectors for the experts that can depend on exogeneous data.
 #' The process is however not currently stable. We advice not using it yet. Use
@@ -46,7 +42,7 @@
 #' }
 #' Possible optional additional parameters are:
 #' \describe{
-#'    \item{loss.type}{(not possible for "ridge", "pinball", and "gamMixture") a string specifying
+#'    \item{loss.type}{(not possible for "ridge", and "gamMixture") a string specifying
 #' the loss function considered to evaluate the performance.  It can be
 #' "squareloss", "mae", "mape", or "pinballloss". See \code{\link{loss}} for
 #' more details. If "pinballloss" is chosen, the quantile to be predicted can be set 
@@ -247,11 +243,4 @@ mixture <-
       
     }
     
-    if ((aggregationRule$name == "pinball")) {
-      if (is.null(aggregationRule$lambda)) {
-        stop("pinball cannot handle automatic calibration")
-      }
-      if (is.null(aggregationRule$tau)){ aggregationRule$tau = 0.5}
-      pinballHour(y = y, experts = experts, lambda = aggregationRule$lambda, w0 = w0, tau = aggregationRule$tau)
-    }
   }
