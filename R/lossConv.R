@@ -21,12 +21,12 @@
 #' the mixture to predict \code{Y_t}.
 #' @param loss.type A string specifying
 #' the loss function considered to evaluate the performance. It can be
-#' "squareloss", "mae", "mape", or "pinballloss". See \code{\link{loss}} for
+#' "square", "absolute", "percentage", or "pinball". See \code{\link{loss}} for
 #' more details.
-#' @param tau Quantile to be predicted if loss.type = "pinballloss" 
+#' @param tau Quantile to be predicted if loss.type = "pinball" 
 #' (default value 0.5 to predict the median).
 #' @return  The average errors suffered by the mixture. Note that if
-#' \code{loss.type = "squareloss"}, the \code{rmse} is returned.  Note also
+#' \code{loss.type = "square"}, the \code{rmse} is returned.  Note also
 #' that the instance are weighted according to the number of activated experts.
 #' @note The function \code{lossConv} is for instance used
 #' to compute the best convex combination in hindsight.
@@ -34,7 +34,7 @@
 #' @keywords ~kwd1 ~kwd2
 #' @export lossConv
 lossConv <-
-function(p,y,experts,awake=NULL,loss.type = 'squareloss',tau = 0.5) {
+function(p,y,experts,awake=NULL,loss.type = 'square',tau = 0.5) {
 
    experts <- as.matrix(experts)
    N <- ncol(experts)  # Number of experts

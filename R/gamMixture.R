@@ -1,7 +1,7 @@
 
 gamMixture <-
 function(y, experts, z, lambda, nknots = 5, 
-  degree = 3, loss.type = 'squareloss', 
+  degree = 3, loss.type = 'square', 
   uniform = FALSE, knots = NULL) {
 
   # building the design matrix with splines  (experts that may smoothly depend on z)  

@@ -1,6 +1,6 @@
 fixedshareCalib <-
   function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), awake = NULL,
-           loss.type = 'squareloss', loss.gradient = TRUE, w0 = NULL, trace = F, gamma = 2,
+           loss.type = 'square', loss.gradient = TRUE, w0 = NULL, trace = F, gamma = 2,
            tau = 0.5)
   {
     experts <- as.matrix(experts)
@@ -121,7 +121,7 @@ fixedshareCalib <-
                 eta = par$eta, grid.eta = grid.eta, 
                 alpha = par$alpha, grid.alpha = grid.alpha,
                 loss = l, grid.loss = mloss, weights.forecast = w)
-    if (loss.type == 'squareloss') {
+    if (loss.type == 'square') {
       res$grid.rmse <- sqrt(mloss)
       res$rmse <- sqrt(l)
     }

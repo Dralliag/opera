@@ -1,7 +1,7 @@
 
 fixedshare <-
   function(y, experts, eta, alpha, awake = NULL, 
-           loss.type = 'squareloss', loss.gradient = TRUE, w0 = NULL,
+           loss.type = 'square', loss.gradient = TRUE, w0 = NULL,
            tau = 0.5) 
   {
     experts <- as.matrix(experts)

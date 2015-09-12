@@ -1,7 +1,7 @@
 
 ewaCalib <-
 function(y, experts, grid.eta = 1, awake = NULL,
-        loss.type = 'squareloss', loss.gradient = TRUE, 
+        loss.type = 'square', loss.gradient = TRUE, 
         w0 = NULL, trace = F, gamma = 2, tau = tau)
 {
   experts <- as.matrix(experts)
@@ -95,7 +95,7 @@ function(y, experts, grid.eta = 1, awake = NULL,
              loss = l, grid.loss = mloss, 
              weights.forecast = w)
   
-  if (loss.type == 'squareloss') {
+  if (loss.type == 'square') {
     res$grid.rmse <- sqrt(mloss)
     res$rmse <- sqrt(l)
   }

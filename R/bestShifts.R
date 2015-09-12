@@ -1,6 +1,6 @@
 # best sequence of experts oracle
 bestShifts <-
-function(y, experts, awake=NULL, loss.type = 'squareloss')
+function(y, experts, awake=NULL, loss.type = 'square')
 {
     N <- ncol(experts)
     T <- nrow(experts)
@@ -14,7 +14,7 @@ function(y, experts, awake=NULL, loss.type = 'squareloss')
     awake[idx.na] <- 0
     experts[idx.na] <- 0
 
-    loss.name <- c('squareloss', 'mae','mape')
+    loss.name <- c('square', 'absolute','percentage')
     loss.number <- which(loss.name == loss.type)
     
     L <- array(INF, dim = c(T,N,3))
@@ -56,7 +56,7 @@ function(y, experts, awake=NULL, loss.type = 'squareloss')
     loss.experts = L[,,loss.number] / T
     loss = apply(loss.experts,1,min)
     res = list(loss = loss)
-    if (loss.type == "squareloss") {
+    if (loss.type == "square") {
       res = list(loss = loss,
         rmse = sqrt(loss))
     }

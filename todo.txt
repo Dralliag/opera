@@ -1,5 +1,4 @@
 
-- ajouter prochain poids
 - faire une fonction plot et une fonction predict
 - faire une vignette ou des slides
 - commenter le code en anglais
@@ -15,5 +14,5 @@
 - ajouter la possibilité de faire de la classification
 - ajouter les algos de bandits (UCB),... et pb de bandits
 - ajouter une mixture du type pinball penalisé (ou perturbé)
-- gamMixture (gérer les href,...)
+- gamMixture (prochain poids, ...)
 

@@ -42,9 +42,9 @@ function(weights,y,experts,awake=NULL) {
   pond <- awake %*% weights
   pred <- (experts * awake) %*% weights / pond
 
-  err1 <- loss(pred,y,'squareloss') * pond
-  err2 <- loss(pred,y,'mae') * pond 
-  err3 <- loss(pred,y,'mape') * pond
+  err1 <- loss(pred,y,'square') * pond
+  err2 <- loss(pred,y,'absolute') * pond 
+  err3 <- loss(pred,y,'percentage') * pond
   
   mpred <- mean(pred)
   mY <- mean(y)

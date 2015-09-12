@@ -1,16 +1,16 @@
 # best linear oracle
 bestLinear <-
-function(y, experts, lambda = 0, loss.type = "squareloss", 
+function(y, experts, lambda = 0, loss.type = "square", 
 	tau = 0.5, niter = 1, ...)
 {  
   experts <- as.matrix(experts)
   N = ncol(experts)
 
   weights <- NULL
-  if (loss.type == "squareloss") {
+  if (loss.type == "square") {
   	weights <- solve(lambda * diag(1,ncol(experts)) + t(experts) %*% experts,t(experts)%*%y)
   	
-  } else if (loss.type == "pinballloss") {
+  } else if (loss.type == "pinball") {
   		weights <- tryCatch({
   						quantreg::rq(y~experts-1,tau = tau)$coefficients},
   						error = function(e) { NULL 

@@ -1,6 +1,6 @@
 # best convex oracle
 bestConvex <-
-function(y, experts, awake=NULL, loss.type='squareloss', niter = 1, tau = 0.5, ...)
+function(y, experts, awake=NULL, loss.type='square', niter = 1, tau = 0.5, ...)
 {
    experts <- as.matrix(experts)
    N <- ncol(experts)
@@ -8,7 +8,7 @@ function(y, experts, awake=NULL, loss.type='squareloss', niter = 1, tau = 0.5, .
    # if there are no NA and if awake is null 
    # we can perform an exact resolution for the square loss
    idx.na <- which(is.na(experts))
-   if (length(idx.na) == 0 && is.null(awake) && loss.type == "squareloss") {
+   if (length(idx.na) == 0 && is.null(awake) && loss.type == "square") {
       y.na = is.na(y)
       y = y[!y.na]
       x = experts[!y.na,]
@@ -67,7 +67,7 @@ function(y, experts, awake=NULL, loss.type='squareloss', niter = 1, tau = 0.5, .
       prediction <- ((experts* awake) %*% t(weights)) / pond
    }
    res = list(loss = bestLoss, weights = weights, prediction = prediction)
-   if (loss.type == "squareloss") {
+   if (loss.type == "square") {
       res$rmse = sqrt(res$loss)
    }
    return(res)

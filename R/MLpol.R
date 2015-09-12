@@ -1,6 +1,6 @@
 MLpol <-
 function(y, experts, awake = NULL,
-            loss.type = 'squareloss', loss.gradient = TRUE, tau = 0.5) 
+            loss.type = 'square', loss.gradient = TRUE, tau = 0.5) 
 {
   experts <- as.matrix(experts)
   N <- ncol(experts)

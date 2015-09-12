@@ -47,8 +47,8 @@
 #' \describe{
 #'    \item{loss.type}{(not possible for "ridge", and "gamMixture" which are restricted to square loss) a string specifying
 #' the loss function considered to evaluate the performance.  It can be
-#' "squareloss", "mae", "mape", or "pinballloss". See \code{\link{loss}} for
-#' more details. If "pinballloss" is chosen, the quantile to be predicted can be set 
+#' "square", "absolute", "percentage", or "pinball". See \code{\link{loss}} for
+#' more details. If "pinball" is chosen, the quantile to be predicted can be set 
 #' with parameter \code{tau} in \code{(0,1)} is possible (the default value is 0.5 to predict the median).
 #' }
 #'    \item{loss.gradient}{A boolean. If
@@ -80,7 +80,7 @@
 #' Possible optional returned parameters are:
 #' \describe{
 #'  \item{rmse}{Root mean square error suffered by the aggregation rule 
-#'  (returned if loss.type = "squareloss")}
+#'  (returned if loss.type = "square")}
 #'  \item{eta}{Sequence of learning rates \code{eta} chosen by the aggregation rule}
 #'  \item{grid.eta}{Grid of learning rates used to perform online calibration of the 
 #'  learning rate (eta)}
@@ -121,7 +121,7 @@
 #' 
 #' # EWA with fixed learning rate
 #' mod = mixture(y=Y, experts=X, 
-#'          aggregationRule=list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=FALSE), 
+#'          aggregationRule=list(name="EWA", eta=1, loss.type='square', loss.gradient=FALSE), 
 #'          awake=awake) 
 #' # plot weights assigned to both experts (when an expert is not available its weight is 0)
 #' matplot(mod$weights, type='l', main='EWA with fixed learning rate', col=2:3) 
@@ -129,7 +129,7 @@
 #' 
 #' # ewa algorithm with gradient loss function
 #' mod = mixture(y=Y, experts=X, 
-#'          aggregationRule=list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=TRUE), 
+#'          aggregationRule=list(name="EWA", eta=1, loss.type='square', loss.gradient=TRUE), 
 #'          awake=awake) 
 #' matplot(mod$weights, type='l', main='EWA with gradient losses', col=2:3) 
 #' cat('EWA mixture with gradient losses, rmse :', rmse(mod$prediction,Y), '\n')
@@ -169,14 +169,14 @@ mixture <-
     if (!is.null(w0) && (aggregationRule$name == "MLpol")) {
       stop(paste(aggregationRule$name, "cannot handle non-uniform prior weight vector"))
     }
-    if (is.null(aggregationRule$loss.type)) {aggregationRule$loss.type = "squareloss"}
+    if (is.null(aggregationRule$loss.type)) {aggregationRule$loss.type = "square"}
     if (is.null(aggregationRule$loss.gradient)) {aggregationRule$loss.gradient = TRUE} 
-    if (!is.null(aggregationRule$tau) && aggregationRule$loss.type != "pinballloss") {
-      warning("Unused parameter tau (loss.type != 'pinballloss')")
+    if (!is.null(aggregationRule$tau) && aggregationRule$loss.type != "pinball") {
+      warning("Unused parameter tau (loss.type != 'pinball')")
     }
     if (is.null(aggregationRule$tau)) {aggregationRule$tau = 0.5}
 
-    if (aggregationRule$loss.type != "squareloss" && (aggregationRule$name == "Ridge" || aggregationRule$name == "gamMixture")) {
+    if (aggregationRule$loss.type != "square" && (aggregationRule$name == "Ridge" || aggregationRule$name == "gamMixture")) {
       stop(paste("Square loss is require for", aggregationRule$name, "aggregationRule."))
     }
     
@@ -244,7 +244,7 @@ mixture <-
       }
       if (is.null(aggregationRule$nknots)){ aggregationRule$nknots = 5}
       if (is.null(aggregationRule$degree)){ aggregationRule$degree = 3}
-      if (is.null(aggregationRule$loss.type)){ aggregationRule$loss.type = "squareloss"}
+      if (is.null(aggregationRule$loss.type)){ aggregationRule$loss.type = "square"}
       if (is.null(aggregationRule$uniform)){ aggregationRule$uniform = FALSE}
       if (is.null(aggregationRule$knots)){ aggregationRule$knots = NULL}
       

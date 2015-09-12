@@ -1,6 +1,6 @@
 MLprod <-
 function(y, experts, awake = NULL, 
-             loss.type = 'squareloss', loss.gradient = TRUE, tau = 0.5, w0 = NULL)
+             loss.type = 'square', loss.gradient = TRUE, tau = 0.5, w0 = NULL)
 {
   
   experts <- as.matrix(experts)

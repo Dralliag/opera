@@ -11,11 +11,11 @@
 #' contains the observations to be predicted.
 #' @param loss.type A string specifying
 #' the loss function considered to evaluate the performance. It can be
-#' "squareloss", "mae", "mape", or "pinballloss". See \code{\link{loss}} for
+#' "square", "absolute", "percentage", or "pinball". See \code{\link{loss}} for
 #' more details.
 #' @param tau A number in \code{[0,1]}
 #' describing the quantile to be predicted. Used only if \code{loss.type =
-#' "pinballloss"}.
+#' "pinball"}.
 #' @return  A vector of length \code{T} containing the sequence of
 #' instantaneous losses suffered by the prediction \code{x}.
 #' @author Pierre Gaillard <pierre-p.gaillard@@edf.fr>
@@ -24,16 +24,16 @@
 #' @keywords ~kwd1 ~kwd2
 #' @export loss
 loss <-
-function(x,y,loss.type = 'squareloss', tau = 0.5) {
-   if (loss.type == 'squareloss')
+function(x,y,loss.type = 'square', tau = 0.5) {
+   if (loss.type == 'square')
       l <- (x-y)^2
-   else if (loss.type == 'mae')
+   else if (loss.type == 'absolute')
       l <- abs(x-y)
-   else if (loss.type == 'mape')
+   else if (loss.type == 'percentage')
       l <- abs(x-y)/y
-   else if (loss.type == 'pinballloss')
+   else if (loss.type == 'pinball')
       l <- (tau - (y<x)) * (y-x)
    else
-     stop("loss.type should be one of these: 'mae', 'mape', 'squareloss', 'pinballloss'")
+     stop("loss.type should be one of these: 'absolute', 'percentage', 'square', 'pinball'")
    return(l)
 }

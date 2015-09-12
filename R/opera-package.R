@@ -62,7 +62,7 @@
 #' 
 #' # EWA with fixed learning rate
 #' mod = mixture(y=Y, experts=X, 
-#'                aggregationRule=list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=FALSE), 
+#'                aggregationRule=list(name="EWA", eta=1, loss.type='square', loss.gradient=FALSE), 
 #'                awake=awake)
 #' # plot weights assigned to both experts (when an expert is not available its weight is 0)
 #' matplot(mod$weights, type='l', main='EWA with fixed learning rate', col=2:3) 
@@ -70,7 +70,7 @@
 #' 
 #' # EWA algorithm with gradient loss function
 #' mod = mixture(y=Y, experts=X, 
-#'                aggregationRule=list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=TRUE), 
+#'                aggregationRule=list(name="EWA", eta=1, loss.type='square', loss.gradient=TRUE), 
 #'                awake=awake)
 #' matplot(mod$weights, type='l', main='EWA with gradient losses', col=2:3) 
 #' cat('EWA mod with gradient losses, rmse :', rmse(mod$prediction,Y), '\n')
@@ -105,7 +105,7 @@
 #' 
 #' # EWA with fixed learning rate
 #' mod = mixture(y=Y, experts=X, 
-#'                aggregationRule=list(name="EWA", eta=1, loss.type='squareloss', loss.gradient=FALSE), 
+#'                aggregationRule=list(name="EWA", eta=1, loss.type='square', loss.gradient=FALSE), 
 #'                awake=awake) 
 #' # plot weights assigned to both experts (when an expert is not available its weight is 0)
 #' matplot(mod$weights, type='l', main='EWA with fixed learning rate', col=2:3) 

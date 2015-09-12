@@ -1,7 +1,7 @@
 
 MLewa <-
 function(y, experts, awake = NULL, 
-                  loss.type='squareloss', loss.gradient = TRUE, 
+                  loss.type='square', loss.gradient = TRUE, 
                   w0 = NULL, tau =0.5)
 {
    experts <- as.matrix(experts)

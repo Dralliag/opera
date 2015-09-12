@@ -3,7 +3,7 @@
 #'  The
 #' function \code{mape} computes the mean absolute percentage error of a
 #' sequence of predictions. It is an equivalent way of running
-#' \code{mean(loss(x,y,loss.type='mape'))} (see \code{\link{loss}}).
+#' \code{mean(loss(x,y,loss.type='percentage'))} (see \code{\link{loss}}).
 #' 
 #' 
 #' @param x A vector containing the sequence of

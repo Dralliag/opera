@@ -26,8 +26,8 @@
 #' \describe{
 #'    \item{loss.type}{(not possible for "linear" oracle which is currently restrained to square loss) a string specifying
 #' the loss function considered to evaluate the performance.  It can be
-#' "squareloss", "mae", "mape", or "pinballloss". See \code{\link{loss}} for
-#' more details. If "pinballloss" is chosen, the quantile to be predicted can be set 
+#' "square", "absolute", "percentage", or "pinball". See \code{\link{loss}} for
+#' more details. If "pinball" is chosen, the quantile to be predicted can be set 
 #' with parameter \code{tau} in \code{(0,1)} is possible (the default value is 0.5 to predict the median).
 #' }
 #'    \item{lambda}{For "linear" oracle. A possible $L_2$ regularization parameter for computing the linear oracle (if the design matrix is not identifiable)}
@@ -65,9 +65,9 @@ oracle <-
   function(y, experts, oracle = "convex", awake = NULL, ...)
   {
     if (is.character(oracle)) {oracle = list(name = oracle)}
-    if (is.null(oracle$loss.type)) {oracle$loss.type = "squareloss"}
-    if (!is.null(oracle$tau) && oracle$loss.type != "pinballloss") {
-      warning("Unused parameter tau (loss.type != 'pinballloss')")
+    if (is.null(oracle$loss.type)) {oracle$loss.type = "square"}
+    if (!is.null(oracle$tau) && oracle$loss.type != "pinball") {
+      warning("Unused parameter tau (loss.type != 'pinball')")
     }
     if (is.null(oracle$tau)) {oracle$tau = 0.5}
     if (!is.null(oracle$lambda) && oracle$name != "linear") {
@@ -111,7 +111,7 @@ oracle <-
       res = list(loss = best.loss,
                  weights = weights, 
                  prediction = experts[,best.expert])
-      if (oracle$loss.type == "squareloss") {
+      if (oracle$loss.type == "square") {
         res$rmse = sqrt(res$loss)
       }
       return(res)

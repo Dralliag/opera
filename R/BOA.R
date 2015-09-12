@@ -1,6 +1,6 @@
 
 BOA <-
-  function (y, experts, awake = NULL, loss.type = "squareloss",
+  function (y, experts, awake = NULL, loss.type = "square",
             loss.gradient = TRUE, w0 = NULL, tau  = 0.5)
   {
 
