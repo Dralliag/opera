@@ -22,7 +22,7 @@ function(y, experts, z, lambda, nknots = 5,
   # We apply Ridge to this new matrix of experts
   u <- ridge(y, X, lambda, w0 = rep(c(1,rep(0,nknots+degree)),N)/N)
   prediction = apply(X*u$weights,1,sum)
-  prediction[1:(href+period)] = apply(experts[1:(href+period),],1,mean)
+  prediction[1] = mean(experts[1,])
   
   return(list(weight=u$weights, design = B, knots = knots, prediction=prediction))
 }

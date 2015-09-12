@@ -19,19 +19,22 @@
 #'    \item{"EWA"}{Exponentially weighted average aggregation rule. A positive learning rate \strong{eta} can be chosen by the user. The
 #' bigger it is the faster the aggregation rule will learn from observations
 #' and experts performances. However too hight values lead to unstable weight
-#' vectors and thus unstable predictions. If it is not specified, the learning rate is calibrated online. }
+#' vectors and thus unstable predictions. If it is not specified, the learning rate is calibrated online. 
+#' A finite grid of potential learning rates to be optimized online can be specified with \strong{grid.eta}.}
 #'    \item{"FS"}{Fixed-share aggregation rule. As for \code{ewa}, a learning rate \strong{eta} can be chosen by the user or calibrated online. The main difference with \code{ewa} aggregation
 #' rule rely in the mixing rate \strong{alpha}\eqn{\in [0,1]} wich considers at
 #' each instance a small probability \code{alpha} to have a rupture in the
 #' sequence and that the best expert may change. Fixed-share aggregation rule
 #' can thus compete with the best sequence of experts that can change a few
 #' times (see \code{\link{oracle}}), while \code{ewa} can only
-#' compete with the best fixed expert. The mixing rate is either chosen by the user either calibrated online.}
+#' compete with the best fixed expert. The mixing rate \strong{alpha} is either chosen by the user either calibrated online.
+#' Finite grids of learning rates and mixing rates to be optimized can be specified with parameters \strong{grid.eta} and \strong{grid.alpha}.}
 #'    \item{"Ridge"}{Ridge regression. It minimizes at
 #' each instance a penalized criterion.  It forms at each instance linear
 #' combination of the experts' forecasts and can assign negative weights that
 #' not necessarily sum to one.  It is useful if the experts are biased or
-#' correlated. It cannot be used with specialized experts. A positive regularization coefficient \strong{lambda} can either be chosen by the user or calibrated online. }
+#' correlated. It cannot be used with specialized experts. A positive regularization coefficient \strong{lambda} can either be chosen by the user or calibrated online. 
+#' A finite grid of coefficient to be optimized can be specified with a parameter \strong{grid.lambda}.}
 #'    \item{"MLpol"}{Polynomial Potential aggregation rule
 #' with different learning rates for each expert.  The learning rates are
 #' calibrated using theoretical values. There are similar aggregation rules like "BOA" (Bernstein online Aggregation see [Wintenberger, 2014] "MLewa", and "MLprod" (see [Gaillard, Erven, and Stoltz, 2014])}
@@ -42,7 +45,7 @@
 #' }
 #' Possible optional additional parameters are:
 #' \describe{
-#'    \item{loss.type}{(not possible for "ridge", and "gamMixture") a string specifying
+#'    \item{loss.type}{(not possible for "ridge", and "gamMixture" which are restricted to square loss) a string specifying
 #' the loss function considered to evaluate the performance.  It can be
 #' "squareloss", "mae", "mape", or "pinballloss". See \code{\link{loss}} for
 #' more details. If "pinballloss" is chosen, the quantile to be predicted can be set 
@@ -179,7 +182,9 @@ mixture <-
     
     if (aggregationRule$name == "Ridge") {
       if (is.null(aggregationRule$lambda)) {
-        return(ridgeCalib(y = y, experts = experts, w0 = w0, gamma = aggregationRule$gamma))
+        if (is.null(aggregationRule$grid.lambda)) {aggregationRule$grid.lambda = 1}
+        return(ridgeCalib(y = y, experts = experts, w0 = w0, gamma = aggregationRule$gamma,
+                          grid.lambda = aggregationRule$grid.lambda))
       } else {
         return(ridge(y, experts, aggregationRule$lambda, w0))
       }
@@ -199,10 +204,12 @@ mixture <-
 
     if (aggregationRule$name == "EWA") {
       if (is.null(aggregationRule$eta)) {
+        if (is.null(aggregationRule$grid.eta)) {aggregationRule$grid.eta = 1}
         return(ewaCalib(y = y, experts = experts, 
                         awake = awake, loss.type = aggregationRule$loss.type, 
                         loss.gradient = aggregationRule$loss.gradient, w0 = w0, 
-                        tau = aggregationRule$tau, gamma = aggregationRule$gamma))
+                        tau = aggregationRule$tau, gamma = aggregationRule$gamma,
+                        grid.eta = sort(aggregationRule$grid.eta)))
       } else {
         return(ewa(y = y, experts = experts, eta = aggregationRule$eta, 
                    awake = awake, loss.type = aggregationRule$loss.type, 
@@ -213,10 +220,13 @@ mixture <-
     
     if ((aggregationRule$name == "FS")) {
       if (is.null(aggregationRule$eta) || is.null(aggregationRule$alpha)) {
+        if (is.null(aggregationRule$grid.eta)) {aggregationRule$grid.eta = 1}
+        if (is.null(aggregationRule$grid.alpha)) {aggregationRule$grid.alpha = 10^(-4:-1)}
         return(fixedshareCalib(y = y, experts = experts, awake = awake, 
                                loss.type = aggregationRule$loss.type, 
                                loss.gradient = aggregationRule$loss.gradient, w0 = w0,
-                               tau = aggregationRule$tau, gamma = aggregationRule$gamma))
+                               tau = aggregationRule$tau, gamma = aggregationRule$gamma,
+                               grid.eta = aggregationRule$grid.eta, grid.alpha = aggregationRule$grid.alpha))
       } else {
         return(fixedshare(y = y, experts = experts, eta = aggregationRule$eta, alpha = aggregationRule$alpha, awake = awake, loss.type = aggregationRule$loss.type, 
                           loss.gradient = aggregationRule$loss.gradient, w0 = w0,

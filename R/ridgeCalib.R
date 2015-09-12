@@ -1,6 +1,6 @@
 # Ridge aggregation rule with automatic calibration of smoothing parameters
 ridgeCalib <-
-function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
+function(y, experts, grid.lambda = 1, w0 = NULL, trace = F, gamma = 2)
 {
 
   experts <- as.matrix(experts)
@@ -11,11 +11,11 @@ function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
   if (is.null(w0)) {w0 <- matrix(1/N, ncol = N)} # Uniform intial weight vector if unspecified
   
   # Smoothing parameter grid 
-  nlambda <- length(gridlambda)
+  nlambda <- length(grid.lambda)
   bestlambda <- floor(nlambda)/2 + 1 # We start with the parameter in the middle of the grid
-  gridlambda <- matrix(gridlambda, nrow = nlambda)
+  grid.lambda <- matrix(grid.lambda, nrow = nlambda)
   
-  lambda <- rep(gridlambda[bestlambda],T)
+  lambda <- rep(grid.lambda[bestlambda],T)
   cumulativeLoss <- rep(0,nlambda)
   
   wlambda <- array(w0, dim = c(N, nlambda))   # Weight matrix proposed by each Ridge(lambda) where lambda is a parameter of the grid
@@ -33,9 +33,9 @@ function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
     # Weights, prediction forme by Ridge(lambda[t]) where lambda[t] is the learning rate calibrated online
     weights[t,] <- wlambda[,bestlambda] 
     prediction[t] <- experts[t,] %*% weights[t,]
-    lambda[t] <- gridlambda[bestlambda]
+    lambda[t] <- grid.lambda[bestlambda]
     
-    # Weights, predictions formed by each Ridge(lambda) for lambda in the grid "gridlambda"
+    # Weights, predictions formed by each Ridge(lambda) for lambda in the grid "grid.lambda"
     pred.lambda[t,] <- experts[t,] %*% wlambda 
     cumulativeLoss <- cumulativeLoss + (pred.lambda[t,] - y[t])^2
     
@@ -50,8 +50,8 @@ function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
     # Expand the grid if the best parameter lies on an extremity
     if (bestlambda == nlambda) { 
       if (trace) cat(' + ')
-      newlambda <- gridlambda[bestlambda] * gamma^(1:3)
-      gridlambda <- c(gridlambda, newlambda)
+      newlambda <- grid.lambda[bestlambda] * gamma^(1:3)
+      grid.lambda <- c(grid.lambda, newlambda)
       nlambda <- nlambda + length(newlambda)
       for (k in 1:length(newlambda)) {
         perfnewlambda <- tryCatch(
@@ -64,11 +64,11 @@ function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
     }
     if (bestlambda == 1) {
       if (trace) cat(' - ')
-      newlambda <- gridlambda[bestlambda] / gamma^(1:3)
+      newlambda <- grid.lambda[bestlambda] / gamma^(1:3)
       nlambda <- nlambda + length(newlambda)
       bestlambda <- bestlambda + length(newlambda)
       for (k in 1:length(newlambda)) {
-        gridlambda <- c(newlambda[k],gridlambda)
+        grid.lambda <- c(newlambda[k],grid.lambda)
         perfnewlambda <- tryCatch(
           ridge(y[1:t], matrix(experts[1:t,],ncol = N), newlambda[k], w0 = w0), 
           error = function(e) {list(prediction = rep(NA, t))})
@@ -79,7 +79,7 @@ function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
     }
     wlambda <- matrix(0,nrow = N, ncol = nlambda)
     for (k in 1:nlambda) {
-      wlambda[,k] = tryCatch(solve(gridlambda[k]*diag(1,N) + At, matrix(gridlambda[k]*w0, nrow=N) + bt),
+      wlambda[,k] = tryCatch(solve(grid.lambda[k]*diag(1,N) + At, matrix(grid.lambda[k]*w0, nrow=N) + bt),
                                error = function(e) {NA})
     }
     # the smoothing parameter has to big large enough
@@ -93,7 +93,7 @@ function(y, experts, gridlambda = 1, w0 = NULL, trace = F, gamma = 2)
   grid.rmse <- sqrt(grid.loss)
   if (trace) cat('\n')
   return(list(weights = weights, prediction = prediction, 
-              lambda = lambda, grid.lambda = gridlambda, 
+              lambda = lambda, grid.lambda = grid.lambda, 
               loss = l, grid.loss = grid.loss, weights.forecast = wlambda[,bestlambda],
               rmse = l.rmse, grid.rmse = grid.rmse))
 }

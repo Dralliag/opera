@@ -34,6 +34,9 @@ test_that("EWA is ok", {
   expect_true(abs(m$weights.forecast[1]-0.6)<1e-1)
   expect_equal(m$loss, mean(loss(m$prediction,Y)))
   
+  grid.eta = runif(5)  
+  m = mixture(y = Y, experts = X, aggregationRule = list(name = "EWA", grid.eta = grid.eta), awake = awake)
+  expect_equal(sum(!(grid.eta %in% m$grid.eta)),0)
 })
 
 # Test of Fixed-share
@@ -63,6 +66,12 @@ test_that("Fixed-share is ok", {
   expect_true(abs(m$weights.forecast[1]-0.6)<1e-1)
   expect_equal(m$loss, mean(loss(m$prediction,Y)))
   
+  grid.eta = runif(5)
+  grid.alpha = runif(3)
+  m = mixture(y = Y, experts = X, aggregationRule = list(name = "FS", grid.eta = grid.eta, grid.alpha = grid.alpha), awake = awake)
+  expect_equal(sum(!(grid.eta %in% m$grid.eta)),0)
+  expect_identical(grid.alpha, m$grid.alpha)
+  
 })
 
 # Test of Ridge
@@ -79,6 +88,11 @@ test_that("Ridge is ok", {
   expect_equal(m$grid.loss[idx.lambda], mean(loss(m.fixed$prediction,Y)))
   expect_equal(m.fixed$loss, m$grid.loss[idx.lambda])
   expect_identical(m.fixed$weights[1,],w0)
+  
+  grid.lambda = runif(3)
+  m = mixture(y = Y, experts = X, aggregationRule = list(name = "Ridge", grid.lambda = grid.lambda, gamma = 100), awake = awake)
+  expect_equal(sum(!(grid.lambda %in% m$grid.lambda)),0)
+  
 })
 
 

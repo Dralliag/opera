@@ -1,6 +1,6 @@
 
 ewaCalib <-
-function(y, experts, grideta = 1, awake = NULL,
+function(y, experts, grid.eta = 1, awake = NULL,
         loss.type = 'squareloss', loss.gradient = TRUE, 
         w0 = NULL, trace = F, gamma = 2, tau = tau)
 {
@@ -17,13 +17,13 @@ function(y, experts, grideta = 1, awake = NULL,
   awake[idx.na] <- 0
   experts[idx.na] <- 0
   
-  neta <- length(grideta)         # Initial number of learning parameter in the grid to be optimized
+  neta <- length(grid.eta)         # Initial number of learning parameter in the grid to be optimized
   besteta <- floor(neta)/2 + 1    # We start with the parameter eta in the middle of the grid
-  eta <- rep(grideta[besteta],T)  # Vector of calibrated learning rates (will be filled online by the algorithm)
+  eta <- rep(grid.eta[besteta],T)  # Vector of calibrated learning rates (will be filled online by the algorithm)
   cumulativeLoss <- rep(0,neta)   # Cumulative loss suffered by each learning rate
   
   R <- array(0,c(N,neta))         # Matrix of regret suffered by each learning rate (columns) against each expert (rows)
-  for (k in 1:neta) {R[,k] <- log(w0)/grideta[k]} # We initialize the regrets so that w0 is the initial weight vector
+  for (k in 1:neta) {R[,k] <- log(w0)/grid.eta[k]} # We initialize the regrets so that w0 is the initial weight vector
   
   weta <- array(w0, dim = c(N,neta))          # Weight matrix assigned by each algorithm EWA(eta) 
   weights <- matrix(0, ncol = N, nrow = T)    # Matrix of weights formed by the mixture
@@ -36,9 +36,9 @@ function(y, experts, grideta = 1, awake = NULL,
     # Weights, prediction formed by EWA(eta[t]) where eta[t] is the learning rate calibrated online
     weights[t,] <- weta[,besteta] * awake[t,] / sum(weta[,besteta] * awake[t,])
     prediction[t] <- experts[t,] %*% weights[t,]
-    eta[t] <- grideta[besteta]
+    eta[t] <- grid.eta[besteta]
 
-    # Weights, predictions formed by each EWA(eta) for eta in the grid "grideta"
+    # Weights, predictions formed by each EWA(eta) for eta in the grid "grid.eta"
     pred <- experts[t,] %*% t(t(weta * awake[t,]) / apply(weta * awake[t,],2,sum))
     cumulativeLoss <- cumulativeLoss + loss(pred, y[t], loss.type, tau = tau) # cumulative loss without gradient trick
     lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient, tau = tau)) # gradient loss suffered by each eta on the grid
@@ -54,8 +54,8 @@ function(y, experts, grideta = 1, awake = NULL,
     # We increase the size of the grid if the best parameter lies in an extremity
     if (besteta == neta) { 
       if (trace) cat(' + ')
-        neweta <- grideta[besteta] * gamma^(1:3)
-        grideta <- c(grideta, neweta)
+        neweta <- grid.eta[besteta] * gamma^(1:3)
+        grid.eta <- c(grid.eta, neweta)
         neta <- neta + length(neweta)
         R <- cbind(R, array(0, dim = c(N,length(neweta))))
         for (k in 1:length(neweta)) {
@@ -68,19 +68,19 @@ function(y, experts, grideta = 1, awake = NULL,
 
     if (besteta == 1) {
       if (trace) cat(' - ')
-      neweta <- grideta[besteta] / gamma^(1:3)
+      neweta <- grid.eta[besteta] / gamma^(1:3)
       neta <- neta + length(neweta)
       besteta <- besteta + length(neweta)
       R <- cbind(array(0, dim = c(N,length(neweta))), R)        
       for (k in 1:length(neweta)) {
-        grideta <- c(neweta[k],grideta)
+        grid.eta <- c(neweta[k],grid.eta)
         perfneweta <- ewa(y[1:t], matrix(experts[1:t,],ncol=N), neweta[k], matrix(awake[1:t,],ncol=N), 
           loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0, tau = tau)
         cumulativeLoss <- c(perfneweta$loss * t, cumulativeLoss)
         R[,besteta-k] <- perfneweta$regret
       }
     }
-    weta <- truncate1(exp(t(t(matrix(R, ncol=neta)) * grideta)))
+    weta <- truncate1(exp(t(t(matrix(R, ncol=neta)) * grid.eta)))
   }
 
   # Next weights
@@ -91,7 +91,7 @@ function(y, experts, grideta = 1, awake = NULL,
   mloss <- cumulativeLoss / T
   
   res = list(weights = weights, prediction = prediction, 
-             eta = eta, grid.eta = grideta, 
+             eta = eta, grid.eta = grid.eta, 
              loss = l, grid.loss = mloss, 
              weights.forecast = w)
   
