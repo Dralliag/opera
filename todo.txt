@@ -5,4 +5,16 @@
 - commenter le code en anglais
 - ridge version séquentielle ? 
 - gamMixture (gérer les href,...)
-- vérifier pinball loss et paramètre tau
+- tester des changements de grilles pour les calibrations
+- fonctions de pertes: 
+	- gérer différences entre lossConv et convexLoss
+	- enlever les fonctions mape, rmse: avoir une fonction de perte globale
+- ajouter le côté séquentiel: on rentre le model qui se met à jour et renvoie la prochaine prévision (mettre un paramètre dans la fonction predict)
+
+
+
+# Plus long terme
+- ajouter la possibilité de faire de la classification
+- ajouter les algos de bandits (UCB),... et pb de bandits
+
+
