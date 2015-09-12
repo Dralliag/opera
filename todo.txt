@@ -16,5 +16,5 @@
 # Plus long terme
 - ajouter la possibilité de faire de la classification
 - ajouter les algos de bandits (UCB),... et pb de bandits
-
+- ajouter une mixture du type pinball penalisé (ou perturbé)
 

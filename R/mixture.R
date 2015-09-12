@@ -173,8 +173,8 @@ mixture <-
     }
     if (is.null(aggregationRule$tau)) {aggregationRule$tau = 0.5}
 
-    if (aggregationRule$loss.type != "squareloss" && aggregationRule$name == "Ridge") {
-      stop("Square loss is require for Ridge aggregationRule.")
+    if (aggregationRule$loss.type != "squareloss" && (aggregationRule$name == "Ridge" || aggregationRule$name == "gamMixture")) {
+      stop(paste("Square loss is require for", aggregationRule$name, "aggregationRule."))
     }
     
     if (aggregationRule$name == "Ridge") {
@@ -230,16 +230,18 @@ mixture <-
         stop("gamMixture cannot handle automatic calibration")
       }
       if (is.null(aggregationRule$z)){
-        stop("A matrix of exogeneous variables z must be given")
+        stop("A matrix (or vector) of exogeneous variables z must be given in aggregationRule")
       }
       if (is.null(aggregationRule$nknots)){ aggregationRule$nknots = 5}
       if (is.null(aggregationRule$degree)){ aggregationRule$degree = 3}
       if (is.null(aggregationRule$loss.type)){ aggregationRule$loss.type = "squareloss"}
       if (is.null(aggregationRule$uniform)){ aggregationRule$uniform = FALSE}
       if (is.null(aggregationRule$knots)){ aggregationRule$knots = NULL}
-      if (is.null(aggregationRule$tau)){ aggregationRule$tau = 0.5}
       
-      return(gamMixture(y = y, experts = experts, z = , aggregationRule$lambda, nknots = aggregationRule$nknots, degree = aggregationRule$degree, loss.type = aggregationRule$loss.type, uniform = aggregationRule$uniform, knots = aggregationRule$knots, tau = aggregationRule$tau))
+      return(gamMixture(y = y, experts = experts, z = aggregationRule$z, aggregationRule$lambda, 
+        nknots = aggregationRule$nknots, degree = aggregationRule$degree, 
+        loss.type = aggregationRule$loss.type, uniform = aggregationRule$uniform, 
+        knots = aggregationRule$knots))
       
     }
     
