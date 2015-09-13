@@ -18,7 +18,7 @@
 #' "pinball"}.
 #' @return  A vector of length \code{T} containing the sequence of
 #' instantaneous losses suffered by the prediction \code{x}.
-#' @author Pierre Gaillard <pierre@gaillard.me>
+#' @author Pierre Gaillard <pierre@@gaillard.me>
 #' @keywords ~kwd1 ~kwd2
 #' @export loss
 loss <-

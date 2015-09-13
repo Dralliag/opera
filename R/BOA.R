@@ -44,6 +44,6 @@ BOA <-
       w <- truncate1(exp(log(w0) + eta[t+1,] * R))
     }
     return(list(weights = weights, prediction = prediction, 
-      eta = eta, weights.forecast =  w/sum(w),
+      eta = eta, coefficients =  w/sum(w),
       loss = mean(loss(prediction, y, loss.type, tau))))
   }

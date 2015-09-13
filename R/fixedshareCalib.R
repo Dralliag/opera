@@ -79,7 +79,7 @@ fixedshareCalib <-
                                      loss.type = loss.type, loss.gradient = loss.gradient, 
                                      w0 = w0, tau = tau)
             cumulativeLoss[bestpar[1]+j,k] <- perfnewpar$loss * t
-            wpar[,bestpar[1]+j,k] <- perfnewpar$weights.forecast
+            wpar[,bestpar[1]+j,k] <- perfnewpar$coefficients
           }
         }
       }
@@ -101,7 +101,7 @@ fixedshareCalib <-
                                      loss.type = loss.type, loss.gradient = loss.gradient, 
                                      w0 = w0, tau = tau)
             cumulativeLoss[1, k] <- perfnewpar$loss * t
-            wpar[, bestpar[1]-j, k] <- perfnewpar$weights.forecast
+            wpar[, bestpar[1]-j, k] <- perfnewpar$coefficients
           }
         }
       }
@@ -120,7 +120,7 @@ fixedshareCalib <-
     res = list(weights = weights, prediction = prediction,
                 eta = par$eta, grid.eta = grid.eta, 
                 alpha = par$alpha, grid.alpha = grid.alpha,
-                loss = l, grid.loss = mloss, weights.forecast = w)
+                loss = l, grid.loss = mloss, coefficients = w)
     if (loss.type == 'square') {
       res$grid.rmse <- sqrt(mloss)
       res$rmse <- sqrt(l)

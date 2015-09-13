@@ -45,5 +45,5 @@ fixedshare <-
     
     # Renvoi de la matrice de poids 
     return(list(weights = weights, prediction = pred,
-                loss = cumulativeLoss / T, weights.forecast = w))
+                loss = cumulativeLoss / T, coefficients = w))
   }

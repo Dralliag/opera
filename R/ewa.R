@@ -40,5 +40,5 @@ function(y, experts, eta, awake = NULL, loss.type = 'square',
   
   return(list(weights = weights, prediction = pred, 
               loss = cumulativeLoss/T, regret = R,
-              weights.forecast =  w))
+              coefficients =  w))
 }

@@ -25,8 +25,8 @@ function(y, experts, awake=NULL, loss.type='square', niter = 1, tau = 0.5, ...)
           NULL
         })
       if (!is.null(res)) {
-        weights = matrix(res$solution, ncol = N)
-        prediction = experts %*% t(weights)
+        coefficients = matrix(res$solution, ncol = N)
+        prediction = experts %*% t(coefficients)
         bestLoss = mean(loss(x = prediction, y))
       }
    } 
@@ -61,12 +61,12 @@ function(y, experts, awake=NULL, loss.type='square', niter = 1, tau = 0.5, ...)
          }
          #print(c(i, l))  
       }
-      weights = matrix(best_p, ncol = N)
-      weights = weights / apply(weights,1,sum)
-      pond <- awake %*% t(weights)
-      prediction <- ((experts* awake) %*% t(weights)) / pond
+      coefficients = matrix(best_p, ncol = N)
+      coefficients = coefficients / apply(coefficients,1,sum)
+      pond <- awake %*% t(coefficients)
+      prediction <- ((experts* awake) %*% t(coefficients)) / pond
    }
-   res = list(loss = bestLoss, weights = weights, prediction = prediction)
+   res = list(loss = bestLoss, coefficients = coefficients, prediction = prediction)
    if (loss.type == "square") {
       res$rmse = sqrt(res$loss)
    }

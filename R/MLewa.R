@@ -52,6 +52,6 @@ function(y, experts, awake = NULL,
    w = w / sum(w)
 
    return(list(weights = weights, prediction = prediction, eta = eta,
-              weights.forecast =  w, 
+              coefficients =  w, 
               loss = mean(loss(prediction, y, loss.type, tau))))
 }

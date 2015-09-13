@@ -93,7 +93,7 @@ function(y, experts, grid.eta = 1, awake = NULL,
   res = list(weights = weights, prediction = prediction, 
              eta = eta, grid.eta = grid.eta, 
              loss = l, grid.loss = mloss, 
-             weights.forecast = w)
+             coefficients = w)
   
   if (loss.type == 'square') {
     res$grid.rmse <- sqrt(mloss)

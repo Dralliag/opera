@@ -6,17 +6,17 @@ function(y, experts, lambda = 0, loss.type = "square",
   experts <- as.matrix(experts)
   N = ncol(experts)
 
-  weights <- NULL
+  coefficients <- NULL
   if (loss.type == "square") {
-  	weights <- solve(lambda * diag(1,ncol(experts)) + t(experts) %*% experts,t(experts)%*%y)
+  	coefficients <- solve(lambda * diag(1,ncol(experts)) + t(experts) %*% experts,t(experts)%*%y)
   	
   } else if (loss.type == "pinball") {
-  		weights <- tryCatch({
+  		coefficients <- tryCatch({
   						quantreg::rq(y~experts-1,tau = tau)$coefficients},
   						error = function(e) { NULL 
   					})
   } 
-  if (is.null(weights)) {
+  if (is.null(coefficients)) {
   		warning("The best linear oracle is only approximated (using optim).")
   	 lossu <- function(u)   {
          return(mean(loss(
@@ -40,11 +40,11 @@ function(y, experts, lambda = 0, loss.type = "square",
             best_u = w
          }
       }
-      weights = matrix(best_u, nrow = N)
+      coefficients = matrix(best_u, nrow = N)
   }
  
-	prev <- experts %*% weights	
+	prev <- experts %*% coefficients	
   loss <- mean(loss(prev, y, loss.type = loss.type, tau = tau))
-  return(list(loss=loss,weights=c(weights),prediction=prev,
+  return(list(loss=loss,coefficients=c(coefficients),prediction=prev,
   	rmse=sqrt(mean(loss(prev,y)))))
 }

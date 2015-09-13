@@ -75,7 +75,7 @@
 #' each expert.}
 #' \item{loss}{ The average loss (as stated by parameter \code{loss.type}) suffered
 #' by the aggregation rule.}
-#' \item{weights.forecast}{ The weights formed by the aggregation rule to perform the
+#' \item{coefficients}{ The weights formed by the aggregation rule to perform the
 #' next prediction}
 #' Possible optional returned parameters are:
 #' \describe{
@@ -88,7 +88,7 @@
 #'  \code{grid.eta}.}
 #'  \item{grid.rmse}{Similar to \code{grid.loss} with RMSEs.}
 #' }
-#' @author Pierre Gaillard <pierre@gaillard.me>
+#' @author Pierre Gaillard <pierre@@gaillard.me>
 #' @keywords ~kwd1 ~kwd2
 #' @examples
 #' 
@@ -147,112 +147,7 @@
 #' 
 #' @export mixture
 
-mixture <-
-  function(y, experts, 
-           aggregationRule = "MLpol",  w0 = NULL, awake = NULL)
-  {
-    # test possible warning and errors
-    if (is.character(aggregationRule)) {
-      aggregationRule = list(name = aggregationRule)
-    } else {
-      if (!is.list(aggregationRule)) {
-        stop("Bad type for aggregationRule: it must be either a list or a character.")
-      }
-    }
-    if (is.null(aggregationRule$name)){
-      aggregationRule$name  = "MLpol"
-      warning("Aggregation rule MLpol is chosen")
-    }
-    if (is.null(aggregationRule$gamma)) {
-      aggregationRule$gamma = 2
-    }
-    if (!is.null(w0) && (aggregationRule$name == "MLpol")) {
-      stop(paste(aggregationRule$name, "cannot handle non-uniform prior weight vector"))
-    }
-    if (is.null(aggregationRule$loss.type)) {aggregationRule$loss.type = "square"}
-    if (is.null(aggregationRule$loss.gradient)) {aggregationRule$loss.gradient = TRUE} 
-    if (!is.null(aggregationRule$tau) && aggregationRule$loss.type != "pinball") {
-      warning("Unused parameter tau (loss.type != 'pinball')")
-    }
-    if (is.null(aggregationRule$tau)) {aggregationRule$tau = 0.5}
+mixture <- function(y, experts, 
+           aggregationRule = "MLpol",  w0 = NULL, awake = NULL) UseMethod("mixture")
 
-    if (aggregationRule$loss.type != "square" && (aggregationRule$name == "Ridge" || aggregationRule$name == "gamMixture")) {
-      stop(paste("Square loss is require for", aggregationRule$name, "aggregationRule."))
-    }
-    
-    if (aggregationRule$name == "Ridge") {
-      if (is.null(aggregationRule$lambda)) {
-        if (is.null(aggregationRule$grid.lambda)) {aggregationRule$grid.lambda = 1}
-        return(ridgeCalib(y = y, experts = experts, w0 = w0, gamma = aggregationRule$gamma,
-                          grid.lambda = aggregationRule$grid.lambda))
-      } else {
-        return(ridge(y, experts, aggregationRule$lambda, w0))
-      }
-    } 
-    
-    if (aggregationRule$name == "MLpol") {
-      return(MLpol(y, experts, awake = awake, loss.type = aggregationRule$loss.type, 
-                  loss.gradient = aggregationRule$loss.gradient, tau = aggregationRule$tau))
-    }
 
-    if ((aggregationRule$name == "BOA") || (aggregationRule$name == "MLewa") || (aggregationRule$name == "MLprod")) {
-      algo <- eval(parse(text = aggregationRule$name))
-      return(algo(y, experts, awake = awake, loss.type = aggregationRule$loss.type, 
-                  loss.gradient = aggregationRule$loss.gradient,
-                  tau = aggregationRule$tau, w0 = w0))
-    }
-
-    if (aggregationRule$name == "EWA") {
-      if (is.null(aggregationRule$eta)) {
-        if (is.null(aggregationRule$grid.eta)) {aggregationRule$grid.eta = 1}
-        return(ewaCalib(y = y, experts = experts, 
-                        awake = awake, loss.type = aggregationRule$loss.type, 
-                        loss.gradient = aggregationRule$loss.gradient, w0 = w0, 
-                        tau = aggregationRule$tau, gamma = aggregationRule$gamma,
-                        grid.eta = sort(aggregationRule$grid.eta)))
-      } else {
-        return(ewa(y = y, experts = experts, eta = aggregationRule$eta, 
-                   awake = awake, loss.type = aggregationRule$loss.type, 
-                   loss.gradient = aggregationRule$loss.gradient, w0 = w0,
-                   tau = aggregationRule$tau))
-      }
-    }
-    
-    if ((aggregationRule$name == "FS")) {
-      if (is.null(aggregationRule$eta) || is.null(aggregationRule$alpha)) {
-        if (is.null(aggregationRule$grid.eta)) {aggregationRule$grid.eta = 1}
-        if (is.null(aggregationRule$grid.alpha)) {aggregationRule$grid.alpha = 10^(-4:-1)}
-        return(fixedshareCalib(y = y, experts = experts, awake = awake, 
-                               loss.type = aggregationRule$loss.type, 
-                               loss.gradient = aggregationRule$loss.gradient, w0 = w0,
-                               tau = aggregationRule$tau, gamma = aggregationRule$gamma,
-                               grid.eta = aggregationRule$grid.eta, grid.alpha = aggregationRule$grid.alpha))
-      } else {
-        return(fixedshare(y = y, experts = experts, eta = aggregationRule$eta, alpha = aggregationRule$alpha, awake = awake, loss.type = aggregationRule$loss.type, 
-                          loss.gradient = aggregationRule$loss.gradient, w0 = w0,
-                          tau = aggregationRule$tau))
-      }
-    }
-    
-    if ((aggregationRule$name == "gamMixture")) {
-      warning("This aggregation rule is not stable in the current version")
-      if (is.null(aggregationRule$lambda)) {
-        stop("gamMixture cannot handle automatic calibration")
-      }
-      if (is.null(aggregationRule$z)){
-        stop("A matrix (or vector) of exogeneous variables z must be given in aggregationRule")
-      }
-      if (is.null(aggregationRule$nknots)){ aggregationRule$nknots = 5}
-      if (is.null(aggregationRule$degree)){ aggregationRule$degree = 3}
-      if (is.null(aggregationRule$loss.type)){ aggregationRule$loss.type = "square"}
-      if (is.null(aggregationRule$uniform)){ aggregationRule$uniform = FALSE}
-      if (is.null(aggregationRule$knots)){ aggregationRule$knots = NULL}
-      
-      return(gamMixture(y = y, experts = experts, z = aggregationRule$z, aggregationRule$lambda, 
-        nknots = aggregationRule$nknots, degree = aggregationRule$degree, 
-        loss.type = aggregationRule$loss.type, uniform = aggregationRule$uniform, 
-        knots = aggregationRule$knots))
-      
-    }
-    
-  }

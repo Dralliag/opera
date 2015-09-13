@@ -94,6 +94,6 @@ function(y, experts, grid.lambda = 1, w0 = NULL, trace = F, gamma = 2)
   if (trace) cat('\n')
   return(list(weights = weights, prediction = prediction, 
               lambda = lambda, grid.lambda = grid.lambda, 
-              loss = l, grid.loss = grid.loss, weights.forecast = wlambda[,bestlambda],
+              loss = l, grid.loss = grid.loss, coefficients = wlambda[,bestlambda],
               rmse = l.rmse, grid.rmse = grid.rmse))
 }

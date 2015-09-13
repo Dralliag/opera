@@ -59,7 +59,7 @@ function(y, experts, awake = NULL,
   }
 
   return(list(weights = weights, prediction = prediction,
-              weights.forecast = w,
+              coefficients = w,
               eta = eta,
               loss = mean(loss(prediction, y, loss.type, tau))))
 }

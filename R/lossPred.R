@@ -27,7 +27,7 @@
 # "pinball"}.
 # @return  A vector containing the loss suffered by the \code{N}
 # predictions in \code{x}.
-# @author Pierre Gaillard <pierre@gaillard.me>
+# @author Pierre Gaillard <pierre@@gaillard.me>
 # @seealso \code{\link{loss}}
 # @keywords ~kwd1 ~kwd2
 lossPred <-

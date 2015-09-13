@@ -20,10 +20,10 @@ function(y, experts, lambda, w0 = NULL) {
   }
   #w[1,] = w0
   
-  weights.forecast = solve(At,bt)
+  coefficients = solve(At,bt)
   prediction <- apply(experts * w, 1, sum)
   l <- mean(loss(prediction,y))
   return(list(weights = w, prediction = prediction, 
-    weights.forecast = weights.forecast,
+    coefficients = coefficients,
     loss =  l))
 }

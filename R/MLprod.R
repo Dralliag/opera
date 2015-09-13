@@ -56,6 +56,6 @@ function(y, experts, awake = NULL,
   w <- truncate1(exp(R))
   w <- eta[T+1,] * w / sum(eta[T+1,] * w)
   return(list(weights = weights, prediction = prediction, eta = eta,
-          weights.forecast = w,
+          coefficients = w,
           loss = mean(loss(prediction, y, loss.type, tau))))
 }

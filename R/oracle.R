@@ -54,68 +54,12 @@
 #' best sequence of expert with at
 #' most $m-1$ shifts.
 #' }
-#' \item{weights}{ Not for the "shifting" oracle. A vector containing the best weight vector corresponding to the oracle. }
+#' \item{coefficients}{ Not for the "shifting" oracle. A vector containing the best weight vector corresponding to the oracle. }
 #' \item{prediction}{ Not for the "shifting" oracle. A vecor containing the
 #' predictions of the oracle.  }
 #' \item{rmse}{If loss.type is the square loss (default) only.
 #' The root mean square error (i.e., it is the square root of \code{loss}.}
-#' @author Pierre Gaillard <pierre@gaillard.me>
+#' @author Pierre Gaillard <pierre@@gaillard.me>
 #' @export oracle
-oracle <-
-  function(y, experts, oracle = "convex", awake = NULL, ...)
-  {
-    if (is.character(oracle)) {oracle = list(name = oracle)}
-    if (is.null(oracle$loss.type)) {oracle$loss.type = "square"}
-    if (!is.null(oracle$tau) && oracle$loss.type != "pinball") {
-      warning("Unused parameter tau (loss.type != 'pinball')")
-    }
-    if (is.null(oracle$tau)) {oracle$tau = 0.5}
-    if (!is.null(oracle$lambda) && oracle$name != "linear") {
-      warning("Unused lambda parameter (oracle != linear)")}
-    if (is.null(oracle$lambda)) oracle$lambda = 0
-    if (!is.null(oracle$niter) && oracle$name!= "convex" && oracle$name != "linear") {
-      warning("Unused niter parameter (oracle should be convex or linear)")} 
-    if (is.null(oracle$niter)) oracle$niter = 3
-    if ((!is.null(awake) || sum(is.na(experts)>0)) && oracle$name != "convex" && oracle$name != "shifting") {
-      stop(paste("Sleeping or missing values not allowed for best", oracle$name, "oracle."))}  
 
-    # if we are looking for the best convex combination of experts
-    if (oracle$name == "convex") {
-      return(
-        bestConvex(
-          y, experts, awake = awake,
-          loss.type = oracle$loss.type, niter = oracle$niter, 
-          tau = oracle$tau,...
-        )
-      )
-    }
-    
-    if (oracle$name == "linear") {
-      return(bestLinear(y, experts, lambda = oracle$lambda, loss.type = oracle$loss.type, tau = oracle$tau))
-    }
-    
-    if (oracle$name == "shifting") {
-      return(bestShifts(
-        y, experts, awake = oracle$awake,
-        loss.type = oracle$loss.type
-      ))
-    }
-    
-    if (oracle$name == "expert") {
-      
-      loss.experts = apply(apply(experts, 2, function (x) {
-        loss(x,y,loss.type = oracle$loss.type,tau = oracle$tau)}), 2, mean)
-      best.loss = min(loss.experts)
-      weights =  (loss.experts == best.loss) / sum(loss.experts == best.loss)
-      best.expert = which(weights > 0)[1]
-      res = list(loss = best.loss,
-                 weights = weights, 
-                 prediction = experts[,best.expert])
-      if (oracle$loss.type == "square") {
-        res$rmse = sqrt(res$loss)
-      }
-      return(res)
-    }
-    
-    stop('oracle parameter is wrong')
-  }
+oracle <- function(y, experts, model = "convex", awake = NULL, ...) UseMethod("oracle")
