@@ -12,7 +12,7 @@
 #' @param experts A matrix containing the experts
 #' forecasts. Each column corresponds to the predictions proposed by an expert
 #' to predict \code{Y}.  It has as many columns as there are experts.
-#' @param oracle Either a character string specifying the oracle to use or a list with a component \code{name} specifying the oracle and any additional parameter needed.
+#' @param model Either a character string specifying the oracle to use or a list with a component \code{name} specifying the oracle and any additional parameter needed.
 #' Currently available oracles are:
 #' \describe{
 #'    \item{"expert"}{The best fixed (constant over time) expert oracle.}
@@ -55,7 +55,7 @@
 #' most $m-1$ shifts.
 #' }
 #' \item{coefficients}{ Not for the "shifting" oracle. A vector containing the best weight vector corresponding to the oracle. }
-#' \item{prediction}{ Not for the "shifting" oracle. A vecor containing the
+#' \item{prediction}{ Not for the "shifting" oracle. A vector containing the
 #' predictions of the oracle.  }
 #' \item{rmse}{If loss.type is the square loss (default) only.
 #' The root mean square error (i.e., it is the square root of \code{loss}.}
@@ -63,3 +63,73 @@
 #' @export oracle
 
 oracle <- function(y, experts, model = "convex", awake = NULL, ...) UseMethod("oracle")
+
+
+#' @export 
+oracle.default <-
+  function(y, experts, model = "convex", awake = NULL, ...)
+  {
+    if (is.character(model)) {model = list(name = model)}
+    if (is.null(model$loss.type)) {model$loss.type = "square"}
+    if (!is.null(model$tau) && model$loss.type != "pinball") {
+      warning("Unused parameter tau (loss.type != 'pinball')")
+    }
+    if (is.null(model$tau)) {model$tau = 0.5}
+    if (!is.null(model$lambda) && model$name != "linear") {
+      warning("Unused lambda parameter (model != linear)")}
+    if (is.null(model$lambda)) model$lambda = 0
+    if (!is.null(model$niter) && model$name!= "convex" && model$name != "linear") {
+      warning("Unused niter parameter (model should be convex or linear)")} 
+    if (is.null(model$niter)) model$niter = 3
+    if ((!is.null(awake) || sum(is.na(experts)>0)) && model$name != "convex" && model$name != "shifting") {
+      stop(paste("Sleeping or missing values not allowed for best", model$name, "oracle."))}  
+
+    if (!(model$name %in% c("convex","linear","shifting","expert"))) {
+      stop("Wrong model specification") 
+    }
+    if (min(y) <= 0 && model$loss.type == "percentage") {
+      stop("Y should be non-negative for percentage loss function")
+    }
+    # if we are looking for the best convex combination of experts
+    if (model$name == "convex") {
+      res <- bestConvex(
+          y, experts, awake = awake,
+          loss.type = model$loss.type, niter = model$niter, 
+          tau = model$tau,...)
+    }
+    
+    if (model$name == "linear") {
+      res <- bestLinear(y, experts, lambda = model$lambda, 
+              loss.type = model$loss.type, tau = model$tau)
+    }
+    
+    if (model$name == "shifting") {
+      res <- bestShifts(y, experts, awake = model$awake,
+              loss.type = model$loss.type)
+    }
+    
+    if (model$name == "expert") {
+      
+      loss.experts = apply(apply(experts, 2, function (x) {
+        loss(x,y,loss.type = model$loss.type,tau = model$tau)}), 2, mean)
+      best.loss = min(loss.experts)
+      coefficients =  (loss.experts == best.loss) / sum(loss.experts == best.loss)
+      best.expert = which(coefficients > 0)[1]
+      res = list(loss = best.loss,
+                 coefficients = coefficients, 
+                 prediction = experts[,best.expert])
+      if (model$loss.type == "square") {
+        res$rmse = sqrt(res$loss)
+      }
+    }
+    
+    res$model <- model$name
+    res$residuals <- y - res$prediction
+    res$call <- match.call()
+    res$Y <- y
+    res$experts <- experts
+    res$loss.type <- model$loss.type
+    
+    class(res) <- "oracle"
+    return(res)
+  }

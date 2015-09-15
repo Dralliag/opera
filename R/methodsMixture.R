@@ -1,6 +1,4 @@
-#' Print mixture method
-#' @method print mixture
-#' @export print.mixture
+#' @export 
 print.mixture <- function(x, ...)
 {
     cat("Call:\n")
@@ -9,8 +7,7 @@ print.mixture <- function(x, ...)
     print(x$coefficients)
 }
 
-#' @method summary mixture
-#' @export summary.mixture
+#' @export 
 summary.mixture <- function(object, ...)
 {
    	rmse <- rmse(object$prediction, object$Y)
@@ -27,9 +24,7 @@ summary.mixture <- function(object, ...)
 	res 
 }
 
-
-#' @method print sumary.mixture
-#' @export print.summary.mixture
+#' @export 
 print.summary.mixture <- function(x,...) 
 {
     cat("Call:\n")
@@ -42,22 +37,20 @@ print.summary.mixture <- function(x,...)
 }
 
 
-
-#' @method plot mixture
-#' @export plot.mixture
-plot.mixture <- function(object, ...) 
+#' @export 
+plot.mixture <- function(x, ...) 
 {
-    object$experts = data.frame(object$experts)
+    x$experts = data.frame(x$experts)
 
-    K = ncol(object$experts)
-    if (is.null(names(object$experts))) {names(object$experts) = colnames(object$experts)}
-    if (is.null(names(object$experts))) {names(object$experts) = paste("Expert",1:K)}
-	if (object$model == "gamMixture") {
+    K = ncol(x$experts)
+    if (is.null(names(x$experts))) {names(x$experts) = colnames(x$experts)}
+    if (is.null(names(x$experts))) {names(x$experts) = paste("Expert",1:K)}
+	if (x$model == "gamMixture") {
 
 	}
-	if (object$model == "Ridge") { # Linear aggregation rule
-		matplot(object$weights, type = 'l', xlab = "Time steps", ylab = "Weights", lty = 1:5, col =1:8, ...)
-		legend("topright", names(object$experts), lty = 1:5, col = 1:8, ...)
+	if (x$model == "Ridge") { # Linear aggregation rule
+		matplot(x$weights, type = 'l', xlab = "Time steps", ylab = "Weights", lty = 1:5, col =1:8, ...)
+		legend("topright", names(x$experts), lty = 1:5, col = 1:8, ...)
 	}
     else { # Convex aggregation rule
         # Mettre le plot en polygon des poids

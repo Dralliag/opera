@@ -1,6 +1,4 @@
-#' Print oracle method
-#' @method print oracle
-#' @export print.oracle
+#' @export 
 print.oracle <- function(x, ...)
 {
     cat("Call:\n")
@@ -15,48 +13,45 @@ print.oracle <- function(x, ...)
     print(summary(x)$losses)
 }
   
-
-#' @method summary oracle
-#' @export summary.oracle
-summary.oracle <- function(x, ...)
+#' @export
+summary.oracle <- function(object, ...)
 {
 
-    if (x$model != "shifting") {   
-        rmse <- rmse(x$prediction, x$Y)
-        mape <- mean(loss(x$prediction, x$Y,loss.type="percentage"))
+    if (object$model != "shifting") {   
+        rmse <- rmse(object$prediction, object$Y)
+        mape <- mean(loss(object$prediction, object$Y,loss.type="percentage"))
     
         # mettre les rmse des oracles pour comparer
         TAB <- cbind(rmse = rmse, mape = mape)
-        rownames(TAB) = paste("Best",x$model,"oracle: ")
+        rownames(TAB) = paste("Best",object$model,"oracle: ")
 
     } else {
 
-        K = nrow(x$experts)
+        K = nrow(object$experts)
         n.shifts = round(quantile(1:K))
-        TAB = matrix(m$loss[n.shifts], nrow = 1)
+        TAB = matrix(object$loss[n.shifts], nrow = 1)
         colnames(TAB) = paste(n.shifts-1,"shifts")
-        rownames(TAB) = paste("Average", x$loss.type, "loss:")
+        rownames(TAB) = paste("Average", object$loss.type, "loss:")
 
-        if (x$loss.type == "square") {
+        if (object$loss.type == "square") {
             TAB = sqrt(TAB)
             rownames(TAB) = "rmse:"
-        } else if (x$loss.type == "absolute") {
+        } else if (object$loss.type == "absolute") {
             rownames(TAB) = "mean absolute error:"
-        } else if (x$loss.type == "percentage") {
+        } else if (object$loss.type == "percentage") {
             rownames(TAB) = "mape:"
         }
     }
 
-    res <- list(call=x$call,
-                coefficients = x$coefficients,
+    res <- list(call=object$call,
+                coefficients = object$coefficients,
                 losses=TAB,
-                model = x$model)
+                model = object$model)
     class(res) <- "summary.oracle"
 	res 
 }
 
-#' @method print sumary.oracle
-#' @export print.summary.oracle
+#' @export 
 print.summary.oracle <- function(x,...) 
 {
     cat("Call:\n")
@@ -71,8 +66,7 @@ print.summary.oracle <- function(x,...)
     print(x$losses)
 }
 
-#' @method plot oracle
-#' @export plot.oracle
+#' @export 
 plot.oracle <- function(x, ...) 
 {
     if (x$model != "shifting") {
