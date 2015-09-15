@@ -86,3 +86,28 @@ plot.oracle <- function(x, ...)
     }
 }
 
+#' @export
+predict.oracle <- function(object, newexpert = NULL, ...)
+{
+    if (missing(newexpert) || is.null(newexpert)) {
+        stop("You should enter new expert predictions")
+    }
+
+    newexpert <- as.matrix(newexpert)
+    if (ncol(newexpert) == 1 && nrow(newexpert) > 1 ) {
+        newexpert = t(newexpert)
+    }
+    K <- ncol(newexpert)
+
+  if (object$model == "gamMixture") {
+    stop("Predict method is not yet available for gamMixture")
+  }
+  else {
+    w <- matrix(object$coefficients, ncol = 1)  
+    
+    if (!online) {
+        pred = newexpert %*% w
+    }
+    return(pred)
+  }
+}

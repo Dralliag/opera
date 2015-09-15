@@ -1,6 +1,6 @@
 MLpol <-
 function(y, experts, awake = NULL,
-            loss.type = 'square', loss.gradient = TRUE, tau = 0.5) 
+            loss.type = 'square', loss.gradient = TRUE, tau = 0.5, training = NULL) 
 {
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -16,11 +16,20 @@ function(y, experts, awake = NULL,
   weights <- matrix(0,ncol=N,nrow=T)
   prediction <- rep(0,T)
   
+  
+
   # Initialization or the learning parameter
   eta <- matrix(exp(700),ncol=N,nrow=T+1)
-  
   # regret suffered by each expert
   R <- rep(0,N)
+
+  if (!is.null(training)) {
+    eta[1,] <- training$eta
+    R <- training$R
+  }
+  
+  
+  
   for (t in 1:T) {
     # We check if there is at least one expert with positive weight
     if (max(awake[t,] * R) > 0) {
@@ -61,5 +70,6 @@ function(y, experts, awake = NULL,
   return(list(weights = weights, prediction = prediction,
               coefficients = w,
               eta = eta,
-              loss = mean(loss(prediction, y, loss.type, tau))))
+              loss = mean(loss(prediction, y, loss.type, tau)),
+              training = list(R = R, eta = eta[T+1,])))
 }

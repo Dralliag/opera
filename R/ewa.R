@@ -1,3 +1,4 @@
+#'export
 ewa <-
 function(y, experts, eta, awake = NULL, loss.type = 'square', 
                 loss.gradient = TRUE, w0 = NULL, tau = 0.5)

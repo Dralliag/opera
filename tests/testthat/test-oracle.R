@@ -49,7 +49,8 @@ test_that("Best convex oracle is ok", {
   m = oracle(y = Y,experts = X, model = list(name = "convex",loss.type="absolute"), awake=awake)
   expect_true(abs(m$coefficients[1] - 0.6)<1e-1)
   expect_equal(m$rmse, NULL)
-  expect_equal(mean(loss(m$prediction,Y,"absolute")), lossConv(m$coefficients,Y,X,awake,"absolute"))
+  l = getAnywhere(lossConv)$objs[[1]]
+  expect_equal(mean(loss(m$prediction,Y,"absolute")), l(m$coefficients,Y,X,awake,"absolute"))
   expect_equal(m$loss, mean(loss(m$prediction,Y,"absolute")))
 })
 

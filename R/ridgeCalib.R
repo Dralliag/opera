@@ -1,6 +1,7 @@
 # Ridge aggregation rule with automatic calibration of smoothing parameters
 ridgeCalib <-
-function(y, experts, grid.lambda = 1, w0 = NULL, trace = F, gamma = 2)
+function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, gamma = 2,
+  training = NULL)
 {
 
   experts <- as.matrix(experts)
@@ -9,7 +10,7 @@ function(y, experts, grid.lambda = 1, w0 = NULL, trace = F, gamma = 2)
   T <- nrow(experts)  # Number of instants
   
   if (is.null(w0)) {w0 <- matrix(1/N, ncol = N)} # Uniform intial weight vector if unspecified
-  
+  if (is.null(grid.lambda)) {grid.lambda = 1}
   # Smoothing parameter grid 
   nlambda <- length(grid.lambda)
   bestlambda <- floor(nlambda)/2 + 1 # We start with the parameter in the middle of the grid

@@ -1,11 +1,11 @@
 - faire une fonction plot et une fonction predict
 - faire une vignette ou des slides
 - commenter le code en anglais
-- ridge version séquentielle ? 
 - fonctions de pertes: 
 	- enlever la fonction rmse: avoir une fonction de perte globale
 	- vérifier les gradient de la perte mape !!! comportement bizarre
 - ajouter le côté séquentiel: on rentre le model qui se met à jour et renvoie la prochaine prévision (mettre un paramètre dans la fonction predict)
+- gérer le cas T = 1 (matrix une seule ligne pour les experts)
 
 
 
@@ -15,4 +15,5 @@
 - ajouter les algos de bandits (UCB),... et pb de bandits
 - ajouter une mixture du type pinball penalisé (ou perturbé)
 - gamMixture (prochain poids, ...)
+- ridge version séquentielle ? 
 
