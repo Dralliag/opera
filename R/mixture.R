@@ -1,24 +1,29 @@
 #' Compute an aggregation rule
 #' 
-#' The function \code{mixture} performs an
-#' aggregation rule chosen by the user. It considers a sequence \code{y} of observations to be predicted
-#' sequentially with the help of experts advices \code{x}.  The forms at each
-#' instance \code{t} a prediction by assigning weight to the experts advices
-#' and combining them.
+#' The function \code{mixture} build an
+#' aggregation rule chosen by the user. 
+#' It can then be used to predict new observations Y sequentially.
+#' If observations \code{Y} and expert advice \code{experts} are provided, 
+#' \code{mixture} is trained by predicting the observations in \code{Y}
+#' sequentially with the help of the expert advice in \code{experts}.  
+#' At each time instance \code{t}, the mixture forms a prediction by assigning 
+#' a weight to each expert and by combining the expert advice.
 #' 
 #' 
-#' @param y  A vector containing the observations
-#' to be predicted.
-#' @param experts A matrix containing the experts
+#' @param Y  A vector of length T (a non negative integer) containing the observations to be predicted sequentially
+#' in order to train the aggregation rule.
+#'  
+#' @param experts A matrix containing the expert
 #' forecasts. Each column corresponds to the predictions proposed by an expert
 #' to predict \code{Y}.  It has as many columns as there are experts.
-#' @param aggregationRule Either a character string specifying the aggregation rule to use or a list with a component \code{name} specifying the aggregation rule and any additional parameter needed. 
-
+#' Its number of row should be \code{T}.
+#' 
+#' @param model A character string specifying the aggregation rule to use. 
 #' Currently available aggregation rules are:
 #' \describe{
 #'    \item{"EWA"}{Exponentially weighted average aggregation rule. A positive learning rate \strong{eta} can be chosen by the user. The
 #' bigger it is the faster the aggregation rule will learn from observations
-#' and experts performances. However too hight values lead to unstable weight
+#' and experts performances. However, too hight values lead to unstable weight
 #' vectors and thus unstable predictions. If it is not specified, the learning rate is calibrated online. 
 #' A finite grid of potential learning rates to be optimized online can be specified with \strong{grid.eta}.}
 #'    \item{"FS"}{Fixed-share aggregation rule. As for \code{ewa}, a learning rate \strong{eta} can be chosen by the user or calibrated online. The main difference with \code{ewa} aggregation
@@ -43,56 +48,73 @@
 #' The process is however not currently stable. We advice not using it yet. Use
 #' only at most one exogeneous variable.}
 #' }
-#' Possible optional additional parameters are:
+#' 
+#' @param loss.type A string or a list with a component "name" specifying
+#' the loss function considered to evaluate the performance. It can be
+#' "square", "absolute", "percentage", or "pinball". In the case of the pinball loss, the quantile 
+#' can be provided by assigning to loss.type a list of two elements: 
 #' \describe{
-#'    \item{loss.type}{(not possible for "ridge", and "gamMixture" which are restricted to square loss) a string specifying
-#' the loss function considered to evaluate the performance.  It can be
-#' "square", "absolute", "percentage", or "pinball". See \code{\link{loss}} for
-#' more details. If "pinball" is chosen, the quantile to be predicted can be set 
-#' with parameter \code{tau} in \code{(0,1)} is possible (the default value is 0.5 to predict the median).
-#' }
-#'    \item{loss.gradient}{A boolean. If
+#'      \item{name}{A string defining the name of the loss function (i.e., "pinball")}
+#'      \item{tau}{ A number in \code{[0,1]} defining the quantile to be predicted. The default value is 0.5 to predict the median.}
+#' }. "Ridge" and "gamMixture" aggregation rules are restricted to square loss.
+#' 
+#' @param loss.gradient A boolean. If
 #' TRUE (default) the aggregation rule will not be directly applied to the loss
 #' function at hand but to a gradient version of it.  The aggregation rule is
-#' then similar to gradient descent aggregation rule.}
-#' }
-#' @param w0 A vector containing the prior weights of the experts. (not possible for "MLpol", "BOA", "MLewa", and "MLprod")
+#' then similar to gradient descent aggregation rule. 
+#' 
+#' @param coefficients A vector containing the prior weights of the experts
+#' (not possible for "MLpol").
+#' 
 #' @param awake A matrix specifying the
 #' activation coefficients of the experts. Its entries lie in \code{[0,1]}.
-#' Needed if some experts are specialists and do not always form and suggest
-#' prediction.  If the expert number \code{k} at instance \code{t} does not
+#' Possible if some experts are specialists and do not always form and suggest
+#' prediction. If the expert number \code{k} at instance \code{t} does not
 #' form any prediction of observation \code{Y_t}, we can put
 #' \code{awake[t,k]=0} so that the mixture does not consider expert \code{k} in
 #' the mixture to predict \code{Y_t}.
-#' @return  
+#' 
+#' @param parameters A list that contains optional parameters for the aggregation rule. 
+#' If no parameters are provided, the aggregation rule is fully calibrated
+#' online. Possible parameters are:
+#' \describe{
+#'    \item{eta}{A positive number defining the learning rate. 
+#'    Possible if model is either "EWA" or "FS"}
+#'    \item{grid.eta}{A vector of positive numbers defining potential learning rates 
+#'    for "EWA" of "FS".
+#'    The learning rate is then calibrated by sequentially optimizing the parameter in 
+#'    the grid. The grid may be extended online if needed by the aggregation rule.}
+#'    \item{gamma}{A positive number defining the exponential step of extension 
+#'    of grid.eta when it is needed. The default value is 2.}
+#'    \item{alpha}{A number in [0,1] defining the mixing rate for "FS".}
+#'    \item{grid.alpha}{A vector of numbers in [0,1] defining potential mixing rates for "FS"
+#'    to be optimized online. The grid is fixed over time. The default value is \code{[0.0001,0.001,0.01,0.1]}.}
+#'    \item{lambda}{A positive number defining the smoothing parameter of "Ridge" aggregation rule.}
+#'    \item{grid.lambda}{Similar to \code{grid.eta} for the parameter \code{lambda}.}
+#' }
+#' 
+#' 
+#' @return An object of class mixture that can be used to perform new predictions. 
+#' It contains the parameters \code{model}, \code{loss.type}, \code{loss.gradient},
+#' \code{experts}, \code{Y}, \code{awake}, and the fields
+#' \item{coefficients}{A vector of coefficients 
+#' assigned to each expert to perform the next prediction.}
+#' 
 #' \item{weights }{ A matrix of dimension \code{c(T,N)}, with
 #' \code{T} the number of instances to be predicted and \code{N} the number of
 #' experts.  Each row contains the convex combination to form the predictions }
 #' \item{prediction }{ A vector of length \code{T} that contains the
-#' predictions outputted by the aggregation rule.  } \item{cumulativeLoss }{ The
-#' cumulated loss suffered by the aggregation rule.  } \item{regret }{ An array
-#' that contains the cumulated regret suffered by the aggregation rule against
-#' each expert.}
+#' predictions outputted by the aggregation rule.  } 
 #' \item{loss}{ The average loss (as stated by parameter \code{loss.type}) suffered
 #' by the aggregation rule.}
-#' \item{coefficients}{ The weights formed by the aggregation rule to perform the
-#' next prediction}
-#' Possible optional returned parameters are:
-#' \describe{
-#'  \item{rmse}{Root mean square error suffered by the aggregation rule 
-#'  (returned if loss.type = "square")}
-#'  \item{eta}{Sequence of learning rates \code{eta} chosen by the aggregation rule}
-#'  \item{grid.eta}{Grid of learning rates used to perform online calibration of the 
-#'  learning rate (eta)}
-#'  \item{grid.loss}{Average losses suffered by all learning rates over the optimized grid
-#'  \code{grid.eta}.}
-#'  \item{grid.rmse}{Similar to \code{grid.loss} with RMSEs.}
-#' }
+#' \item{parameters}{The learning parameters chosen by the aggregation rule.}
+#' \item{training}{A list that contains usefull temporary information of the 
+#' aggregation rule to be updated and to perform predictions.}
 #' @author Pierre Gaillard <pierre@@gaillard.me>
 #' @keywords ~kwd1 ~kwd2
 #' @examples
 #' 
-#' library('opera')              # load the package
+#'library('opera')              # load the package
 #' set.seed(1)                   
 #' 
 #' T = 100                       # number of instances
@@ -118,36 +140,46 @@
 #' X3 = X1 * awake[,1] + X2 * (1-awake[,1])
 #' cat("Best sequence of experts in hindsight, rmse :", rmse(X3,Y), '\n\n')
 #' 
-#' 
 #' # EWA with fixed learning rate
-#' mod = mixture(y=Y, experts=X, 
-#'          aggregationRule=list(name="EWA", eta=1, loss.type='square', loss.gradient=FALSE), 
-#'          awake=awake) 
+#' mod = mixture(Y=Y, experts=X, model="EWA", parameters = list(eta=1), 
+#'               loss.type='square', loss.gradient=FALSE, awake=awake) 
+#' 
 #' # plot weights assigned to both experts (when an expert is not available its weight is 0)
 #' matplot(mod$weights, type='l', main='EWA with fixed learning rate', col=2:3) 
 #' cat('EWA mixture, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
 #' # ewa algorithm with gradient loss function
-#' mod = mixture(y=Y, experts=X, 
-#'          aggregationRule=list(name="EWA", eta=1, loss.type='square', loss.gradient=TRUE), 
-#'          awake=awake) 
+#' mod = mixture(Y=Y, experts=X, model="EWA", parameters = list(eta=1), 
+#'               loss.type='square', loss.gradient=TRUE, awake=awake) 
 #' matplot(mod$weights, type='l', main='EWA with gradient losses', col=2:3) 
 #' cat('EWA mixture with gradient losses, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
 #' # ewa algorithm with automatic calibration of the learning parameter
-#' mod = mixture(y=Y, experts=X, aggregationRule = "EWA", awake = awake)
+#' mod = mixture(Y=Y, experts=X, model = "EWA", awake = awake)
 #' matplot(mod$weights, type='l', main = 'Automatic EWA', col=2:3) 
 #' cat('EWA mixture with automatic tuning, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
 #' # MLpol aggregation rule
-#' mod = mixture(y=Y, experts=X, aggregationRule="MLpol", awake = awake)
+#' mod = mixture(Y=Y, experts=X, model="MLpol", awake = awake)
 #' mod$prediction = apply(mod$weights*X, 1, sum)
 #' matplot(mod$weights, type='l', main = 'MLpol mixture', col=2:3, ylim = c(0,1))
 #' cat('MLpol mixture, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
+#' # Similarly, the aggregation can be build first without data
+#' mod0 = mixture(model="BOA", loss.type=list(name="pinball", tau=0.7))
+#' # then use to predict X, and Y using the predict method
+#' mod1 = predict(mod0, newexperts=X, newY=Y, online=TRUE, type="model", awake=awake)
+#' 
+#' # The same is achieved bellow in a sequential fashion (i.e., mod = mod1)
+#' mod = mod0
+#' for (t in 1:T){
+#'   mod = predict(mod, newY=Y[t], newexperts=X[t,], online=TRUE, type="model", awake=awake[t,])
+#' }
+#'  
 #' @export mixture
 
-mixture <- function(model,  ...) UseMethod("mixture")
+mixture <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square", 
+        loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list()) UseMethod("mixture")
 
 
 #' @export 

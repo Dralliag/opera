@@ -3,7 +3,7 @@
 #' The function \code{oracle} performs a strategie that cannot be defined online
 #' (in contrast to \link{mixture}). It requires in advance the knowledge of the whole
 #' data set \code{Y} and the expert advice to be well defined.
-#' Example of oracles are the best fixed expert, the best fixed convex
+#' Examples of oracles are the best fixed expert, the best fixed convex
 #' combination rule, the best linear combination rule, or the best expert
 #' that can shift a few times.
 #'
@@ -12,7 +12,7 @@
 #' @param experts A matrix containing the experts
 #' forecasts. Each column corresponds to the predictions proposed by an expert
 #' to predict \code{Y}.  It has as many columns as there are experts.
-#' @param model Either a character string specifying the oracle to use or a list with a component \code{name} specifying the oracle and any additional parameter needed.
+#' @param model A character string specifying the oracle to use or a list with a component \code{name} specifying the oracle and any additional parameter needed.
 #' Currently available oracles are:
 #' \describe{
 #'    \item{"expert"}{The best fixed (constant over time) expert oracle.}
@@ -22,30 +22,36 @@
 #' sequence of experts with at most $m$ shifts that would have performed the
 #' best to predict the sequence of observations in \code{Y}.}
 #' }
-#' Possible optional additional parameters are:
+#' @param loss.type A string or a list with a component "name" specifying
+#' the loss function considered to evaluate the performance. It can be
+#' "square", "absolute", "percentage", or "pinball". In the case of the pinball loss, the quantile 
+#' can be provided by assigning to loss.type a list of two elements: 
 #' \describe{
-#'    \item{loss.type}{(not possible for "linear" oracle which is currently restrained to square loss) a string specifying
-#' the loss function considered to evaluate the performance.  It can be
-#' "square", "absolute", "percentage", or "pinball". See \code{\link{loss}} for
-#' more details. If "pinball" is chosen, the quantile to be predicted can be set 
-#' with parameter \code{tau} in \code{(0,1)} is possible (the default value is 0.5 to predict the median).
-#' }
-#'    \item{lambda}{For "linear" oracle. A possible $L_2$ regularization parameter for computing the linear oracle (if the design matrix is not identifiable)}
-#'    \item{niter}{For "convex" and "linear" oracle (if direct computation of the oracle is not possible). 
-#'      Number of optimization steps to process in order to approximate the oracle. 
-#'      (default value is 3).}
-#' }
+#'      \item{name}{A string defining the name of the loss function (i.e., "pinball")}
+#'      \item{tau}{ A number in \code{[0,1]} defining the quantile to be predicted. The default value is 0.5 to predict the median.}
+#' } 
+#' 
+#' @param lambda A positive number used by the "linear" oracle only. 
+#' A possible $L_2$ regularization parameter for computing the linear oracle 
+#' (if the design matrix is not identifiable)
+#' @param niter A positive integer for "convex" and "linear" oracles 
+#' if direct computation of the oracle is not implemented. 
+#' It defines the number of optimization steps to perform in 
+#' order to approximate the oracle (default value is 3).
+#' 
 #' @param awake A matrix specifying the
 #' activation coefficients of the experts. Its entries lie in \code{[0,1]}.
-#' Needed if some experts are specialists and do not always form and suggest
-#' prediction.  If the expert number \code{k} at instance \code{t} does not
+#' Possible if some experts are specialists and do not always form and suggest
+#' prediction. If the expert number \code{k} at instance \code{t} does not
 #' form any prediction of observation \code{Y_t}, we can put
 #' \code{awake[t,k]=0} so that the mixture does not consider expert \code{k} in
 #' the mixture to predict \code{Y_t}.
-#' @param ... If oracle = "convex". Additional parameters
-#' that are passed to \code{\link{optim}} function is order to perform convex optimization.
+#' 
+#' @param ... Additional parameters
+#' that are passed to \code{\link{optim}} function is order to perform convex optimization 
+#' (see parameter \code{niter}).
 #'
-#' @return
+#' @return An object of class "oracle" that contains:
 #' \item{loss}{ The average loss suffered by the oracle. For the "shifting" oracle,
 #' it is a vector of length \code{T} where
 #' \code{T} is the number of instance to be predicted (i.e., the length of the
@@ -59,6 +65,7 @@
 #' predictions of the oracle.  }
 #' \item{rmse}{If loss.type is the square loss (default) only.
 #' The root mean square error (i.e., it is the square root of \code{loss}.}
+#' 
 #' @author Pierre Gaillard <pierre@@gaillard.me>
 #' @export oracle
 

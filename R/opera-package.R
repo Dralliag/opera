@@ -1,5 +1,3 @@
-
-
 #' Online Prediction by ExpeRts Aggregation
 #' 
 #' The package \code{opera} performs, for regression-oriented time-series,
@@ -29,12 +27,8 @@
 #' @keywords package
 #' @examples
 #' 
-#' library('opera')              # load the package
+#'library('opera')              # load the package
 #' set.seed(1)                   
-#' 
-#' # -----------------------------------------------------------------
-#' #              EASY IID DATA WITHOUT BREAKS
-#' # -----------------------------------------------------------------
 #' 
 #' T = 100                       # number of instances
 #' t = 1:T                       # instances
@@ -59,33 +53,41 @@
 #' X3 = X1 * awake[,1] + X2 * (1-awake[,1])
 #' cat("Best sequence of experts in hindsight, rmse :", rmse(X3,Y), '\n\n')
 #' 
-#' 
 #' # EWA with fixed learning rate
-#' mod = mixture(y=Y, experts=X, 
-#'                aggregationRule=list(name="EWA", eta=1, loss.type='square', loss.gradient=FALSE), 
-#'                awake=awake)
+#' mod = mixture(Y=Y, experts=X, model="EWA", parameters = list(eta=1), 
+#'               loss.type='square', loss.gradient=FALSE, awake=awake) 
+#' 
 #' # plot weights assigned to both experts (when an expert is not available its weight is 0)
 #' matplot(mod$weights, type='l', main='EWA with fixed learning rate', col=2:3) 
-#' cat('EWA mod, rmse :', rmse(mod$prediction,Y), '\n')
+#' cat('EWA mixture, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
-#' # EWA algorithm with gradient loss function
-#' mod = mixture(y=Y, experts=X, 
-#'                aggregationRule=list(name="EWA", eta=1, loss.type='square', loss.gradient=TRUE), 
-#'                awake=awake)
+#' # ewa algorithm with gradient loss function
+#' mod = mixture(Y=Y, experts=X, model="EWA", parameters = list(eta=1), 
+#'               loss.type='square', loss.gradient=TRUE, awake=awake) 
 #' matplot(mod$weights, type='l', main='EWA with gradient losses', col=2:3) 
-#' cat('EWA mod with gradient losses, rmse :', rmse(mod$prediction,Y), '\n')
+#' cat('EWA mixture with gradient losses, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
-#' # EWA algorithm with automatic calibration of the learning parameter
-#' mod = mixture(y=Y, experts=X, aggregationRule="EWA", awake=awake)
+#' # ewa algorithm with automatic calibration of the learning parameter
+#' mod = mixture(Y=Y, experts=X, model = "EWA", awake = awake)
 #' matplot(mod$weights, type='l', main = 'Automatic EWA', col=2:3) 
-#' cat('EWA mod with automatic tuning, rmse :', rmse(mod$prediction,Y), '\n')
+#' cat('EWA mixture with automatic tuning, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
 #' # MLpol aggregation rule
-#' mod = mixture(y=Y, experts=X, aggregationRule="MLpol", awake=awake)
+#' mod = mixture(Y=Y, experts=X, model="MLpol", awake = awake)
 #' mod$prediction = apply(mod$weights*X, 1, sum)
-#' matplot(mod$weights, type='l', main = 'MLpol mod', col=2:3, ylim = c(0,1))
-#' cat('MLpol mod, rmse :', rmse(mod$prediction,Y), '\n')
+#' matplot(mod$weights, type='l', main = 'MLpol mixture', col=2:3, ylim = c(0,1))
+#' cat('MLpol mixture, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
+#' # Similarly, the aggregation can be build first without data
+#' mod0 = mixture(model="BOA", loss.type=list(name="pinball", tau=0.7))
+#' # then use to predict X, and Y using the predict method
+#' mod1 = predict(mod0, newexperts=X, newY=Y, online=TRUE, type="model", awake=awake)
+#' 
+#' # The same is achieved bellow in a sequential fashion (i.e., mod = mod1)
+#' mod = mod0
+#' for (t in 1:T){
+#'   mod = predict(mod, newY=Y[t], newexperts=X[t,], online=TRUE, type="model", awake=awake[t,])
+#' }
 #' 
 #' # -----------------------------------------------------------------
 #' #                 TIME-SERIES WITH BREAKS
@@ -103,25 +105,22 @@
 #' cat("Best sequence of experts in hindsight, rmse :", rmse(X3,Y), '\n\n')
 #' 
 #' 
-#' # EWA with fixed learning rate
-#' mod = mixture(y=Y, experts=X, 
-#'                aggregationRule=list(name="EWA", eta=1, loss.type='square', loss.gradient=FALSE), 
-#'                awake=awake) 
+#' # We want to perform online prediction of EWA with fixed learning rate
+#' mod = mixture(Y=Y, experts=X, model="EWA", parameter = list(eta=1),
+#'						loss.type='square', loss.gradient=FALSE, 
+#'                		awake=awake) 
+#'
 #' # plot weights assigned to both experts (when an expert is not available its weight is 0)
 #' matplot(mod$weights, type='l', main='EWA with fixed learning rate', col=2:3) 
 #' cat('EWA mod, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
 #' 
 #' # Fixed-share with automatic tuning of learning rate
-#' mod = mixture(y=Y, experts=X, aggregationRule="FS", awake=awake)
+#' mod = mixture(Y=Y, experts=X, model="FS", awake=awake)
+#'
 #' # plot weights assigned to both experts (when an expert is not available its weight is 0)
 #' matplot(mod$weights, type='l', main='Fixed-share with automatic tuning', col=2:3) 
 #' cat('Fixed-share mod, rmse :', rmse(mod$prediction,Y), '\n')
-#' 
-#' # MLpol mod
-#' mod = mixture(y=Y, experts=X, aggregationRule="MLpol", awake=awake)
-#' matplot(mod$weights, type='l', main = 'MLpol mod', col=2:3)
-#' cat('MLpol mod, rmse :', rmse(mod$prediction,Y), '\n')
 #' 
 #' 
 #' 

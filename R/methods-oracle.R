@@ -104,10 +104,7 @@ predict.oracle <- function(object, newexpert = NULL, ...)
   }
   else {
     w <- matrix(object$coefficients, ncol = 1)  
-    
-    if (!online) {
-        pred = newexpert %*% w
-    }
+    pred = newexpert %*% w
     return(pred)
   }
 }

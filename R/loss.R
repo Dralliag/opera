@@ -9,13 +9,14 @@
 #' containing the sequence of prediction to be evaluated.
 #' @param y  A vector of length \code{T} that
 #' contains the observations to be predicted.
-#' @param loss.type A string specifying
+#' @param loss.type A string or a list with a component "name" specifying
 #' the loss function considered to evaluate the performance. It can be
-#' "square", "absolute", "percentage", or "pinball". See \code{\link{loss}} for
-#' more details.
-#' @param tau A number in \code{[0,1]}
-#' describing the quantile to be predicted. Used only if \code{loss.type =
-#' "pinball"}.
+#' "square", "absolute", "percentage", or "pinball". In the case of the pinball loss, the quantile 
+#' can be provided by assigning to loss.type a list of two elements: 
+#' \describe{
+#'      \item{name}{A string defining the name of the loss function (i.e., "pinball")}
+#'      \item{tau}{ A number in \code{[0,1]} defining the quantile to be predicted. The default value is 0.5 to predict the median.}
+#' } 
 #' @return  A vector of length \code{T} containing the sequence of
 #' instantaneous losses suffered by the prediction \code{x}.
 #' @author Pierre Gaillard <pierre@@gaillard.me>

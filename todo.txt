@@ -1,14 +1,15 @@
 - faire une fonction plot et une fonction predict
 - faire une vignette ou des slides
-- commenter le code en anglais
 - fonctions de pertes: 
 	- enlever la fonction rmse: avoir une fonction de perte globale
 	- vérifier les gradient de la perte mape !!! comportement bizarre
-- ajouter le côté séquentiel: on rentre le model qui se met à jour et renvoie la prochaine prévision (mettre un paramètre dans la fonction predict)
-- gérer le cas T = 1 (matrix une seule ligne pour les experts)
+- finir la fonction predict (batch,...)
 - ajouter erreur explicative si experts, awake, Y, mal fournis (de tailles différentes)
 - tout bien indenter
 - shifting oracle et pinball loss
+- ajouter erreur quand on met une mauvaise perte
+- faire un exemple pour oracle --> fonction exemple ?
+- jeu de données de Yannig
 
 # Plus long terme
 - ajouter la possibilité de faire de la classification
@@ -18,5 +19,5 @@
 - gamMixture (prochain poids, ...)
 - ridge version séquentielle ? 
 - lasso séquentiel
-
+- commenter le code en anglais
 

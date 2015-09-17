@@ -2,23 +2,35 @@
 
 #' @export 
 predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
-                            online = FALSE, type=c("object$model","response"),...)
+                            online = FALSE, type=c("object$model","response"),z = NULL,...)
   {
+
     # test possible warnings and errors
     if (is.null(newexperts)) {
-      cat("Renvoyer les prévisions du modèle fitté")
+      cat("Return prediction of the fitted model \n")
+      # TODO !!!
     }
+
+    if (is.null(newY)) {
+      cat("Return the same algorithm (not updated) with batch prediction \n")
+      # TODO !!!
+    }
+
+    T <- length(newY)
+    newexperts <- matrix(newexperts, nrow = T)
     K = ncol(newexperts)
+    if (!is.null(awake)){awake <- matrix(awake, nrow = T)}
+
     if (is.null(object$training) && (object$coefficients != "Uniform") && (object$model == "MLpol")) {
       stop(paste(object$model, "cannot handle non-uniform prior weight vector"))
     }
     if (object$coefficients[1] == "Uniform") {object$coefficients <- rep(1/K,K)}
     if (!is.null(object$loss.type$tau) && object$loss.type$name != "pinball") {
-      warning("Unused parameter tau (loss.type != 'pinball')")
+      warning("Unused parameter tau (loss.type$name != 'pinball')")
     }
 
     if (object$loss.type$name != "square" && (object$model == "Ridge" || object$model == "gamMixture")) {
-      stop(paste("Square loss is require for", object$model, "aggregationRule."))
+      stop(paste("Square loss is require for", object$model, "model."))
     }
     if (min(newY) <= 0 && object$loss.type$name == "percentage") {
       stop("Y should be non-negative for percentage loss function")
@@ -82,21 +94,21 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
     
     if ((object$model == "gamMixture")) {
       warning("This aggregation rule is not stable in the current version")
-      if (is.null(aggregationRule$lambda)) {
+      if (is.null(parameters$lambda)) {
         stop("gamMixture cannot handle automatic calibration")
       }
-      if (is.null(aggregationRule$z)){
-        stop("A matrix (or vector) of exogeneous variables z must be given in aggregationRule")
+      if (is.null(z)){
+        stop("A matrix (or vector) of exogeneous variables z must be provided")
       }
-      if (is.null(aggregationRule$nknots)){ aggregationRule$nknots = 5}
-      if (is.null(aggregationRule$degree)){ aggregationRule$degree = 3}
-      if (is.null(aggregationRule$uniform)){ aggregationRule$uniform = FALSE}
-      if (is.null(aggregationRule$knots)){ aggregationRule$knots = NULL}
+      if (is.null(parameters$nknots)){ parameters$nknots = 5}
+      if (is.null(parameters$degree)){ parameters$degree = 3}
+      if (is.null(parameters$uniform)){ parameters$uniform = FALSE}
+      if (is.null(parameters$knots)){ parameters$knots = NULL}
       
-      res <- gamMixture(y = y, experts = experts, z = aggregationRule$z, aggregationRule$lambda, 
-        nknots = aggregationRule$nknots, degree = aggregationRule$degree, 
-        loss.type = object$loss.type$name, uniform = aggregationRule$uniform, 
-        knots = aggregationRule$knots)
+      res <- gamMixture(y = newY, experts = newexperts, z = z, parameters$lambda, 
+        nknots = parameters$nknots, degree = parameters$degree, 
+        loss.type = object$loss.type$name, uniform = parameters$uniform, 
+        knots = parameters$knots)
     }
     #res$call <- match.call()
     res$prediction <- c(object$prediction,res$prediction)
