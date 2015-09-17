@@ -18,58 +18,57 @@ test_that("loss functions return correct values", {
 
 # Test of oracle functions
 test_that("Best expert oracle is ok", {
-  m.best_expert = oracle(y = Y,experts = X, model = "expert")
-  expect_that(m.best_expert$coefficients[1], equals(1))
-  expect_that(m.best_expert$loss, equals(mean((X[,1]-Y)^2)))
-  expect_that(sum(m.best_expert$prediction), equals(sum(X[,1])))
-  expect_that(m.best_expert$rmse, equals(rmse(X[,1],Y)))
+  m = oracle(Y = Y,experts = X, model = "expert")
+  expect_that(m$coefficients[1], equals(1))
+  expect_that(m$loss, equals(mean((X[,1]-Y)^2)))
+  expect_that(sum(m$prediction), equals(sum(X[,1])))
+  expect_that(m$rmse, equals(rmse(X[,1],Y)))
   
-  expect_error(oracle(y = Y,experts = X, model = "expert", awake = awake),
+  expect_error(oracle(Y = Y,experts = X, model = "expert", awake = awake),
                "Sleeping or missing values not allowed")
-  expect_warning(oracle(y = Y,experts = X,model = list(name = "expert", lambda = 3)), 
+  expect_warning(oracle(Y = Y,experts = X,model = "expert", lambda = 3), 
                         "Unused lambda parameter")  
-  expect_warning(oracle(y = Y,experts = X,model = list(name = "expert", niter = 3)), 
+  expect_warning(oracle(Y = Y,experts = X,model = "expert", niter = 3), 
                         "Unused niter parameter")
 })
 
 test_that("Best convex oracle is ok", {
-  m = oracle(y = Y,experts = X, model = "convex")
+  m = oracle(Y = Y,experts = X, model = "convex")
   expect_equal(m$coefficients[1], 0.6)
   expect_equal(sum(m$coefficients),1)
   expect_equal(m$loss, 0)
   expect_true(sum(abs(m$prediction - Y))<1e-10)
   expect_equal(m$rmse, 0)
   
-  m = oracle(y = Y,experts = X, model = list(name = "convex",loss.type="percentage"))
+  m = oracle(Y = Y,experts = X, model = "convex",loss.type="percentage")
   expect_true(abs(m$coefficients[1] - 0.6)<1e-4)
   expect_true(m$loss<1e-4)
   expect_true(sum(abs(m$prediction - Y))<1e-4)
-  expect_equal(m$rmse, NULL)
   
-  m = oracle(y = Y,experts = X, model = list(name = "convex",loss.type="absolute"), awake=awake)
+  m = oracle(Y = Y,experts = X, model = "convex",loss.type="absolute", awake=awake)
   expect_true(abs(m$coefficients[1] - 0.6)<1e-1)
-  expect_equal(m$rmse, NULL)
   l = getAnywhere(lossConv)$objs[[1]]
   expect_equal(mean(loss(m$prediction,Y,"absolute")), l(m$coefficients,Y,X,awake,"absolute"))
   expect_equal(m$loss, mean(loss(m$prediction,Y,"absolute")))
 })
 
 test_that("Best linear oracle is ok", {
-  m = oracle(y = Y, experts = X, model = "linear")
+  m = oracle(Y = Y, experts = X, model = "linear")
   expect_equal(m$coefficients[1],0.6)
   expect_equal(sum(m$coefficients),1)
   expect_equal(m$loss, 0)
   expect_true(sum(abs(m$prediction - Y))<1e-10)
   expect_equal(m$rmse, 0)
-  expect_error(oracle(y = Y, experts = X, model = "linear", awake = awake), 
+  expect_error(oracle(Y = Y, experts = X, model = "linear", awake = awake), 
                "Sleeping or missing values not allowed")
   
-  m = oracle(y = Y, experts = X, model = list(name = "linear", loss.type = "percentage"))
+  m = oracle(Y = Y, experts = X, model = "linear", loss.type = "percentage")
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = "percentage")))
 })
 
 test_that("Quantile oracles are ok", {
   set.seed(1)
+  
   # test of quantile oracles
   quantiles = seq(0.1,0.9,by = 0.1)
   K = length(quantiles)
@@ -77,35 +76,35 @@ test_that("Quantile oracles are ok", {
   X = t(matrix(rep(quantile(Y, probs = quantiles),n),nrow = K))
   i = sample(1:K,1) 
   
+  l = list(name = "pinball", tau = quantiles[i])
   # best expert oracle
-  m.best_expert = oracle(y = Y,experts = X, model = list(name = "expert", loss.type="pinball", tau = quantiles[i]))
+  m.best_expert = oracle(Y = Y,experts = X, model = "expert", loss.type=l)
   expect_equal(which(m.best_expert$coefficients == 1),i)
-  expect_equal(m.best_expert$loss,mean(loss(m.best_expert$prediction,Y,loss.type = "pinball",tau = quantiles[i])))
+  expect_equal(m.best_expert$loss,mean(loss(m.best_expert$prediction,Y,loss.type = l)))
   
   # best convex oracle
-  m = oracle(y = Y,experts = X[,c(1,K)], model = list(name = "convex", loss.type="pinball", tau = quantiles[i]))
+  m = oracle(Y = Y,experts = X[,c(1,K)], model = "convex", loss.type= l)
   expect_less_than(abs(sum(X[1,c(1,K)] * m$coefficients) - X[1,i]), 0.1)
-  expect_equal(m$loss,mean(loss(m$prediction,Y,loss.type = "pinball",tau = quantiles[i])))
-  expect_warning(oracle(y = Y,experts = X[,c(1,K)], model = list(name = "convex", loss.type="pinball", tau = quantiles[i])))
+  expect_equal(m$loss,mean(loss(m$prediction,Y,loss.type = l)))
+  expect_warning(oracle(Y = Y,experts = X[,c(1,K)], model = "convex", loss.type= l))
   
   # best linear oracle (with singular matrix)
-  m = oracle(y = Y,experts = X[,c(1,K)], model = list(name = "linear", loss.type="pinball", tau = quantiles[i], niter = 10))
+  m = oracle(Y = Y,experts = X[,c(1,K)], model = "linear", loss.type= l, niter = 10)
   expect_less_than(abs(sum(X[1,c(1,K)] * m$coefficients) - X[1,i]), 0.1)
-  expect_equal(m$loss,mean(loss(m$prediction,Y,loss.type = "pinball",tau = quantiles[i])))
-  expect_warning(oracle(y = Y,experts = X[,c(1,K)], model = list(name = "linear", loss.type="pinball", tau = quantiles[i])))
+  expect_equal(m$loss,mean(loss(m$prediction,Y,loss.type = l)))
+  expect_warning(oracle(Y = Y,experts = X[,c(1,K)], model = "linear", loss.type= l))
   
   
   # best linear oracle (with direct computation using rq)
   X[n,] = 1
   Y[n] = 1
-  i = sample(1:K,1) 
-  m = oracle(y = Y,experts = X[,c(1,K)], model = list(name = "linear", loss.type="pinball", tau = quantiles[i]))
+  m = oracle(Y = Y,experts = X[,c(1,K)], model = "linear", loss.type= l)
   expect_less_than(abs(sum(X[1,c(1,K)] * m$coefficients) - X[1,i]), 0.1)
-  expect_equal(m$loss,mean(loss(m$prediction,Y,loss.type = "pinball",tau = quantiles[i])))
+  expect_equal(m$loss,mean(loss(m$prediction,Y,loss.type = l)))
 })
 
 test_that("Best shifting oracle is ok",{
-  m = oracle(y = Y,  experts = X, model = list(name = "shifting", loss.type = "square"))
+  m = oracle(Y = Y,  experts = X, model = "shifting", loss.type = "square")
   expect_equal(m$loss[1], min(mean(loss(X[,1],Y)), mean(loss(X[,2],Y))))
   expect_equal(class(m),"oracle")
   expect_equal(class(summary(m)),"summary.oracle")

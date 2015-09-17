@@ -33,7 +33,7 @@
 # @seealso \code{\link{loss}},
 # @keywords ~kwd1 ~kwd2
 lossConv <-
-function(p,y,experts,awake=NULL,loss.type = 'square',tau = 0.5) {
+function(p,y,experts,awake=NULL,loss.type = 'square') {
 
    experts <- as.matrix(experts)
    N <- ncol(experts)  # Number of experts
@@ -49,6 +49,6 @@ function(p,y,experts,awake=NULL,loss.type = 'square',tau = 0.5) {
 
    pond <- awake %*% p
    pred <- ((experts* awake) %*% p) / pond
-   l = mean(loss(pred,y,loss.type = loss.type,tau = tau))
+   l = mean(loss(pred,y,loss.type = loss.type))
    return(l)
 }

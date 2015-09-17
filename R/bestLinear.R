@@ -1,16 +1,15 @@
 # best linear oracle
 bestLinear <-
-function(y, experts, lambda = 0, loss.type = "square", 
-	tau = 0.5, niter = 1, ...)
+function(y, experts, lambda = 0, loss.type = list(name = "square"), niter = 1, ...)
 {  
   experts <- as.matrix(experts)
   N = ncol(experts)
 
   coefficients <- NULL
-  if (loss.type == "square") {
+  if (loss.type$name == "square") {
   	coefficients <- solve(lambda * diag(1,ncol(experts)) + t(experts) %*% experts,t(experts)%*%y)
   	
-  } else if (loss.type == "pinball") {
+  } else if (loss.type$name == "pinball") {
   		coefficients <- tryCatch({
   						quantreg::rq(y~experts-1,tau = tau)$coefficients},
   						error = function(e) { NULL 
@@ -22,8 +21,7 @@ function(y, experts, lambda = 0, loss.type = "square",
          return(mean(loss(
          		x = experts %*% matrix(u,nrow=ncol(experts)), 
          		y = y, 
-         		loss.type = loss.type, 
-         		tau = tau))) 
+         		loss.type = loss.type))) 
       }
       
       best_u <- rep(0,N)
@@ -44,7 +42,5 @@ function(y, experts, lambda = 0, loss.type = "square",
   }
  
 	prev <- experts %*% coefficients	
-  loss <- mean(loss(prev, y, loss.type = loss.type, tau = tau))
-  return(list(loss=loss,coefficients=c(coefficients),prediction=prev,
-  	rmse=sqrt(mean(loss(prev,y)))))
+  return(list(coefficients=c(coefficients),prediction=prev))
 }

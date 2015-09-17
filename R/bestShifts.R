@@ -1,7 +1,7 @@
 # best sequence of experts oracle
 bestShifts <-
-function(y, experts, awake=NULL, loss.type = 'square', trace = FALSE)
-{
+function(y, experts, awake=NULL, loss.type = list(name = 'square'), trace = FALSE)
+{   
     N <- ncol(experts)
     T <- nrow(experts)
     INF <- exp(700)
@@ -15,11 +15,13 @@ function(y, experts, awake=NULL, loss.type = 'square', trace = FALSE)
     experts[idx.na] <- 0
 
     loss.name <- c('square', 'absolute','percentage')
-    loss.number <- which(loss.name == loss.type)
+    loss.number <- which(loss.name == loss.type$name)
     
     L <- array(INF, dim = c(T,N,3))
     L[1,,] <- 0
     instanceLoss <- array(0,dim=c(N,3))
+
+    #browser()
     for (t in 1:T)
     {
       if (!(t %% 100) && trace) {

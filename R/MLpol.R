@@ -1,6 +1,6 @@
 MLpol <-
 function(y, experts, awake = NULL,
-            loss.type = 'square', loss.gradient = TRUE, tau = 0.5, training = NULL) 
+            loss.type = 'square', loss.gradient = TRUE, training = NULL) 
 {
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -26,9 +26,9 @@ function(y, experts, awake = NULL,
   if (!is.null(training)) {
     eta[1,] <- training$eta
     R <- training$R
+  } else {
+    training = list(eta = eta[1,])
   }
-  
-  
   
   for (t in 1:T) {
     # We check if there is at least one expert with positive weight
@@ -47,9 +47,9 @@ function(y, experts, awake = NULL,
     prediction[t] <- pred
     
     # Observe losses
-    lpred <- lossPred(pred, y[t], pred, tau = tau,
+    lpred <- lossPred(pred, y[t], pred, 
                  loss.type = loss.type, loss.gradient = loss.gradient)
-    lexp <- lossPred(experts[t,], y[t], pred, tau = tau,
+    lexp <- lossPred(experts[t,], y[t], pred, 
                 loss.type = loss.type, loss.gradient = loss.gradient)
 
     # Update the regret and the weight
@@ -66,10 +66,16 @@ function(y, experts, awake = NULL,
   } else {
     w <- rep(1/N,N)
   }
+  object <- list(model = "MLpol", loss.type = loss.type, loss.gradient = loss.gradient,
+      coefficients = w)
+  
+  object$parameters <- list(eta = eta[1:T,])
+  object$weights <- weights
+  object$prediction <- prediction
 
-  return(list(weights = weights, prediction = prediction,
-              coefficients = w,
-              eta = eta,
-              loss = mean(loss(prediction, y, loss.type, tau)),
-              training = list(R = R, eta = eta[T+1,])))
+  object$training = list(
+    eta = eta[T+1,],
+    R = R)
+  class(object) <- "mixture"
+  return(object)
 }

@@ -22,15 +22,23 @@
 #' @keywords ~kwd1 ~kwd2
 #' @export loss
 loss <-
-function(x,y,loss.type = 'square', tau = 0.5) {
-   if (loss.type == 'square')
+function(x,y,loss.type = 'square') {
+
+   if (!is.list(loss.type)) {
+      loss.type = list(name = loss.type)
+   }
+   if (is.null(loss.type$tau) && loss.type$name == 'pinball') {
+      loss.type$tau = 0.5
+   }
+
+   if (loss.type$name == 'square')
       l <- (x-y)^2
-   else if (loss.type == 'absolute')
+   else if (loss.type$name == 'absolute')
       l <- abs(x-y)
-   else if (loss.type == 'percentage')
+   else if (loss.type$name == 'percentage')
       l <- abs(x-y)/y
-   else if (loss.type == 'pinball')
-      l <- (tau - (y<x)) * (y-x)
+   else if (loss.type$name == 'pinball')
+      l <- (loss.type$tau - (y<x)) * (y-x)
    else
      stop("loss.type should be one of these: 'absolute', 'percentage', 'square', 'pinball'")
    return(l)

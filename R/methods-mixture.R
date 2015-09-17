@@ -1,9 +1,11 @@
 #' @export 
 print.mixture <- function(x, ...)
 {
-    cat("Call:\n")
-    print(x$call)
-    cat("\nCoefficients:\n")
+    cat("Aggregation rule: ")
+    cat(x$model, '\n')
+    cat("Loss function: ", x$loss.type$name, "loss", '\n')
+    cat("Gradient trick: ", x$loss.gradient, "\n")
+    cat("Coefficients: ")
     print(x$coefficients)
 }
 
@@ -55,35 +57,3 @@ plot.mixture <- function(x, ...)
         # Mettre le plot en polygon des poids
     }
 }
-
-# #' @export
-# predict.mixture <- function(object, newexpert = NULL, newY = NULL, 
-# 														online = FALSE, type=c("model","response"),...)
-# {
-# 	if (object$model == "gamMixture") {
-# 	  stop("Predict method is not yet available for gamMixture")
-# 	}
-
-# 	if (is.null(newexpert)) {
-# 		prediction = NULL
-# 		new.model = object
-# 	}
-# 	else {
-
-# 		newexpert <- as.matrix(newexpert)
-# 		if (ncol(newexpert) == 1 && nrow(newexpert) > 1 ) {
-# 			newexpert = t(newexpert)
-# 		}
-
-# 		if (is.null(newY) || (!online)) {
-# 			if (online) {
-# 				warning("Non null observations newY is needed to perform online prediction.")
-# 			}
-# 			w <- matrix(object$coefficients, ncol = 1)	
-# 	  	if (!online) {
-# 	  		prediction = newexpert %*% w
-# 	  	}
-# 		}
-# 	}
-# 	return(prediction)
-# }

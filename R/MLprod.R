@@ -1,6 +1,7 @@
 MLprod <-
 function(y, experts, awake = NULL, 
-             loss.type = 'square', loss.gradient = TRUE, tau = 0.5, w0 = NULL)
+             loss.type = "square", loss.gradient = TRUE, w0 = NULL,
+             training = NULL)
 {
   
   experts <- as.matrix(experts)
@@ -23,6 +24,12 @@ function(y, experts, awake = NULL,
   eta <- matrix(exp(700),ncol=N,nrow=T+1)
   prediction <- rep(0,T)
   
+  if (!is.null(training)) {
+    eta[1,] <- training$eta
+    R <- training$R
+    L <- training$L
+  }
+
   for(t in 1:T){
     
     # Update weights
@@ -35,9 +42,9 @@ function(y, experts, awake = NULL,
     prediction[t] <- pred
      
     # Observe losses
-    lpred <- lossPred(pred,  y[t], pred, tau = tau,
+    lpred <- lossPred(pred,  y[t], pred,
                  loss.type = loss.type, loss.gradient = loss.gradient)
-    lexp <- lossPred(experts[t,], y[t], pred, tau = tau,
+    lexp <- lossPred(experts[t,], y[t], pred,
                 loss.type = loss.type, loss.gradient = loss.gradient)
 
     r = awake[t,] * (lpred - lexp)
@@ -53,9 +60,22 @@ function(y, experts, awake = NULL,
       browser("Nan in R")
     }
   }
+
   w <- truncate1(exp(R))
   w <- eta[T+1,] * w / sum(eta[T+1,] * w)
-  return(list(weights = weights, prediction = prediction, eta = eta,
-          coefficients = w,
-          loss = mean(loss(prediction, y, loss.type, tau))))
+
+  object <- list(model = "MLprod", loss.type = loss.type, loss.gradient = loss.gradient,
+      coefficients = w)
+  
+  object$parameters <- list(eta = eta[1:T,])
+  object$weights <- weights
+  object$prediction <- prediction
+
+  object$training = list(
+    eta = eta[T+1,],
+    R = R,
+    L = L)
+  class(object) <- "mixture"
+
+  return(object)
 }

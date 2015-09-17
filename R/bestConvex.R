@@ -1,6 +1,6 @@
 # best convex oracle
 bestConvex <-
-function(y, experts, awake=NULL, loss.type='square', niter = 1, tau = 0.5, ...)
+function(y, experts, awake=NULL, loss.type=list(name = 'square'), niter = 1, ...)
 {
    experts <- as.matrix(experts)
    N <- ncol(experts)
@@ -8,7 +8,7 @@ function(y, experts, awake=NULL, loss.type='square', niter = 1, tau = 0.5, ...)
    # if there are no NA and if awake is null 
    # we can perform an exact resolution for the square loss
    idx.na <- which(is.na(experts))
-   if (length(idx.na) == 0 && is.null(awake) && loss.type == "square") {
+   if (length(idx.na) == 0 && is.null(awake) && loss.type$name == "square") {
       y.na = is.na(y)
       y = y[!y.na]
       x = experts[!y.na,]
@@ -40,7 +40,7 @@ function(y, experts, awake=NULL, loss.type='square', niter = 1, tau = 0.5, ...)
       experts[idx.na] <- 0
       
       lossp <- function(p)   {
-         return(lossConv(p, y, experts, awake, loss.type, tau)) 
+         return(lossConv(p, y, experts, awake, loss.type)) 
       }
       
       best_p <- rep(0,N)
@@ -66,9 +66,6 @@ function(y, experts, awake=NULL, loss.type='square', niter = 1, tau = 0.5, ...)
       pond <- awake %*% t(coefficients)
       prediction <- ((experts* awake) %*% t(coefficients)) / pond
    }
-   res = list(loss = bestLoss, coefficients = coefficients, prediction = prediction)
-   if (loss.type == "square") {
-      res$rmse = sqrt(res$loss)
-   }
+   res = list(coefficients = coefficients, prediction = prediction)
    return(res)
 }

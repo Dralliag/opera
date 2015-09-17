@@ -2,12 +2,12 @@
 #'
 #' The function \code{oracle} performs a strategie that cannot be defined online
 #' (in contrast to \link{mixture}). It requires in advance the knowledge of the whole
-#' data set \code{y} and the expert advice to be well defined.
+#' data set \code{Y} and the expert advice to be well defined.
 #' Example of oracles are the best fixed expert, the best fixed convex
 #' combination rule, the best linear combination rule, or the best expert
 #' that can shift a few times.
 #'
-#' @param y  A vector containing the observations
+#' @param Y  A vector containing the observations
 #' to be predicted.
 #' @param experts A matrix containing the experts
 #' forecasts. Each column corresponds to the predictions proposed by an expert
@@ -20,7 +20,7 @@
 #'    \item{"linear"}{The best fixed linear combination of expert}
 #'    \item{"shifting"}{It computes for all number $m$ of stwitches the
 #' sequence of experts with at most $m$ shifts that would have performed the
-#' best to predict the sequence of observations in \code{y}.}
+#' best to predict the sequence of observations in \code{Y}.}
 #' }
 #' Possible optional additional parameters are:
 #' \describe{
@@ -49,7 +49,7 @@
 #' \item{loss}{ The average loss suffered by the oracle. For the "shifting" oracle,
 #' it is a vector of length \code{T} where
 #' \code{T} is the number of instance to be predicted (i.e., the length of the
-#' sequence \code{y}). The value of $loss(m)$ is the loss
+#' sequence \code{Y}). The value of $loss(m)$ is the loss
 #' (determined by the parameter \code{loss.type}) suffered by the
 #' best sequence of expert with at
 #' most $m-1$ shifts.
@@ -62,73 +62,76 @@
 #' @author Pierre Gaillard <pierre@@gaillard.me>
 #' @export oracle
 
-oracle <- function(y, experts, model = "convex", awake = NULL, ...) UseMethod("oracle")
+oracle <- function(Y, experts, model = "convex", loss.type = "square", 
+                    awake = NULL, lambda = NULL, niter = NULL,
+                    ...) UseMethod("oracle")
 
 
 #' @export 
 oracle.default <-
-  function(y, experts, model = "convex", awake = NULL, ...)
+  function(Y, experts, model = "convex", loss.type = "square", awake = NULL, lambda = NULL,
+           niter = NULL, ...)
   {
-    if (is.character(model)) {model = list(name = model)}
-    if (is.null(model$loss.type)) {model$loss.type = "square"}
-    if (!is.null(model$tau) && model$loss.type != "pinball") {
+    
+    if (is.null(loss.type)) {loss.type = list(name = "square")}
+    if (!is.list(loss.type)) {loss.type = list(name = loss.type)}
+
+    if (!is.null(loss.type$tau) && loss.type$name != "pinball") {
       warning("Unused parameter tau (loss.type != 'pinball')")
     }
-    if (is.null(model$tau)) {model$tau = 0.5}
-    if (!is.null(model$lambda) && model$name != "linear") {
+    if (!is.null(lambda) && model != "linear") {
       warning("Unused lambda parameter (model != linear)")}
-    if (is.null(model$lambda)) model$lambda = 0
-    if (!is.null(model$niter) && model$name!= "convex" && model$name != "linear") {
-      warning("Unused niter parameter (model should be convex or linear)")} 
-    if (is.null(model$niter)) model$niter = 3
-    if ((!is.null(awake) || sum(is.na(experts)>0)) && model$name != "convex" && model$name != "shifting") {
-      stop(paste("Sleeping or missing values not allowed for best", model$name, "oracle."))}  
+    if (is.null(lambda) && model == "linear") lambda = 0
 
-    if (!(model$name %in% c("convex","linear","shifting","expert"))) {
+    if (!is.null(niter) && model!= "convex" && model != "linear") {
+      warning("Unused niter parameter (model should be convex or linear)")} 
+    if (is.null(niter)) niter = 3
+
+    if ((!is.null(awake) || sum(is.na(experts)>0)) && model != "convex" && model != "shifting") {
+      stop(paste("Sleeping or missing values not allowed for best", model, "oracle."))}  
+
+    if (!(model %in% c("convex","linear","shifting","expert"))) {
       stop("Wrong model specification") 
     }
-    if (min(y) <= 0 && model$loss.type == "percentage") {
+    if (min(Y) <= 0 && loss.type$name == "percentage") {
       stop("Y should be non-negative for percentage loss function")
     }
     # if we are looking for the best convex combination of experts
-    if (model$name == "convex") {
-      res <- bestConvex(
-          y, experts, awake = awake,
-          loss.type = model$loss.type, niter = model$niter, 
-          tau = model$tau,...)
+    if (model == "convex") {
+      res <- bestConvex(Y, experts, awake = awake,
+                loss.type = loss.type, niter = niter,...)
     }
     
-    if (model$name == "linear") {
-      res <- bestLinear(y, experts, lambda = model$lambda, 
-              loss.type = model$loss.type, tau = model$tau)
+    if (model == "linear") {
+      res <- bestLinear(Y, experts, lambda = lambda, loss.type = loss.type)
     }
     
-    if (model$name == "shifting") {
-      res <- bestShifts(y, experts, awake = model$awake,
-              loss.type = model$loss.type)
+    if (model == "shifting") {
+      res <- bestShifts(Y, experts, awake = awake, loss.type = loss.type)
     }
     
-    if (model$name == "expert") {
-      
+    if (model == "expert") {
       loss.experts = apply(apply(experts, 2, function (x) {
-        loss(x,y,loss.type = model$loss.type,tau = model$tau)}), 2, mean)
+        loss(x,Y,loss.type = loss.type)}), 2, mean)
       best.loss = min(loss.experts)
       coefficients =  (loss.experts == best.loss) / sum(loss.experts == best.loss)
       best.expert = which(coefficients > 0)[1]
       res = list(loss = best.loss,
                  coefficients = coefficients, 
                  prediction = experts[,best.expert])
-      if (model$loss.type == "square") {
-        res$rmse = sqrt(res$loss)
-      }
     }
-    
-    res$model <- model$name
-    res$residuals <- y - res$prediction
+
+    res$model <- model
+    res$loss.type <- loss.type
     res$call <- match.call()
-    res$Y <- y
+    if (model != "shifting") {
+      res$residuals <- Y - res$prediction
+      res$loss <- mean(loss(res$prediction,Y,loss.type))
+      res$rmse <- sqrt(mean(loss(res$prediction,Y,"square")))
+    }
+    res$Y <- Y
     res$experts <- experts
-    res$loss.type <- model$loss.type
+    
     
     class(res) <- "oracle"
     return(res)

@@ -3,7 +3,6 @@ ridgeCalib <-
 function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, gamma = 2,
   training = NULL)
 {
-
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -11,22 +10,34 @@ function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, gamma = 2,
   
   if (is.null(w0)) {w0 <- matrix(1/N, ncol = N)} # Uniform intial weight vector if unspecified
   if (is.null(grid.lambda)) {grid.lambda = 1}
+  if (is.null(gamma)) {gamma = 2}
+  
   # Smoothing parameter grid 
   nlambda <- length(grid.lambda)
-  bestlambda <- floor(nlambda)/2 + 1 # We start with the parameter in the middle of the grid
   grid.lambda <- matrix(grid.lambda, nrow = nlambda)
-  
-  lambda <- rep(grid.lambda[bestlambda],T)
   cumulativeLoss <- rep(0,nlambda)
   
-  wlambda <- array(w0, dim = c(N, nlambda))   # Weight matrix proposed by each Ridge(lambda) where lambda is a parameter of the grid
   weights <- matrix(0, ncol = N, nrow = T)    # Matrix of weights formed by the mixture
   prediction <- rep(0, T)                     # Vector of predictions formed by the mixing algorithm
   pred.lambda <- matrix(0, ncol = nlambda, nrow = T) # Prediction of mixture algorithm with different learning rates eta
 
-  At <- diag(0, N)
-  bt <- rep(0, N)
-
+  if (!is.null(training)) {
+    At <- training$At
+    bt <- training$bt
+    bestlambda <- training$bestlambda
+    wlambda <- training$wlambda
+    w0 <- training$w0
+    cumulativeLoss <- training$cumulativeLoss
+    T0 <- training$T
+  } else {
+    At <- diag(0, N)
+    bt <- rep(0, N)
+    bestlambda <- floor(nlambda)/2 + 1 # We start with the parameter in the middle of the grid
+    wlambda <- array(w0, dim = c(N, nlambda))   # Weight matrix proposed by each Ridge(lambda) where lambda is a parameter of the grid
+    T0 <- 0
+  }
+  
+  lambda <- rep(grid.lambda[bestlambda],T)
   for(t in 1:T){
     # Display the state of progress of the algorithm
     if (!(t %% floor(T/10)) && trace) cat(floor(10 * t/T)*10, '% -- ')
@@ -88,13 +99,24 @@ function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, gamma = 2,
     lambda.min = which(!(is.na(wlambda[1,])))[1]
     bestlambda = max(lambda.min, bestlambda)
   }
-  l <- mean(loss(prediction,y))
-  grid.loss <- cumulativeLoss / T
-  l.rmse <- sqrt(l)
-  grid.rmse <- sqrt(grid.loss)
+
+  object <- list(model = "Ridge", loss.type = list(name ="square"), coefficients = wlambda[,bestlambda])
+
+  object$parameters <- list(lambda = lambda[1:T], grid.lambda = grid.lambda)
+  object$weights <- weights
+  object$prediction <- prediction
+
+  object$training = list(
+    T = T0 + T,
+    wlambda = wlambda,
+    w0 = w0,
+    At = At,
+    bt = bt,
+    bestlambda = bestlambda,
+    cumulativeLoss = cumulativeLoss,
+    grid.loss = cumulativeLoss / (T0 + T)
+    )
+
   if (trace) cat('\n')
-  return(list(weights = weights, prediction = prediction, 
-              lambda = lambda, grid.lambda = grid.lambda, 
-              loss = l, grid.loss = grid.loss, coefficients = wlambda[,bestlambda],
-              rmse = l.rmse, grid.rmse = grid.rmse))
+  return(object)
 }

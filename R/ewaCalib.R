@@ -2,7 +2,7 @@
 ewaCalib <-
 function(y, experts, grid.eta = 1, awake = NULL,
         loss.type = 'square', loss.gradient = TRUE, 
-        w0 = NULL, trace = F, gamma = 2, tau = tau)
+        w0 = NULL, trace = F, gamma = 2, training = NULL)
 {
   experts <- as.matrix(experts)
   
@@ -11,12 +11,14 @@ function(y, experts, grid.eta = 1, awake = NULL,
   
   if (is.null(w0)) {w0 <- rep(1,N)} # Uniform intial weight vector if unspecified
   if (is.null(awake)) {awake = matrix(1, nrow = T, ncol = N)} # Full activation if unspecified
+  if (is.null(gamma)) {gamma = 2}
 
   awake <- as.matrix(awake)
   idx.na <- which(is.na(experts))
   awake[idx.na] <- 0
   experts[idx.na] <- 0
   
+  T0 <- 0 # number of observations in previous runs
   neta <- length(grid.eta)         # Initial number of learning parameter in the grid to be optimized
   besteta <- floor(neta)/2 + 1    # We start with the parameter eta in the middle of the grid
   eta <- rep(grid.eta[besteta],T)  # Vector of calibrated learning rates (will be filled online by the algorithm)
@@ -29,6 +31,16 @@ function(y, experts, grid.eta = 1, awake = NULL,
   weights <- matrix(0, ncol = N, nrow = T)    # Matrix of weights formed by the mixture
   prediction <- rep(0, T)                     # Predictions formed by the mixture
   
+  if (!is.null(training)) {
+    weta <- training$weta
+    w0 <- training$w0
+    R <- training$R
+    cumulativeLoss <- training$cumulativeLoss
+    besteta <- training$besteta
+    eta[1] <- grid.eta[besteta]
+    T0 <- training$T 
+  }
+
   for(t in 1:T){
     # Display the state of progress of the algorithm
     if (!(t %% floor(T/10)) && trace) cat(floor(10 * t/T)*10, '% -- ')
@@ -40,9 +52,9 @@ function(y, experts, grid.eta = 1, awake = NULL,
 
     # Weights, predictions formed by each EWA(eta) for eta in the grid "grid.eta"
     pred <- experts[t,] %*% t(t(weta * awake[t,]) / apply(weta * awake[t,],2,sum))
-    cumulativeLoss <- cumulativeLoss + loss(pred, y[t], loss.type, tau = tau) # cumulative loss without gradient trick
-    lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient, tau = tau)) # gradient loss suffered by each eta on the grid
-    lexp <- lossPred(experts[t,], y[t], pred, loss.type, loss.gradient, tau = tau) # gradient loss suffered by each expert
+    cumulativeLoss <- cumulativeLoss + loss(pred, y[t], loss.type) # cumulative loss without gradient trick
+    lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient)) # gradient loss suffered by each eta on the grid
+    lexp <- lossPred(experts[t,], y[t], pred, loss.type, loss.gradient) # gradient loss suffered by each expert
 
 
     # Regret update
@@ -60,9 +72,9 @@ function(y, experts, grid.eta = 1, awake = NULL,
         R <- cbind(R, array(0, dim = c(N,length(neweta))))
         for (k in 1:length(neweta)) {
           perfneweta <- ewa(y[1:t], matrix(experts[1:t,],ncol=N), neweta[k], matrix(awake[1:t,],ncol=N), 
-                                  loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0, tau = tau)
-          cumulativeLoss <- c(cumulativeLoss, perfneweta$loss * t)
-          R[,besteta+k] <- perfneweta$regret
+                                  loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0)
+          cumulativeLoss <- c(cumulativeLoss, perfneweta$training$cumulativeLoss)
+          R[,besteta+k] <- perfneweta$training$R
         }
     }
 
@@ -75,9 +87,9 @@ function(y, experts, grid.eta = 1, awake = NULL,
       for (k in 1:length(neweta)) {
         grid.eta <- c(neweta[k],grid.eta)
         perfneweta <- ewa(y[1:t], matrix(experts[1:t,],ncol=N), neweta[k], matrix(awake[1:t,],ncol=N), 
-          loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0, tau = tau)
-        cumulativeLoss <- c(perfneweta$loss * t, cumulativeLoss)
-        R[,besteta-k] <- perfneweta$regret
+          loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0)
+        cumulativeLoss <- c(perfneweta$training$cumulativeLoss, cumulativeLoss)
+        R[,besteta-k] <- perfneweta$training$R
       }
     }
     weta <- truncate1(exp(t(t(matrix(R, ncol=neta)) * grid.eta)))
@@ -86,19 +98,24 @@ function(y, experts, grid.eta = 1, awake = NULL,
   # Next weights
   w <- weta[,besteta]  / sum(weta[,besteta])
   
-  # Losses 
-  l <-  mean(loss(prediction, y, loss.type=loss.type, tau = tau))
-  mloss <- cumulativeLoss / T
-  
-  res = list(weights = weights, prediction = prediction, 
-             eta = eta, grid.eta = grid.eta, 
-             loss = l, grid.loss = mloss, 
-             coefficients = w)
-  
-  if (loss.type == 'square') {
-    res$grid.rmse <- sqrt(mloss)
-    res$rmse <- sqrt(l)
-  }
+  object <- list(model = "EWA", loss.type = loss.type, 
+    loss.gradient = loss.gradient,
+    coefficients = w)
+
+  object$parameters <- list(eta = eta[1:T], grid.eta = grid.eta)
+  object$weights <- weights
+  object$prediction <- prediction
+
+  object$training = list(
+    T = T0 + T,
+    weta  = weta,
+    w0  = w0,
+    R = R,
+    cumulativeLoss = cumulativeLoss,
+    besteta = besteta,
+    grid.loss = cumulativeLoss / (T0 + T))
+
+  class(object) <- "mixture"
   if (trace) cat('\n')
-  return(res)
+  return(object)
 }

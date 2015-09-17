@@ -1,7 +1,7 @@
 fixedshareCalib <-
   function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), awake = NULL,
            loss.type = 'square', loss.gradient = TRUE, w0 = NULL, trace = F, gamma = 2,
-           tau = 0.5)
+           training = NULL)
   {
     experts <- as.matrix(experts)
     
@@ -10,12 +10,14 @@ fixedshareCalib <-
     
     if (is.null(w0)) {w0 <- rep(1,N)} # Uniform intial weight vector if unspecified
     if (is.null(awake)) {awake = matrix(1, nrow = T, ncol = N)} # Full activation if unspecified
+    if (is.null(gamma)) {gamma = 2}
     
     awake = as.matrix(awake) 
     idx.na <- which(is.na(experts))
     awake[idx.na] <- 0
     experts[idx.na] <- 0
     
+    T0 <- 0 # number of observations in previous runs
     neta <- length(grid.eta)       # Number of learning rates in the grid
     nalpha <-length(grid.alpha)    # Number of mixing rates in the grid
     bestpar <- c(floor(neta)/2,floor(nalpha)/2)+1 # We start with the parameters in the middle of the grids
@@ -28,6 +30,15 @@ fixedshareCalib <-
     weights <- matrix(0, ncol = N, nrow = T)    # Matrix of weights formed by the mixture
     prediction <- rep(0, T)                     # Predictions formed by the mixture
     
+    if (!is.null(training)) {
+      bestpar <- training$bestpar
+      wpar <- training$wpar
+      w0 <- training$w0
+      R <- training$R
+      cumulativeLoss <- training$cumulativeLoss
+      T0 <- training$T 
+    }
+
     for(t in 1:T){
       # Display the state of progress of the algorithm
       if (!(t %% floor(T/10)) && trace) cat(floor(10 * t/T)*10, '% -- ')
@@ -44,9 +55,9 @@ fixedshareCalib <-
         # Weights, prediction, and losses formed by FixedShare(eta,alpha) for (eta,alpha) in the grid
         waux <-  t(t(wpar[,,k] * awake[t,]) / apply(as.matrix(wpar[,,k]*awake[t,]), 2, sum))
         pred <- experts[t,] %*% waux
-        cumulativeLoss[,k] <- cumulativeLoss[,k] + loss(pred, y[t], loss.type,tau=tau) # Non gradient cumulative losses
-        lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient,tau=tau))
-        lexp <- lossPred(experts[t,], y[t], pred, loss.type, loss.gradient,tau=tau)
+        cumulativeLoss[,k] <- cumulativeLoss[,k] + loss(pred, y[t], loss.type) # Non gradient cumulative losses
+        lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient))
+        lexp <- lossPred(experts[t,], y[t], pred, loss.type, loss.gradient)
         
         # Regret update
         R <- t(t(log(wpar[,,k]))/grid.eta) + awake[t,] * t(lpred - t(lexp))
@@ -77,8 +88,8 @@ fixedshareCalib <-
             perfnewpar <- fixedshare(y[1:t], matrix(experts[1:t,],ncol=N), neweta[j], grid.alpha[k], 
                                      awake =  matrix(awake[1:t,],ncol=N),
                                      loss.type = loss.type, loss.gradient = loss.gradient, 
-                                     w0 = w0, tau = tau)
-            cumulativeLoss[bestpar[1]+j,k] <- perfnewpar$loss * t
+                                     w0 = w0)
+            cumulativeLoss[bestpar[1]+j,k] <- perfnewpar$training$cumulativeLoss
             wpar[,bestpar[1]+j,k] <- perfnewpar$coefficients
           }
         }
@@ -99,8 +110,8 @@ fixedshareCalib <-
                                      neweta[j], grid.alpha[k],
                                      awake = matrix(awake[1:t,],ncol=N),
                                      loss.type = loss.type, loss.gradient = loss.gradient, 
-                                     w0 = w0, tau = tau)
-            cumulativeLoss[1, k] <- perfnewpar$loss * t
+                                     w0 = w0)
+            cumulativeLoss[1, k] <- perfnewpar$training$cumulativeLoss
             wpar[, bestpar[1]-j, k] <- perfnewpar$coefficients
           }
         }
@@ -109,22 +120,32 @@ fixedshareCalib <-
     
     # Next weights
     w <- wpar[,bestpar[1],bestpar[2]]  / sum(wpar[,bestpar[1],bestpar[2]])
-    
-    # Losses
-    l <-  mean(loss(prediction, y ,loss.type = loss.type, tau = tau)) # Average loss suffered by the algorithm
-    mloss <- cumulativeLoss / T         # Average loss of each learning rate on the grid
-    
 
-    rownames(mloss) = grid.eta
-    colnames(mloss) = grid.alpha
-    res = list(weights = weights, prediction = prediction,
-                eta = par$eta, grid.eta = grid.eta, 
-                alpha = par$alpha, grid.alpha = grid.alpha,
-                loss = l, grid.loss = mloss, coefficients = w)
-    if (loss.type == 'square') {
-      res$grid.rmse <- sqrt(mloss)
-      res$rmse <- sqrt(l)
-    }
+
+    object <- list(model = "EWA", loss.type = loss.type, 
+    loss.gradient = loss.gradient,
+    coefficients = w)
+
+
+    object$parameters <- list(eta = par$eta[1:T], 
+      alpha = par$alpha[1:T], grid.eta = grid.eta, grid.alpha = grid.alpha)
+    object$weights <- weights
+    object$prediction <- prediction
+
+    object$training = list(
+      T = T0 + T,
+      wpar  = wpar,
+      w0  = w0,
+      R = R,
+      cumulativeLoss = cumulativeLoss,
+      bestpar = bestpar,
+      grid.loss = cumulativeLoss / (T0 + T))
+
+
+    rownames(object$training$grid.loss) = grid.eta
+    colnames(object$training$grid.loss) = grid.alpha
+    class(object) <- "mixture"
+
     if (trace) cat('\n')
-    return(res)
+    return(object)
   }
