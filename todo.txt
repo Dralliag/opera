@@ -1,9 +1,8 @@
-- faire une fonction plot et une fonction predict
+- faire une fonction plot 
 - faire une vignette ou des slides
 - fonctions de pertes: 
 	- enlever la fonction rmse: avoir une fonction de perte globale
 	- vérifier les gradient de la perte mape !!! comportement bizarre
-- aide pour la fonction predict
 - shifting oracle et pinball loss
 - faire un exemple pour oracle --> fonction exemple ?
 - jeu de données de Yannig
