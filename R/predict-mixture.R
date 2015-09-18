@@ -29,7 +29,7 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
     object$coefficients <- rep(1/K, K)
   }
   if (!is.null(object$loss.type$tau) && object$loss.type$name != "pinball") {
-    warning("Unused parameter tau (loss.type$name != 'pinball')")
+    warning("Unused parameter tau (loss.type$name != 'pinball)")
   }
   
   if (object$loss.type$name != "square" && (object$model == "Ridge" || object$model == "gamMixture")) {

@@ -4,7 +4,7 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL) {
   N <- ncol(experts)
   T <- nrow(experts)
   
-  # Uniform intial weight vector if unspecified
+  # Uniform initial weight vector if unspecified
   if (is.null(w0)) {
     w0 <- matrix(1/N, ncol = N)
   }

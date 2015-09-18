@@ -6,11 +6,11 @@
 # of \code{N} prediction of the observation \code{y} to be evaluated.  @param y A number containing
 # the observation.  @param pred A reference prediction that the predictions in \code{x} aim to
 # correct.  @param loss.type A string specifying the loss function considered to evaluate the
-# performance. It can be 'square', 'absolute', 'percentage', or 'pinball'. See \code{\link{loss}}
+# performance. It can be "square", "absolute", "percentage", or "pinball". See \code{\link{loss}}
 # for more details.  @param loss.gradient A boolean. If TRUE (default) the aggregation rule will not
 # be directly applied to the loss function at hand but to a gradient version of it. The aggregation
 # rule is then similar to gradient descent aggregation rule.  @param tau A number in \code{[0,1]}
-# describing the quantile to be predicted. Used only if \code{loss.type = 'pinball'}.  @return A
+# describing the quantile to be predicted. Used only if \code{loss.type = "pinball"}.  @return A
 # vector containing the loss suffered by the \code{N} predictions in \code{x}.  @author Pierre
 # Gaillard <pierre@@gaillard.me> @seealso \code{\link{loss}} @keywords ~kwd1 ~kwd2
 lossPred <- function(x, y, pred = NULL, loss.type = "square", loss.gradient = FALSE) {

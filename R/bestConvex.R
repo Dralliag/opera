@@ -45,18 +45,20 @@ bestConvex <- function(y, experts, awake = NULL, loss.type = list(name = "square
     bestLoss <- exp(700)
     
     for (i in 1:niter) {
-      # Optimisation convexe avec choix aléatoire de la condition initiale
+      # Random initialization
       p <- runif(N, 0, 1)
       p <- p/sum(p)
+
+      # Convex optimization
       w <- optim(p, lossp, gr = NULL, lower = 1e-20, method = "L-BFGS-B", ...)
-      # Projection sur le simplex
+
+      # Projection on the simplex
       w <- pmax(w$par, 0)
       l <- lossp(w)
       if (bestLoss > l) {
         bestLoss <- l
         best_p <- w
       }
-      # print(c(i, l))
     }
     coefficients <- matrix(best_p, ncol = N)
     coefficients <- coefficients/apply(coefficients, 1, sum)

@@ -8,10 +8,10 @@
 # prediction.  If the expert number \code{k} at instance \code{t} does not form any prediction of
 # observation \code{Y_t}, we can put \code{awake[t,k]=0} so that the mixture does not consider
 # expert \code{k} in the mixture to predict \code{Y_t}.  @param loss.type A string specifying the
-# loss function considered to evaluate the performance.  It can be 'square', 'absolute',
-# 'percentage', or 'pinball'. See \code{\link{loss}} for more details.  @param tau Quantile to be
-# predicted if loss.type = 'pinball' (default value 0.5 to predict the median).  @return The average
-# errors suffered by the mixture. Note that if \code{loss.type = 'square'}, the \code{rmse} is
+# loss function considered to evaluate the performance.  It can be "square", "absolute",
+# "percentage", or "pinball". See \code{\link{loss}} for more details.  @param tau Quantile to be
+# predicted if loss.type = "pinball" (default value 0.5 to predict the median).  @return The average
+# errors suffered by the mixture. Note that if \code{loss.type = "square"}, the \code{rmse} is
 # returned.  Note also that the instance are weighted according to the number of activated experts.
 # @note The function \code{lossConv} is for instance used to compute the best convex combination in
 # hindsight.  @seealso \code{\link{loss}}, @keywords ~kwd1 ~kwd2

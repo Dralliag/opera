@@ -53,7 +53,7 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
     prediction[t] <- experts[t, ] %*% weights[t, ]
     lambda[t] <- grid.lambda[bestlambda]
     
-    # Weights, predictions formed by each Ridge(lambda) for lambda in the grid 'grid.lambda'
+    # Weights, predictions formed by each Ridge(lambda) for lambda in the grid "grid.lambda"
     pred.lambda[t, ] <- experts[t, ] %*% wlambda
     cumulativeLoss <- cumulativeLoss + (pred.lambda[t, ] - y[t])^2
     

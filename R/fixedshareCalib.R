@@ -57,7 +57,7 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
     prediction[t] <- experts[t, ] %*% weights[t, ]
     par <- rbind(par, data.frame(eta = grid.eta[bestpar[1]], alpha = grid.alpha[bestpar[2]]))
     
-    # Loop over the mixing rates alpha in the grid 'grid.alpha'
+    # Loop over the mixing rates alpha in the grid "grid.alpha"
     for (k in 1:nalpha) {
       
       # Weights, prediction, and losses formed by FixedShare(eta,alpha) for (eta,alpha) in the grid

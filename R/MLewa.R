@@ -4,7 +4,7 @@ MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
   N <- ncol(experts)
   T <- nrow(experts)
   
-  # Uniform intial weight vector if unspecified
+  # Uniform initial weight vector if unspecified
   if (is.null(w0)) {
     w0 <- rep(1, N)
   }

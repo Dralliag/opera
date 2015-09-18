@@ -59,7 +59,7 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
     prediction[t] <- experts[t, ] %*% weights[t, ]
     eta[t] <- grid.eta[besteta]
     
-    # Weights, predictions formed by each EWA(eta) for eta in the grid 'grid.eta'
+    # Weights, predictions formed by each EWA(eta) for eta in the grid "grid.eta"
     pred <- experts[t, ] %*% t(t(weta * awake[t, ])/apply(weta * awake[t, ], 2, sum))
     cumulativeLoss <- cumulativeLoss + loss(pred, y[t], loss.type)  # cumulative loss without gradient trick
     lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient))  # gradient loss suffered by each eta on the grid

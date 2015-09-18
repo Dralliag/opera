@@ -15,26 +15,26 @@
 #' @param model A character string specifying the oracle to use or a list with a component \code{name} specifying the oracle and any additional parameter needed.
 #' Currently available oracles are:
 #' \describe{
-#'    \item{'expert'}{The best fixed (constant over time) expert oracle.}
-#'    \item{'convex'}{The best fixed convex combination (vector of non-negative weights that sum to 1)}
-#'    \item{'linear'}{The best fixed linear combination of expert}
-#'    \item{'shifting'}{It computes for all number $m$ of stwitches the
+#'    \item{"expert"}{The best fixed (constant over time) expert oracle.}
+#'    \item{"convex"}{The best fixed convex combination (vector of non-negative weights that sum to 1)}
+#'    \item{"linear"}{The best fixed linear combination of expert}
+#'    \item{"shifting"}{It computes for all number $m$ of stwitches the
 #' sequence of experts with at most $m$ shifts that would have performed the
 #' best to predict the sequence of observations in \code{Y}.}
 #' }
-#' @param loss.type A string or a list with a component 'name' specifying
+#' @param loss.type A string or a list with a component "name" specifying
 #' the loss function considered to evaluate the performance. It can be
-#' 'square', 'absolute', 'percentage', or 'pinball'. In the case of the pinball loss, the quantile 
+#' "square", "absolute", "percentage", or "pinball". In the case of the pinball loss, the quantile 
 #' can be provided by assigning to loss.type a list of two elements: 
 #' \describe{
-#'      \item{name}{A string defining the name of the loss function (i.e., 'pinball')}
+#'      \item{name}{A string defining the name of the loss function (i.e., "pinball")}
 #'      \item{tau}{ A number in \code{[0,1]} defining the quantile to be predicted. The default value is 0.5 to predict the median.}
 #' } 
 #' 
-#' @param lambda A positive number used by the 'linear' oracle only. 
+#' @param lambda A positive number used by the "linear" oracle only. 
 #' A possible $L_2$ regularization parameter for computing the linear oracle 
 #' (if the design matrix is not identifiable)
-#' @param niter A positive integer for 'convex' and 'linear' oracles 
+#' @param niter A positive integer for "convex" and "linear" oracles 
 #' if direct computation of the oracle is not implemented. 
 #' It defines the number of optimization steps to perform in 
 #' order to approximate the oracle (default value is 3).
@@ -51,8 +51,8 @@
 #' that are passed to \code{\link{optim}} function is order to perform convex optimization 
 #' (see parameter \code{niter}).
 #'
-#' @return An object of class 'oracle' that contains:
-#' \item{loss}{ The average loss suffered by the oracle. For the 'shifting' oracle,
+#' @return An object of class "oracle" that contains:
+#' \item{loss}{ The average loss suffered by the oracle. For the "shifting" oracle,
 #' it is a vector of length \code{T} where
 #' \code{T} is the number of instance to be predicted (i.e., the length of the
 #' sequence \code{Y}). The value of $loss(m)$ is the loss
@@ -60,8 +60,8 @@
 #' best sequence of expert with at
 #' most $m-1$ shifts.
 #' }
-#' \item{coefficients}{ Not for the 'shifting' oracle. A vector containing the best weight vector corresponding to the oracle. }
-#' \item{prediction}{ Not for the 'shifting' oracle. A vector containing the
+#' \item{coefficients}{ Not for the "shifting" oracle. A vector containing the best weight vector corresponding to the oracle. }
+#' \item{prediction}{ Not for the "shifting" oracle. A vector containing the
 #' predictions of the oracle.  }
 #' \item{rmse}{If loss.type is the square loss (default) only.
 #' The root mean square error (i.e., it is the square root of \code{loss}.}
@@ -88,13 +88,13 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
     warning("Unused parameter tau (loss.type != 'pinball')")
   }
   if (!is.null(lambda) && model != "linear") {
-    warning("Unused lambda parameter (model != linear)")
+    warning("Unused lambda parameter (model != 'linear')")
   }
   if (is.null(lambda) && model == "linear") 
     lambda <- 0
   
   if (!is.null(niter) && model != "convex" && model != "linear") {
-    warning("Unused niter parameter (model should be convex or linear)")
+    warning("Unused niter parameter (model should be 'convex' or 'linear')")
   }
   if (is.null(niter)) 
     niter <- 3

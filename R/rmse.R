@@ -3,7 +3,7 @@
 #'  The
 #' function \code{rmse} computes the root mean square error of a sequence of
 #' predictions. It is an equivalent way of running
-#' \code{sqrt(mean(loss(x,y,loss.type='square')))} (see
+#' \code{sqrt(mean(loss(x,y,loss.type="square")))} (see
 #' \code{\link{loss}}).
 #' 
 #' 

@@ -32,19 +32,17 @@ ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradie
   }
   
   for (t in 1:T) {
-    # Mise à jour du vecteur de poids de l'algo
+    # Weight update
     weights[t, ] <- t(truncate1(exp(eta * R)) * t(awake[t, ]))
     weights[t, ] <- weights[t, ]/sum(weights[t, ])
     
-    # Prévision et perte non loss.gradient de l'algo
+    # Prediction and losses
     pred[t] <- experts[t, ] %*% weights[t, ]
     cumulativeLoss <- cumulativeLoss + loss(pred[t], y[t], loss.type)
-    
-    # Perte de l'algo et des experts (peut être loss.gradient)
     lpred <- lossPred(pred[t], y[t], pred[t], loss.type, loss.gradient)
     lexp <- lossPred(experts[t, ], y[t], pred[t], loss.type, loss.gradient)
     
-    # Mise à jour du vecteur de regret
+    # Regret update
     R <- R + awake[t, ] * (lpred - lexp)
   }
   w <- t(truncate1(exp(eta * R)))/sum(t(truncate1(exp(eta * R))))

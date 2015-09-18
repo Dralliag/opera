@@ -28,8 +28,10 @@ bestLinear <- function(y, experts, lambda = 0, loss.type = list(name = "square")
     bestLoss <- exp(700)
     
     for (i in 1:niter) {
-      # Optimisation convexe avec choix aléatoire de la condition initiale
+      # Random initialization
       u <- rnorm(N, 0, 1)
+      
+      # Convex initialization
       w <- optim(u, lossu, gr = NULL, ...)$par
       l <- lossu(w)
       if (bestLoss > l) {
