@@ -10,10 +10,6 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
     w0 <- rep(1, N)
   }
   
-  # Full activation if unspecified
-  if (is.null(awake)) {
-    awake <- matrix(1, nrow = T, ncol = N)
-  }
   if (is.null(gamma)) {
     gamma <- 2
   }

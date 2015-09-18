@@ -21,6 +21,7 @@ test_that("Errors are explained", {
    expect_error(oracle(Y = Y[1:2], experts = X), "Bad dimensions")
    
 })
+
 # Test of EWA
 test_that("EWA is ok", {
   w0 <- c(0.3, 0.7)
@@ -117,7 +118,6 @@ test_that("Ridge is ok", {
   expect_equal(sum(!(grid.lambda %in% m$parameters$grid.lambda)), 0)
 })
 
-
 # test of MLPol,...
 test_that("MLpol, MLprod, MLewa, and BOA are ok", {
   possible_loss_type <- c("percentage", "absolute", "square", "pinball")
@@ -163,7 +163,7 @@ test_that("MLpol, MLprod, MLewa, and BOA are ok", {
   expect_equal(m, m1)
 })
 
-
+# test of quantile prediction
 test_that("Quantile mixture are ok", {
   # test de la partie quantile
   n <- 200
@@ -227,3 +227,29 @@ test_that("Quantile mixture are ok", {
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_less_than(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.8)
 }) 
+
+# test of predict function
+test_that("Predict method is ok", {
+   model <- sample(c("BOA", "MLpol", "MLprod", "MLewa", "Ridge", "FS"), 1)
+   l <- sample(c("square", "pinball", "percentage", "absolute"), 1)
+   
+   m <- mixture(model = model, loss.type = l)  
+   expect_warning(predict(m))
+   
+   # single online prediction and sequential prediction return similar models
+   m1 <- predict(m ,newY = Y,newexperts = X, type = "m", awake = awake) 
+   m2 <- m
+   for (t in 1:n){
+     m2 <- predict(m2, newY=Y[t], newexperts=X[t,], online=TRUE, 
+                   type="model", awake=awake[t,])
+   }
+   expect_equal(m1,m2)
+   
+   # batch prediction is ok
+   m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, awake = awake) 
+   expect_equal(m1$coefficients,m2$coefficients)
+   
+   m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = awake) 
+   expect_equal(m1$prediction,m2)
+})
+

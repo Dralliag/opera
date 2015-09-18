@@ -3,10 +3,12 @@
 - fonctions de pertes: 
 	- enlever la fonction rmse: avoir une fonction de perte globale
 	- vérifier les gradient de la perte mape !!! comportement bizarre
-- finir la fonction predict (batch,...)
+- aide pour la fonction predict
 - shifting oracle et pinball loss
 - faire un exemple pour oracle --> fonction exemple ?
 - jeu de données de Yannig
+- match.arg pour la perte
+
 
 # Plus long terme
 - ajouter la possibilité de faire de la classification

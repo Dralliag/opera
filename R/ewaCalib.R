@@ -11,10 +11,6 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
     w0 <- rep(1, N)
   }
   
-  # Full activation if unspecified
-  if (is.null(awake)) {
-    awake <- matrix(1, nrow = T, ncol = N)
-  }
   if (is.null(gamma)) {
     gamma <- 2
   }

@@ -9,11 +9,6 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
     w0 <- rep(1, N)
   }
   
-  # No sleeping if awake is not specified
-  if (is.null(awake)) {
-    awake <- matrix(1, nrow = T, ncol = N)
-  }
-  
   awake <- as.matrix(awake)
   idx.na <- which(is.na(experts))
   awake[idx.na] <- 0
