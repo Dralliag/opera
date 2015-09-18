@@ -50,14 +50,18 @@ print.summary.mixture <- function(x, ...) {
 #' @export 
 plot.mixture <- function(x, ...) {
   x$experts <- data.frame(x$experts)
-  
+  x$weights <- data.frame(x$weights)
+  T <- nrow(x$experts)
   K <- ncol(x$experts)
+  
   if (is.null(names(x$experts))) {
     names(x$experts) <- colnames(x$experts)
   }
   if (is.null(names(x$experts))) {
     names(x$experts) <- paste("Expert", 1:K)
   }
+  names(x$weights) <- names(x$experts)
+  
   if (x$model == "gamMixture") {
     stop("Plot method is not yet available for gamMixture")
   }
@@ -67,7 +71,22 @@ plot.mixture <- function(x, ...) {
     legend("topright", names(x$experts), lty = 1:5, col = 1:8, ...)
   } else {
     # Convex aggregation rule Mettre le plot en polygon des poids
-
     
+     par(mar = c(3,3,0.4,0.1), mgp = c(0,0.5,0))
+     plot(c(1), type='l', col=1:8, lwd=2, axes=F, xlim = c(1,T), ylim = c(0,1), ylab='', xlab='')
+     mtext(side = 2, text = "Weights", line = 1.8, cex = 1)
+     mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)   
+     x.idx = c(1,1:T,T:1)
+     for (i in 1:K) {
+        w.summed <- apply(matrix(x$weights[,i:K], nrow = T),1,sum)
+        y.idx <- c(0,w.summed,rep(0,T))
+        polygon(x = x.idx,y=y.idx, col=i+1)    
+     }
+     axis(1)
+     axis(2)
+     box()
+     dev.off()
   }
+ 
+  boxplot(x$weights)
 } 
