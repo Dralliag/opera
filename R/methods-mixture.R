@@ -10,27 +10,41 @@ print.mixture <- function(x, ...) {
 
 #' @export 
 summary.mixture <- function(object, ...) {
-  rmse <- rmse(object$prediction, object$Y)
-  mape <- mean(loss(object$prediction, object$Y, loss.type = "percentage"))
-  
-  # mettre les rmse des oracles pour comparer
-  TAB <- cbind(rmse = rmse, mape = mape)
-  rownames(TAB) <- "Average losses:"
-  
-  res <- list(call = object$call, coefficients = object$coefficients, losses = TAB)
+  if (is.null(object$Y)) {
+    K <- "Unknown"
+    T <- 0
+    TAB <- c("No losses yet")
+  } else {
+    T <- length(Y)
+    K <- length(object$parameters)
+
+    rmse.algo <- rmse(object$prediction, object$Y)
+    mape.algo <- mean(loss(object$prediction, object$Y, loss.type = "percentage"))
+    rmse.unif <- sqrt(lossConv(rep(1/K,K),object$Y,object$experts, awake = object$awake))
+    mape.unif <- lossConv(rep(1/K,K),object$Y,object$experts, awake = object$awake, loss.type = "percentage")
+
+    TAB <- data.frame(rmse = c(rmse.algo, rmse.unif), mape = c(mape.algo, mape.unif))
+    rownames(TAB) <- c(object$model,"Uniform")
+  }
+
+  res <- list(object = object, 
+    coefficients = object$coefficients, 
+    losses = TAB,
+    n.experts = K,
+    n.observations = T)
   class(res) <- "summary.mixture"
   res
 }
 
 #' @export 
 print.summary.mixture <- function(x, ...) {
-  cat("Call:\n")
-  print(x$call)
-  cat("\n")
-  
-  cat("\nCoefficients:\n")
-  print(x$coefficients)
-  print(x$losses)
+  print(x$object)
+  cat("\nNumber of experts: ", x$n.experts)
+  cat("\nNumber of observations: ", x$n.observations,"\n\n")
+
+  if (!is.null(dim(x$losses))) {
+    print(x$losses)
+  }
 }
 
 #' @export 
@@ -53,5 +67,7 @@ plot.mixture <- function(x, ...) {
     legend("topright", names(x$experts), lty = 1:5, col = 1:8, ...)
   } else {
     # Convex aggregation rule Mettre le plot en polygon des poids
+
+    
   }
 } 

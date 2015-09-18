@@ -1,4 +1,4 @@
-- faire une fonction plot 
+- faire une fonction plot, summary, print 
 - faire une vignette ou des slides
 - fonctions de pertes: 
 	- enlever la fonction rmse: avoir une fonction de perte globale
@@ -6,7 +6,6 @@
 - shifting oracle et pinball loss
 - faire un exemple pour oracle --> fonction exemple ?
 - jeu de données de Yannig
-- match.arg pour la perte
 
 
 # Plus long terme
@@ -18,4 +17,5 @@
 - ridge version séquentielle ? 
 - lasso séquentiel
 - commenter le code en anglais
+- match.arg pour la perte
 
