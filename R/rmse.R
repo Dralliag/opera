@@ -20,12 +20,10 @@
 #' @author Pierre Gaillard <pierre@@gaillard.me>
 #' @keywords ~kwd1 ~kwd2
 #' @export rmse
-rmse <-
-function (x,y, awake=NULL, na.rm=TRUE) 
-{
+rmse <- function(x, y, awake = NULL, na.rm = TRUE) {
   if (is.null(awake)) {
-    sqrt(mean((x-y)^2, na.rm=na.rm))
+    sqrt(mean((x - y)^2, na.rm = na.rm))
   } else {
-    sqrt(sum((x-y)^2 * awake, na.rm=na.rm) / sum(awake * (!is.na(x-y))))
+    sqrt(sum((x - y)^2 * awake, na.rm = na.rm)/sum(awake * (!is.na(x - y))))
   }
-}
+} 

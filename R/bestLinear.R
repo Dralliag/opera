@@ -1,47 +1,45 @@
 # best linear oracle
-bestLinear <-
-function(y, experts, lambda = 0, loss.type = list(name = "square"), niter = 1, ...)
-{  
+bestLinear <- function(y, experts, lambda = 0, loss.type = list(name = "square"), niter = 1, ...) {
   experts <- as.matrix(experts)
-  N = ncol(experts)
-
+  N <- ncol(experts)
+  
   coefficients <- NULL
   if (loss.type$name == "square") {
-  	coefficients <- solve(lambda * diag(1,ncol(experts)) + t(experts) %*% experts,t(experts)%*%y)
-  	
+    coefficients <- solve(lambda * diag(1, ncol(experts)) + t(experts) %*% experts, t(experts) %*% 
+      y)
+    
   } else if (loss.type$name == "pinball") {
-      if (is.null(loss.type$tau)) {loss.type$tau = 0.5}
-  		coefficients <- tryCatch({
-  						quantreg::rq(y~experts-1,tau = loss.type$tau)$coefficients},
-  						error = function(e) { NULL 
-  					})
-  } 
-  if (is.null(coefficients)) {
-  		warning("The best linear oracle is only approximated (using optim).")
-  	 lossu <- function(u)   {
-         return(mean(loss(
-         		x = experts %*% matrix(u,nrow=ncol(experts)), 
-         		y = y, 
-         		loss.type = loss.type))) 
-      }
-      
-      best_u <- rep(0,N)
-      bestLoss <- exp(700)
-      
-      for (i in 1:niter)
-      {
-         # Optimisation convexe avec choix aléatoire de la condition initiale   
-         u <- rnorm(N,0,1)
-         w <- optim(u,lossu, gr = NULL, ...)$par
-         l <- lossu(w)
-         if (bestLoss > l) {
-            bestLoss = l
-            best_u = w
-         }
-      }
-      coefficients = matrix(best_u, nrow = N)
+    if (is.null(loss.type$tau)) {
+      loss.type$tau <- 0.5
+    }
+    coefficients <- tryCatch({
+      quantreg::rq(y ~ experts - 1, tau = loss.type$tau)$coefficients
+    }, error = function(e) {
+      NULL
+    })
   }
- 
-	prev <- experts %*% coefficients	
-  return(list(coefficients=c(coefficients),prediction=prev))
-}
+  if (is.null(coefficients)) {
+    warning("The best linear oracle is only approximated (using optim).")
+    lossu <- function(u) {
+      return(mean(loss(x = experts %*% matrix(u, nrow = ncol(experts)), y = y, loss.type = loss.type)))
+    }
+    
+    best_u <- rep(0, N)
+    bestLoss <- exp(700)
+    
+    for (i in 1:niter) {
+      # Optimisation convexe avec choix aléatoire de la condition initiale
+      u <- rnorm(N, 0, 1)
+      w <- optim(u, lossu, gr = NULL, ...)$par
+      l <- lossu(w)
+      if (bestLoss > l) {
+        bestLoss <- l
+        best_u <- w
+      }
+    }
+    coefficients <- matrix(best_u, nrow = N)
+  }
+  
+  prev <- experts %*% coefficients
+  return(list(coefficients = c(coefficients), prediction = prev))
+} 

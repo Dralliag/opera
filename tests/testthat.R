@@ -1,2 +1,2 @@
 library(testthat)
-test_check("opera")
+test_check("opera") 

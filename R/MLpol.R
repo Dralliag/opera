@@ -1,81 +1,73 @@
-MLpol <-
-function(y, experts, awake = NULL,
-            loss.type = 'square', loss.gradient = TRUE, training = NULL) 
-{
+MLpol <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, training = NULL) {
   experts <- as.matrix(experts)
   N <- ncol(experts)
   T <- nrow(experts)
   
-  if (is.null(awake)) {awake = matrix(1, nrow = T, ncol = N)} # Activation 1 si non spécifiée
-  awake = as.matrix(awake)
+  # No sleeping if unspecified
+  if (is.null(awake)) {
+    awake <- matrix(1, nrow = T, ncol = N)
+  }
+  awake <- as.matrix(awake)
   idx.na <- which(is.na(experts))
   awake[idx.na] <- 0
   experts[idx.na] <- 0
-
+  
   # weight assigned to each expert
-  weights <- matrix(0,ncol=N,nrow=T)
-  prediction <- rep(0,T)
+  weights <- matrix(0, ncol = N, nrow = T)
+  prediction <- rep(0, T)
   
-  
-
   # Initialization or the learning parameter
-  eta <- matrix(exp(700),ncol=N,nrow=T+1)
+  eta <- matrix(exp(700), ncol = N, nrow = T + 1)
   # regret suffered by each expert
-  R <- rep(0,N)
-
+  R <- rep(0, N)
+  
   if (!is.null(training)) {
-    eta[1,] <- training$eta
+    eta[1, ] <- training$eta
     R <- training$R
   } else {
-    training = list(eta = eta[1,])
+    training <- list(eta = eta[1, ])
   }
   
   for (t in 1:T) {
     # We check if there is at least one expert with positive weight
-    if (max(awake[t,] * R) > 0) {
-      w <- eta[t,] * pmax(R,0) / sum(eta[t,] * pmax(R,0))
+    if (max(awake[t, ] * R) > 0) {
+      w <- eta[t, ] * pmax(R, 0)/sum(eta[t, ] * pmax(R, 0))
     } else {
-      w <- rep(1,N)
+      w <- rep(1, N)
     }
-
+    
     # form the mixture and the prediction
-    p <- awake[t,] * w / sum(awake[t,]*w ) 
-    pred <- experts[t,] %*% p
-
+    p <- awake[t, ] * w/sum(awake[t, ] * w)
+    pred <- experts[t, ] %*% p
+    
     # save the mixture and the prediction
-    weights[t,] <- p
+    weights[t, ] <- p
     prediction[t] <- pred
     
     # Observe losses
-    lpred <- lossPred(pred, y[t], pred, 
-                 loss.type = loss.type, loss.gradient = loss.gradient)
-    lexp <- lossPred(experts[t,], y[t], pred, 
-                loss.type = loss.type, loss.gradient = loss.gradient)
-
+    lpred <- lossPred(pred, y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
+    lexp <- lossPred(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
+    
     # Update the regret and the weight
-    r <- awake[t,] * (lpred - lexp)
+    r <- awake[t, ] * (lpred - lexp)
     R <- R + r
     
-
     # Update the learning rate
-    eta[t+1,] <- 1/(1/eta[t,] + r^2)   
-  } 
+    eta[t + 1, ] <- 1/(1/eta[t, ] + r^2)
+  }
   # We check if there is at least one expert with positive weight
   if (max(R) > 0) {
-    w <- eta[T+1,] * pmax(R,0) / sum(eta[T+1,] * pmax(R,0))
+    w <- eta[T + 1, ] * pmax(R, 0)/sum(eta[T + 1, ] * pmax(R, 0))
   } else {
-    w <- rep(1/N,N)
+    w <- rep(1/N, N)
   }
-  object <- list(model = "MLpol", loss.type = loss.type, loss.gradient = loss.gradient,
-      coefficients = w)
+  object <- list(model = "MLpol", loss.type = loss.type, loss.gradient = loss.gradient, coefficients = w)
   
-  object$parameters <- list(eta = eta[1:T,])
+  object$parameters <- list(eta = eta[1:T, ])
   object$weights <- weights
   object$prediction <- prediction
-
-  object$training = list(
-    eta = eta[T+1,],
-    R = R)
+  
+  object$training <- list(eta = eta[T + 1, ], R = R)
   class(object) <- "mixture"
   return(object)
-}
+} 
