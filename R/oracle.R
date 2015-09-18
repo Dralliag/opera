@@ -78,8 +78,8 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
   niter = NULL, ...) {
   
    # Test that Y and experts have correct dimensions
-   if ((is.null(Y) && !is.null(experts)) || (!is.null(Y) && is.null(experts))) {
-      stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
+   if (is.null(Y) || is.null(experts)) {
+      stop("Y and experts should not be null")
    }
    if (length(Y) == 1) {
       experts <- as.matrix(experts)

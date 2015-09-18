@@ -201,21 +201,20 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
   if ((is.null(Y) && !is.null(experts)) || (!is.null(Y) && is.null(experts))) {
     stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
   }
-  if (length(Y) == 1) {
-    experts <- as.matrix(experts)
-    if (nrow(experts) == 1 || ncol(experts) == 1) {
-      experts <- matrix(experts, nrow = 1)
-    } else {
+  if (!is.null(Y)) {
+    if (length(Y) == 1) {
+      experts <- as.matrix(experts)
+      if (nrow(experts) == 1 || ncol(experts) == 1) {
+        experts <- matrix(experts, nrow = 1)
+      } else {
+        stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
+      }
+    }
+    if (!(length(Y) == nrow(experts))) {
       stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
     }
-  }
-  if (!(length(Y) == nrow(experts))) {
-    stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
-  }
-
-
-  if (!is.null(Y) && !is.null(experts)) {
     object <- predict(object, newY = Y, newexperts = experts, awake = awake, type = "model")
+    
   }
   return(object)
 } 
