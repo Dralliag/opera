@@ -189,11 +189,31 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
   if (!is.list(loss.type)) {
     loss.type <- list(name = loss.type)
   }
-  
+  if (!(loss.type$name %in% c("pinball","square","percentage","absolute"))) {
+    stop("loss.type should be one of these: 'absolute', 'percentage', 'square', 'pinball'")
+  }
+
   object <- list(model = model, loss.type = loss.type, loss.gradient = loss.gradient, coefficients = coefficients, 
     parameters = parameters, Y = NULL, experts = NULL, awake = NULL, training = NULL)
   class(object) <- "mixture"
   
+  # Test that Y and experts have correct dimensions
+  if ((is.null(Y) && !is.null(experts)) || (!is.null(Y) && is.null(experts))) {
+    stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
+  }
+  if (length(Y) == 1) {
+    experts <- as.matrix(experts)
+    if (nrow(experts) == 1 || ncol(experts) == 1) {
+      experts <- matrix(experts, nrow = 1)
+    } else {
+      stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
+    }
+  }
+  if (!(length(Y) == nrow(experts))) {
+    stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
+  }
+
+
   if (!is.null(Y) && !is.null(experts)) {
     object <- predict(object, newY = Y, newexperts = experts, awake = awake, type = "model")
   }

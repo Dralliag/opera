@@ -10,7 +10,17 @@ X[n, ] <- c(1, 1)
 Y[n] <- 1
 awake <- cbind(rep(c(0, 1), n/2), 1)
 
-
+# Test warnings and errors
+test_that("Errors are explained", {
+   expect_error(mixture(loss.type="plop"),"loss.type")
+   expect_error(oracle(Y,X,loss.type="plop"),"loss.type")
+   
+   expect_error(mixture(Y = Y), "Bad dimensions")
+   expect_error(mixture(experts = X), "Bad dimensions")
+   expect_error(mixture(Y = Y[1:2], experts = X), "Bad dimensions")
+   expect_error(oracle(Y = Y[1:2], experts = X), "Bad dimensions")
+   
+})
 # Test of EWA
 test_that("EWA is ok", {
   w0 <- c(0.3, 0.7)
