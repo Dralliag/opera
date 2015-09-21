@@ -77,8 +77,8 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
       neta <- neta + length(neweta)
       R <- cbind(R, array(0, dim = c(N, length(neweta))))
       for (k in 1:length(neweta)) {
-        perfneweta <- ewa(y[1:t], matrix(experts[1:t, ], ncol = N), neweta[k], matrix(awake[1:t, 
-          ], ncol = N), loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0)
+        perfneweta <- ewa(c(training$oldY,y[1:t]), rbind(training$oldexperts,matrix(experts[1:t, ], ncol = N)), neweta[k], awake = 
+          rbind(training$oldawake,matrix(awake[1:t, ], ncol = N)), loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0)
         cumulativeLoss <- c(cumulativeLoss, perfneweta$training$cumulativeLoss)
         R[, besteta + k] <- perfneweta$training$R
       }
@@ -93,8 +93,12 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
       R <- cbind(array(0, dim = c(N, length(neweta))), R)
       for (k in 1:length(neweta)) {
         grid.eta <- c(neweta[k], grid.eta)
-        perfneweta <- ewa(y[1:t], matrix(experts[1:t, ], ncol = N), neweta[k], matrix(awake[1:t, 
-          ], ncol = N), loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0)
+        perfneweta <- ewa(
+          y = c(training$oldY,y[1:t]), 
+          experts = rbind(training$oldexperts, matrix(experts[1:t, ], ncol = N)), 
+          eta = neweta[k], 
+          awake = rbind(training$oldawake,matrix(awake[1:t, ], ncol = N)),
+         loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0)
         cumulativeLoss <- c(perfneweta$training$cumulativeLoss, cumulativeLoss)
         R[, besteta - k] <- perfneweta$training$R
       }
@@ -112,7 +116,8 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
   object$prediction <- prediction
   
   object$training <- list(T = T0 + T, weta = weta, w0 = w0, R = R, cumulativeLoss = cumulativeLoss, 
-    besteta = besteta, grid.loss = cumulativeLoss/(T0 + T))
+    besteta = besteta, grid.loss = cumulativeLoss/(T0 + T), oldexperts = rbind(training$oldexperts,experts), oldY = c(training$oldY,y),
+    oldawake = rbind(training$oldawake,awake))
   
   class(object) <- "mixture"
   if (trace) 

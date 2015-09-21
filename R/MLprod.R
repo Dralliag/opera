@@ -27,6 +27,7 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
     eta[1, ] <- training$eta
     R <- training$R
     L <- training$L
+    maxloss <- training$maxloss
   }
   
   for (t in 1:T) {
@@ -67,7 +68,7 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
   object$weights <- weights
   object$prediction <- prediction
   
-  object$training <- list(eta = eta[T + 1, ], R = R, L = L)
+  object$training <- list(eta = eta[T + 1, ], R = R, L = L, maxloss = maxloss)
   class(object) <- "mixture"
   
   return(object)

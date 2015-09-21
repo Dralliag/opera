@@ -110,6 +110,12 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
     stop(paste("Square loss is require for", object$model, "model."))
   }
 
+  if (!is.null(awake) && !identical(awake, matrix(1, nrow = T, ncol = N)) && (object$model == "Ridge" || object$model == "gamMixture")) {
+    stop(paste("Sleeping or missing values not allowed for", object$model, "model."))
+  }
+
+
+
   # if no expert advice is provided, it returns the fitted object
   if (is.null(newexperts)) {
     if (!is.null(newY)) {
@@ -146,7 +152,7 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
     }
 
     if (object$model == "Ridge") {
-      if (is.null(object$parameters$lambda)) {
+      if (is.null(object$parameters$lambda)|| !is.null(object$parameters$grid.lambda)) {
         newobject <- ridgeCalib(y = newY, experts = newexperts, w0 = object$coefficients, gamma = object$parameters$gamma, 
           grid.lambda = object$parameters$grid.lambda, training = object$training)
         newobject$parameters$lambda <- c(object$parameters$lambda, newobject$parameters$lambda)
@@ -185,7 +191,7 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
       }
     }
     
-    if ((object$model == "FS")) {
+    if (object$model == "FS") {
       if (is.null(object$parameters$eta) || is.null(object$parameters$alpha) || !is.null(object$parameters$grid.eta) || 
         !is.null(object$parameters$grid.alpha)) {
         if (is.null(object$parameters$grid.eta)) {
@@ -197,6 +203,8 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
         newobject <- fixedshareCalib(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
           loss.gradient = object$loss.gradient, w0 = object$coefficients, gamma = object$parameters$gamma, 
           grid.eta = object$parameters$grid.eta, grid.alpha = object$parameters$grid.alpha, training = object$training)
+        newobject$parameters$eta <- c(object$parameters$eta, newobject$parameters$eta)
+        newobject$parameters$alpha <- c(object$parameters$alpha, newobject$parameters$alpha)
       } else {
         newobject <- fixedshare(y = newY, experts = newexperts, eta = object$parameters$eta, alpha = object$parameters$alpha, 
           awake = awake, loss.type = object$loss.type, loss.gradient = object$loss.gradient, w0 = object$coefficients, 

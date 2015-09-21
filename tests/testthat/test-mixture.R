@@ -12,14 +12,14 @@ awake <- cbind(rep(c(0, 1), n/2), 1)
 
 # Test warnings and errors
 test_that("Errors are explained", {
-   expect_error(mixture(loss.type="plop"),"loss.type")
-   expect_error(oracle(Y,X,loss.type="plop"),"loss.type")
-   
-   expect_error(mixture(Y = Y), "Bad dimensions")
-   expect_error(mixture(experts = X), "Bad dimensions")
-   expect_error(mixture(Y = Y[1:2], experts = X), "Bad dimensions")
-   expect_error(oracle(Y = Y[1:2], experts = X), "Bad dimensions")
-   
+  expect_error(mixture(loss.type="plop"),"loss.type")
+  expect_error(oracle(Y,X,loss.type="plop"),"loss.type")
+  
+  expect_error(mixture(Y = Y), "Bad dimensions")
+  expect_error(mixture(experts = X), "Bad dimensions")
+  expect_error(mixture(Y = Y[1:2], experts = X), "Bad dimensions")
+  expect_error(oracle(Y = Y[1:2], experts = X), "Bad dimensions")
+  
 })
 
 # Test of EWA
@@ -39,7 +39,7 @@ test_that("EWA is ok", {
   
   eta <- 0.5
   m.fixed <- mixture(Y = Y, experts = X, model = "EWA", parameters = list(eta = eta), loss.type = possible_loss_type[i.loss], 
-    coefficients = w0)
+                     coefficients = w0)
   idx.eta <- which(m$parameters$grid.eta == eta)
   expect_equal(m$training$grid.loss[idx.eta], mean(loss(m.fixed$prediction, Y, loss.type = possible_loss_type[i.loss])))
   expect_equal(m.fixed$loss, m$training$grid.loss[idx.eta])
@@ -55,9 +55,9 @@ test_that("EWA is ok", {
   expect_equal(sum(!(grid.eta %in% m$parameters$grid.eta)), 0)
   
   m1 <- mixture(Y = Y[1:10], experts = X[1:10, ], model = "EWA", parameters = list(grid.eta = grid.eta), 
-    awake = awake[1:10, ])
+                awake = awake[1:10, ])
   m1 <- predict(object = m1, newexperts = X[-c(1:10), ], newY = Y[-c(1:10)], awake = awake[-c(1:10), 
-    ], online = TRUE, type = "model")
+                                                                                           ], online = TRUE, type = "model")
   expect_equal(m, m1)
   
 })
@@ -76,7 +76,7 @@ test_that("Fixed-share is ok", {
   eta <- 2
   alpha <- 0.01
   m.fixed <- mixture(Y = Y, experts = X, model = "FS", parameters = list(eta = eta, alpha = alpha), 
-    loss.type = possible_loss_type[i.loss], coefficients = w0)
+                     loss.type = possible_loss_type[i.loss], coefficients = w0)
   idx.eta <- which(m$parameters$grid.eta == eta)
   idx.alpha <- which(m$parameters$grid.alpha == alpha)
   expect_equal(m$training$grid.loss[idx.eta, idx.alpha], mean(loss(m.fixed$prediction, Y, loss.type = possible_loss_type[i.loss])))
@@ -90,7 +90,7 @@ test_that("Fixed-share is ok", {
   grid.eta <- runif(5)
   grid.alpha <- runif(3)
   m <- mixture(Y = Y, experts = X, model = "FS", parameters = list(grid.eta = grid.eta, grid.alpha = grid.alpha), 
-    awake = awake)
+               awake = awake)
   expect_equal(sum(!(grid.eta %in% m$parameters$grid.eta)), 0)
   expect_identical(grid.alpha, m$parameters$grid.alpha)
 })
@@ -113,8 +113,7 @@ test_that("Ridge is ok", {
   expect_identical(m.fixed$weights[1, ], w0)
   
   grid.lambda <- runif(3)
-  m <- mixture(Y = Y, experts = X, model = "Ridge", parameters = list(grid.lambda = grid.lambda, gamma = 100), 
-    awake = awake)
+  m <- mixture(Y = Y, experts = X, model = "Ridge", parameters = list(grid.lambda = grid.lambda, gamma = 100))
   expect_equal(sum(!(grid.lambda %in% m$parameters$grid.lambda)), 0)
 })
 
@@ -174,7 +173,7 @@ test_that("Quantile mixture are ok", {
   i <- sample(1:K, 1)
   l <- list(name = "pinball", tau = quantiles[i])
   m <- mixture(Y = Y, experts = X, model = "EWA", loss.type = l, loss.gradient = FALSE, parameters = list(eta = 1, 
-    gamma = 100))
+                                                                                                          gamma = 100))
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_less_than(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
   # e <- rnorm(K) expect_equal(c(predict(m,e)), sum(c(e)*c(m$coefficients)))
@@ -185,7 +184,7 @@ test_that("Quantile mixture are ok", {
   
   # Fixed share
   m <- mixture(Y = Y, experts = X, model = "FS", loss.type = l, loss.gradient = FALSE, parameters = list(eta = 1, 
-    alpha = 0.01))
+                                                                                                         alpha = 0.01))
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_less_than(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
   
@@ -230,26 +229,29 @@ test_that("Quantile mixture are ok", {
 
 # test of predict function
 test_that("Predict method is ok", {
-   model <- sample(c("BOA", "MLpol", "MLprod", "MLewa", "Ridge", "FS"), 1)
-   l <- sample(c("square", "pinball", "percentage", "absolute"), 1)
-   
-   m <- mixture(model = model, loss.type = l)  
-   expect_warning(predict(m))
-   
-   # single online prediction and sequential prediction return similar models
-   m1 <- predict(m ,newY = Y,newexperts = X, type = "m", awake = awake) 
-   m2 <- m
-   for (t in 1:n){
-     m2 <- predict(m2, newY=Y[t], newexperts=X[t,], online=TRUE, 
-                   type="model", awake=awake[t,])
-   }
-   expect_equal(m1,m2)
-   
-   # batch prediction is ok
-   m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, awake = awake) 
-   expect_equal(m1$coefficients,m2$coefficients)
-   
-   m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = awake) 
-   expect_equal(m1$prediction,m2)
+  for (model in  c("BOA", "MLpol", "MLprod", "MLewa", "FS", "Ridge")) {
+    l <- sample(c("square", "pinball", "percentage", "absolute"), 1)
+    if (model == "Ridge") {
+      l <- "square"
+      awake <- NULL
+    }
+    m <- mixture(model = model, loss.type = l)  
+    expect_warning(predict(m))
+    
+    # single online prediction and sequential prediction return similar models
+    m1 <- predict(m, newY = Y, newexperts = X, type = "m", awake = awake) 
+    m2 <- m
+    for (t in 1:n){
+      m2 <- predict(m2, newY=Y[t], newexperts=X[t,], online=TRUE, type="model", awake=awake[t,])
+    }
+    expect_equal(m1,m2)
+    
+    # batch prediction is ok
+    m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, awake = awake) 
+    expect_equal(m1$coefficients,m2$coefficients)
+    
+    m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = awake) 
+    expect_equal(m1$prediction,m2)
+  }
 })
 

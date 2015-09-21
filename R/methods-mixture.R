@@ -67,26 +67,65 @@ plot.mixture <- function(x, ...) {
   }
   if (x$model == "Ridge") {
     # Linear aggregation rule
-    matplot(x$weights, type = "l", xlab = "Time steps", ylab = "Weights", lty = 1:5, col = 1:8, ...)
+    matplot(x$weights, type = "l", xlab = "Time steps", ylab = "Weights", lty = 1:5, col = 1:8, 
+      main = "Evolution of the weights associated with the experts",...)
     legend("topright", names(x$experts), lty = 1:5, col = 1:8, ...)
   } else {
     # Convex aggregation rule Mettre le plot en polygon des poids
     
-     par(mar = c(3,3,0.4,0.1), mgp = c(0,0.5,0))
-     plot(c(1), type='l', col=1:8, lwd=2, axes=F, xlim = c(1,T), ylim = c(0,1), ylab='', xlab='')
+     par(mar = c(3,3,1.6,0.1), mgp = c(2,.5,0))
+     plot(c(1), type='l', col=1:8, lwd=2, axes=F, xlim = c(1,T), ylim = c(0,1), ylab='', xlab='', main = "Evolution of the convex weights associated with the experts")
      mtext(side = 2, text = "Weights", line = 1.8, cex = 1)
      mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)   
      x.idx = c(1,1:T,T:1)
      for (i in 1:K) {
-        w.summed <- apply(matrix(x$weights[,i:K], nrow = T),1,sum)
+        w.summed <- apply(matrix(as.matrix(x$weights[,i:K]), nrow = T),1,sum)
         y.idx <- c(0,w.summed,rep(0,T))
         polygon(x = x.idx,y=y.idx, col=i+1)    
      }
      axis(1)
      axis(2)
      box()
-     dev.off()
   }
  
-  boxplot(x$weights)
-} 
+  # break
+  cat("Hit <Return> to see next plot:")
+  pause <- readLines(n=1)
+
+  # Box plot
+  par(mar = c(3,3,1.6,0.1))
+  boxplot(x$weights, 
+    main = "Box plot of the weights associated with the experts")
+  mtext(side = 2, text = "Weights", line = 1.8, cex = 1)
+     
+
+  # break
+  cat("Hit <Return> to see next plot:")
+  pause <- readLines(n=1)
+
+  # Cumulative loss
+  par(mar = c(3,3,1.6,0.1), mgp = c(1,0.5,0))
+  cumul.losses <-  apply(loss(x$experts,x$Y,x$loss.type), 2, cumsum)
+  matplot(cumul.losses, type = 'l', col = "gray", lty =1, xlab = "", ylab = "",
+          main = paste("Cumulative", x$loss.type, "loss"))
+  lines(cumsum(loss(x$prediction,x$Y,x$loss.type)), col = 2)
+  mtext(side = 2, text = "Cumulative loss", line = 1.8, cex = 1)
+  mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)   
+  legend("topleft", c("Experts", x$model), bty='n', lty =1, col = c(1,2))
+
+  # break
+  cat("Hit <Return> to see next plot:")
+  pause <- readLines(n=1)
+  
+  
+  # Cumulative residuals
+  par(mar = c(3,3,1.6,0.1),mgp = c(1,0.5,0))
+  cumul.residuals <-  apply(x$Y - x$experts, 2, cumsum)
+  matplot(cumul.residuals, type = 'l', col = "gray", lty =1, xlab = "", ylab = "",
+          main = paste("Cumulative residuals"))
+  lines(x$Y - x$prediction, col = 2)
+  mtext(side = 2, text = "Cumulative residuals", line = 1.8, cex = 1)
+  mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)   
+  legend("topleft", c("Experts", x$model), bty='n', lty =1, col = c(1,2))
+  
+  } 

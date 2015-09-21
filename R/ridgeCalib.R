@@ -72,7 +72,9 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
       grid.lambda <- c(grid.lambda, newlambda)
       nlambda <- nlambda + length(newlambda)
       for (k in 1:length(newlambda)) {
-        perfnewlambda <- tryCatch(ridge(y[1:t], matrix(experts[1:t, ], ncol = N), newlambda[k], 
+        perfnewlambda <- tryCatch(ridge(y = c(training$oldY,y[1:t]), 
+          experts = rbind(training$oldexperts, matrix(experts[1:t, ], ncol = N)), 
+          lambda = newlambda[k], 
           w0 = w0), error = function(e) {
           list(prediction = rep(0, t))
         })
@@ -89,7 +91,10 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
       bestlambda <- bestlambda + length(newlambda)
       for (k in 1:length(newlambda)) {
         grid.lambda <- c(newlambda[k], grid.lambda)
-        perfnewlambda <- tryCatch(ridge(y[1:t], matrix(experts[1:t, ], ncol = N), newlambda[k], 
+        perfnewlambda <- tryCatch(
+          y = ridge(c(training$oldY,y[1:t]), 
+          experts = rbind(training$oldexperts, matrix(experts[1:t, ], ncol = N)), 
+          lambda = newlambda[k], 
           w0 = w0), error = function(e) {
           list(prediction = rep(NA, t))
         })
@@ -112,12 +117,12 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
   
   object <- list(model = "Ridge", loss.type = list(name = "square"), coefficients = wlambda[, bestlambda])
   
-  object$parameters <- list(lambda = lambda[1:T], grid.lambda = grid.lambda)
+  object$parameters <- list(lambda = c(lambda[1:T]), grid.lambda = c(grid.lambda))
   object$weights <- weights
   object$prediction <- prediction
   
   object$training <- list(T = T0 + T, wlambda = wlambda, w0 = w0, At = At, bt = bt, bestlambda = bestlambda, 
-    cumulativeLoss = cumulativeLoss, grid.loss = cumulativeLoss/(T0 + T))
+    cumulativeLoss = cumulativeLoss, grid.loss = cumulativeLoss/(T0 + T), oldexperts = rbind(training$oldexperts,experts), oldY = c(training$oldY,y))
   
   if (trace) 
     cat("\n")
