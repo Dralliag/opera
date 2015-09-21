@@ -140,16 +140,19 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
     res <- bestShifts(Y, experts, awake = awake, loss.type = loss.type)
   }
   
-  if (model == "expert") {
     loss.experts <- apply(apply(experts, 2, function(x) {
       loss(x, Y, loss.type = loss.type)
     }), 2, mean)
+
+  if (model == "expert") {
     best.loss <- min(loss.experts)
     coefficients <- (loss.experts == best.loss)/sum(loss.experts == best.loss)
     best.expert <- which(coefficients > 0)[1]
-    res <- list(loss = best.loss, coefficients = coefficients, prediction = experts[, best.expert])
+    res <- list(loss = best.loss, coefficients = coefficients, prediction = experts[, best.expert],
+      loss.experts = loss.experts)
   }
   
+  res$loss.experts <- loss.experts
   res$model <- model
   res$loss.type <- loss.type
   res$call <- match.call()
@@ -160,6 +163,7 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
   }
   res$Y <- Y
   res$experts <- experts
+  res$awake <- awake
   
   
   class(res) <- "oracle"

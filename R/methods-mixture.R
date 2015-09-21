@@ -5,7 +5,7 @@ print.mixture <- function(x, ...) {
   cat("Loss function: ", x$loss.type$name, "loss", "\n")
   cat("Gradient trick: ", x$loss.gradient, "\n")
   cat("Coefficients: ")
-  print(x$coefficients)
+  print(signif(x$coefficients, digits = 2))
 }
 
 #' @export 
@@ -15,7 +15,7 @@ summary.mixture <- function(object, ...) {
     T <- 0
     TAB <- c("No losses yet")
   } else {
-    T <- length(Y)
+    T <- length(object$Y)
     K <- length(object$parameters)
 
     rmse.algo <- rmse(object$prediction, object$Y)
@@ -43,7 +43,7 @@ print.summary.mixture <- function(x, ...) {
   cat("\nNumber of observations: ", x$n.observations,"\n\n")
 
   if (!is.null(dim(x$losses))) {
-    print(x$losses)
+    print(signif(x$losses, digits = 2))
   }
 }
 
