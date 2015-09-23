@@ -30,15 +30,21 @@
 #'library('opera')  # load the package
 #'set.seed(1)
 #'
-# Example: find the best one week ahead forecasting strategy (weekly data)
+#'# Example: find the best one week ahead forecasting strategy (weekly data)
 #'# packages
 #'library(mgcv)
 #'library(caret)
 #'
 #'# import data
+#'data(electric_load)
 #'idx_data_test <- 680:nrow(electric_load)
 #'data_train <- electric_load[-idx_data_test, ]
 #'data_test <- electric_load[idx_data_test, ]
+#'
+#'# Medium term model to remove trend and seasonality (using generalized additive model)
+#'detrend.fit <- gam(Load ~ s(Time,k=3) + s(NumWeek) + s(Temp) + s(IPI), data = data_train)
+#'electric_load$Trend <- c(predict(detrend.fit), predict(detrend.fit,newdata = data_test))
+#'electric_load$Load.detrend <- electric_load$Load - electric_load$Trend
 #'
 #'# a few graphs to display the data
 #'attach(data_train)
@@ -49,37 +55,35 @@
 #'acf(Load, lag.max = 20)
 #'detach(data_train)
 #'
-#'# Build the expert forecasts A generalized additive model
-#'gam.fit <- gam(Load ~ s(IPI) + s(Temp) + s(Time) + s(Load1) + s(NumWeek), data = data_train)
+#'# Build the expert forecasts 
+#'# ##########################
+#'
+#'# A generalized additive model
+#'gam.fit <- gam(Load ~ s(IPI) + s(Temp) + s(Time, k=3) + 
+#'                s(Load1) + as.factor(NumWeek), data = data_train)
 #'gam.forecast <- predict(gam.fit, newdata = data_test)
+#'rmse(gam.forecast,data_test$Load)
 #'
-#'# A random forests
-#'rf.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek, data = data_train, 
-#'                ntree = 100, method = "rf", trace = FALSE)
-#'rf.forecast <- predict(rf.fit, newdata = data_test)
-#'
-#'# An ar model
+#'# An online autoregressive model on the residuals of the medium term model
 #'ar.forecast <- numeric(length(idx_data_test))
 #'for (i in seq(idx_data_test)) {
-#'  ar.fit <- ar(electric_load$Load[1:(idx_data_test[i] - 1)])
-#'  ar.forecast[i] <- as.numeric(predict(ar.fit)$pred)
+#'  ar.fit <- ar(electric_load$Load.detrend[1:(idx_data_test[i] - 1)])
+#'  ar.forecast[i] <- as.numeric(predict(ar.fit)$pred) + electric_load$Trend[idx_data_test[i]]
 #'}
+#'rmse(ar.forecast,data_test$Load) 
 #'
 #'# A GBM
-#'gbm0.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek, data = data_train, 
-#'                  method = "gbm")
+#'gbm0.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek, 
+#'                  data = data_train, method = "gbm")
 #'gbm.forecast <- predict(gbm0.fit, newdata = data_test)
+#'rmse(gbm.forecast,data_test$Load) 
 #'
-#'# A neural network
-#'my.grid <- expand.grid(.decay = c(0.5, 0.1), .size = c(5, 6, 7))
-#'nnet.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek, data = data_train, 
-#'                  method = "nnet", maxit = 1000, tuneGrid = my.grid, trace = FALSE, linout = 1)
-#'nnet.forecast <- predict(nnet.fit, newdata = data_test)
 #'
-#'######################## Aggregation of experts
+#'# Aggregation of experts
+#'###########################
 #'
-#'X <- cbind(gam.forecast, rf.forecast, ar.forecast, gbm.forecast)
-#'colnames(X) <- c("gam", "rf", "ar", "gbm")
+#'X <- cbind(gam.forecast, ar.forecast, gbm.forecast)
+#'colnames(X) <- c("gam", "ar", "gbm")
 #'
 #'Y <- data_test$Load
 #'T <- cbind(Y, X)
@@ -88,8 +92,7 @@
 #'
 #'
 #'# How good are the expert? Look at the oracles
-#'
-#'oracle.convex <- oracle(Y = Y, experts = X, loss.type = "percentage", model = "convex")
+#'oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "convex")
 #'plot(oracle.convex)
 #'oracle.convex
 #'
@@ -99,9 +102,10 @@
 #'oracle.shift
 #'
 #'# Online aggregation of the experts with MLpol
+#'#############################################
 #'
 #'# Initialize the aggregation rule
-#'m0.MLpol <- mixture(model = "MLprod", loss.type = "percentage")
+#'m0.MLpol <- mixture(model = "MLpol", loss.type = "square")
 #'
 #'# Perform online prediction using EWA There are 3 equivalent possibilities 1)
 #'# start with an empty model and update the model sequentially
@@ -114,14 +118,14 @@
 #'m2.MLpol <- predict(m0.MLpol, newexpert = X, newY = Y, online = TRUE)
 #'
 #'# 3) perform the online aggregation directly
-#'m3.MLpol <- mixture(Y = Y, experts = X, model = "MLpol", loss.type = "percentage")
+#'m3.MLpol <- mixture(Y = Y, experts = X, model = "MLpol", loss.type = "square")
 #'
 #'# These predictions are equivalent:
 #'identical(m1.MLpol, m2.MLpol)  # TRUE
 #'identical(m1.MLpol, m3.MLpol)  # TRUE
 #'
 #'# Display the results
-#'summary(m1.MLpol)
-#'plot(m1.MLpol) 
+#'summary(m3.MLpol)
+#'plot(m3.MLpol) 
 
 NULL 
