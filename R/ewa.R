@@ -1,5 +1,5 @@
-ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradient = TRUE, w0 = NULL, 
-  training = NULL) {
+ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
+  w0 = NULL, training = NULL) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -43,7 +43,8 @@ ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradie
   }
   w <- t(truncate1(exp(eta * R)))/sum(t(truncate1(exp(eta * R))))
   
-  object <- list(model = "EWA", loss.type = loss.type, loss.gradient = loss.gradient, coefficients = w)
+  object <- list(model = "EWA", loss.type = loss.type, loss.gradient = loss.gradient, 
+    coefficients = w)
   
   object$parameters <- list(eta = eta)
   object$weights <- weights

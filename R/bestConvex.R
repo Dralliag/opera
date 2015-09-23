@@ -1,9 +1,11 @@
 # best convex oracle
-bestConvex <- function(y, experts, awake = NULL, loss.type = list(name = "square"), niter = 1, ...) {
-  experts <- as.matrix(experts)
+bestConvex <- function(y, experts, awake = NULL, loss.type = list(name = "square"), 
+  niter = 1, ...) {
+  experts <- matrix(as.numeric(as.matrix(experts)), nrow = length(y))
   N <- ncol(experts)
   
-  # if there are no NA and if awake is null we can perform an exact resolution for the square loss
+  # if there are no NA and if awake is null we can perform an exact resolution for
+  # the square loss
   idx.na <- which(is.na(experts))
   if (length(idx.na) == 0 && is.null(awake) && loss.type$name == "square") {
     y.na <- is.na(y)
@@ -48,10 +50,10 @@ bestConvex <- function(y, experts, awake = NULL, loss.type = list(name = "square
       # Random initialization
       p <- runif(N, 0, 1)
       p <- p/sum(p)
-
+      
       # Convex optimization
       w <- optim(p, lossp, gr = NULL, lower = 1e-20, method = "L-BFGS-B", ...)
-
+      
       # Projection on the simplex
       w <- pmax(w$par, 0)
       l <- lossp(w)
@@ -63,7 +65,7 @@ bestConvex <- function(y, experts, awake = NULL, loss.type = list(name = "square
     coefficients <- matrix(best_p, ncol = N)
     coefficients <- coefficients/apply(coefficients, 1, sum)
     pond <- awake %*% t(coefficients)
-    prediction <- ((experts * awake) %*% t(coefficients))/pond
+    prediction <- ((as.numeric(experts) * awake) %*% t(coefficients))/pond
   }
   res <- list(coefficients = coefficients, prediction = prediction)
   return(res)

@@ -1,5 +1,6 @@
 # best sequence of experts oracle
-bestShifts <- function(y, experts, awake = NULL, loss.type = list(name = "square"), trace = FALSE) {
+bestShifts <- function(y, experts, awake = NULL, loss.type = list(name = "square"), 
+  trace = FALSE) {
   N <- ncol(experts)
   T <- nrow(experts)
   INF <- exp(700)
@@ -26,14 +27,16 @@ bestShifts <- function(y, experts, awake = NULL, loss.type = list(name = "square
   for (t in 1:T) {
     if (!(t%%100) && trace) {
       cat(floor(t^2/T^2 * 10000)/100, "% -- ")
-      cat("t = ", t - 1, ": average minimal loss with t shifts : ", min(sqrt(L[t - 1, , loss.number]/(t - 
-        1))), " without shifts :", min(sqrt(L[1, , loss.number]/(t - 1))), "\n")
+      cat("t = ", t - 1, ": average minimal loss with t shifts : ", min(sqrt(L[t - 
+        1, , loss.number]/(t - 1))), " without shifts :", min(sqrt(L[1, , 
+        loss.number]/(t - 1))), "\n")
     }
     
     Et1 <- which(awake[t - 1, ] > 0)
     Et <- which(awake[t, ] > 0)
     for (l in 1:3) {
-      instanceLoss[, l] <- loss(experts[t, ], y[t], loss.name[l]) * awake[t, ]
+      instanceLoss[, l] <- loss(experts[t, ], y[t], loss.name[l]) * awake[t, 
+        ]
     }
     L[1:t, -Et, ] <- INF
     if (t > 1) {

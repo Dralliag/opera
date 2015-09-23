@@ -30,7 +30,8 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL) {
   }
   # w[1,] = w0
   
-  object <- list(model = "Ridge", loss.type = list(name = "square"), coefficients = solve(At, bt))
+  object <- list(model = "Ridge", loss.type = list(name = "square"), coefficients = solve(At, 
+    bt))
   
   object$parameters <- list(lambda = lambda)
   object$weights <- w

@@ -27,100 +27,101 @@
 #' @keywords package
 #' @examples
 #' 
-#'library("opera")  # load the package
+#'library('opera')  # load the package
 #'set.seed(1)
 #'
-#'T <- 100  # number of instances
-#'t <- 1:T  # instances
-#'Y <- cos(5 * 2 * pi * t/T)  # sequence to be predicted
+# Example: find the best one week ahead forecasting strategy (weekly data)
+#'# packages
+#'library(mgcv)
+#'library(caret)
 #'
-#'X1 <- Y + 0.1 * rnorm(T)  # first expert (with small average error)
-#'X2 <- Y + 0.3 * rnorm(T)  # second expert
-#'awake1 <- rep(c(rep(1, 9), 0), T/10)  # the first expert is not always available
-#'awake2 <- rep(1, T)  # the second expert is always available
+#'# import data
+#'idx_data_test <- 680:nrow(electric_load)
+#'data_train <- electric_load[-idx_data_test, ]
+#'data_test <- electric_load[idx_data_test, ]
 #'
-#'X <- cbind(X1, X2)  # matrix of experts
-#'awake <- cbind(awake1, awake2)  # activation matrix
+#'# a few graphs to display the data
+#'attach(data_train)
+#'plot(Load, type = "l")
+#'plot(Temp, Load, pch = 16, cex = 0.5)
+#'plot(NumWeek, Load, pch = 16, cex = 0.5)
+#'plot(Load, Load1, pch = 16, cex = 0.5)
+#'acf(Load, lag.max = 20)
+#'detach(data_train)
 #'
-#'matplot(X, type = "l", col = 2:3)  # plot experts" predictions
-#'lines(Y)  # plot observations
+#'# Build the expert forecasts A generalized additive model
+#'gam.fit <- gam(Load ~ s(IPI) + s(Temp) + s(Time) + s(Load1) + s(NumWeek), data = data_train)
+#'gam.forecast <- predict(gam.fit, newdata = data_test)
 #'
-#'# Performance of the experts
-#'cat("Expert 1, rmse :", rmse(X1, Y, awake = awake1), "\n")
-#'cat("Expert 2, rmse :", rmse(X2, Y, awake = awake2), "\n")
+#'# A random forests
+#'rf.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek, data = data_train, 
+#'                ntree = 100, method = "rf", trace = FALSE)
+#'rf.forecast <- predict(rf.fit, newdata = data_test)
 #'
-#'# Performance of taking expert 1 if available, expert 2 otherwise
-#'X3 <- X1 * awake[, 1] + X2 * (1 - awake[, 1])
-#'cat("Best sequence of experts in hindsight, rmse :", rmse(X3, Y), "\n\n")
-#'
-#'# EWA with fixed learning rate
-#'mod <- mixture(Y = Y, experts = X, model = "EWA", parameters = list(eta = 1),  
-#'loss.type = "square", loss.gradient = FALSE, awake = awake)
-#'
-#'# plot weights assigned to both experts (when an expert is not available its weight is 0)
-#'matplot(mod$weights, type = "l", main = "EWA with fixed learning rate", col = 2:3)
-#'cat("EWA mixture, rmse :", rmse(mod$prediction, Y), "\n")
-#'
-#'# ewa algorithm with gradient loss function
-#'mod <- mixture(Y = Y, experts = X, model = "EWA", parameters = list(eta = 1), 
-#'               loss.type = "square", loss.gradient = TRUE, awake = awake)
-#'matplot(mod$weights, type = "l", main = "EWA with gradient losses", col = 2:3)
-#'cat("EWA mixture with gradient losses, rmse :", rmse(mod$prediction, Y), "\n")
-#'
-#'# ewa algorithm with automatic calibration of the learning parameter
-#'mod <- mixture(Y = Y, experts = X, model = "EWA", awake = awake)
-#'matplot(mod$weights, type = "l", main = "Automatic EWA", col = 2:3)
-#'cat("EWA mixture with automatic tuning, rmse :", rmse(mod$prediction, Y), "\n")
-#'
-#'# MLpol aggregation rule
-#'mod <- mixture(Y = Y, experts = X, model = "MLpol", awake = awake)
-#'mod$prediction <- apply(mod$weights * X, 1, sum)
-#'matplot(mod$weights, type = "l", main = "MLpol mixture", col = 2:3, ylim = c(0, 1))
-#'cat("MLpol mixture, rmse :", rmse(mod$prediction, Y), "\n")
-#'
-#'# Similarly, the aggregation can be build first without data
-#'mod0 <- mixture(model = "BOA", loss.type = list(name = "pinball", tau = 0.7))
-#'# then use to predict X, and Y using the predict method
-#'mod1 <- predict(mod0, newexperts = X, newY = Y, online = TRUE, type = "model", awake = awake)
-#'
-#'# The same is achieved bellow in a sequential fashion (i.e., mod = mod1)
-#'mod <- mod0
-#'for (t in 1:T) {
-#'    mod <- predict(mod, newY = Y[t], newexperts = X[t, ], online = TRUE, 
-#'                   type = "model", awake = awake[t, ])
+#'# An ar model
+#'ar.forecast <- numeric(length(idx_data_test))
+#'for (i in seq(idx_data_test)) {
+#'  ar.fit <- ar(electric_load$Load[1:(idx_data_test[i] - 1)])
+#'  ar.forecast[i] <- as.numeric(predict(ar.fit)$pred)
 #'}
 #'
-#'# ----------------------------------------------------------------- 
-#'#                     TIME-SERIES WITH BREAKS
-#'# -----------------------------------------------------------------
+#'# A GBM
+#'gbm0.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek, data = data_train, 
+#'                  method = "gbm")
+#'gbm.forecast <- predict(gbm0.fit, newdata = data_test)
 #'
-#'# We now assume that there is a break in the time series and that experts 
-#'# are swaped after alpha*T instances
-#'alpha <- 1/2
-#'X[floor(alpha * T):T, ] <- X[floor(alpha * T):T, 2:1]
-#'awake[floor(alpha * T):T, ] <- awake[floor(alpha * T):T, 2:1]
+#'# A neural network
+#'my.grid <- expand.grid(.decay = c(0.5, 0.1), .size = c(5, 6, 7))
+#'nnet.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek, data = data_train, 
+#'                  method = "nnet", maxit = 1000, tuneGrid = my.grid, trace = FALSE, linout = 1)
+#'nnet.forecast <- predict(nnet.fit, newdata = data_test)
 #'
-#'# Performances of the experts
-#'cat("Expert 1, rmse :", rmse(X1, Y, awake = awake1), "\n")
-#'cat("Expert 2, rmse :", rmse(X2, Y, awake = awake2), "\n")
-#'cat("Best sequence of experts in hindsight, rmse :", rmse(X3, Y), "\n\n")
+#'######################## Aggregation of experts
 #'
+#'X <- cbind(gam.forecast, rf.forecast, ar.forecast, gbm.forecast)
+#'colnames(X) <- c("gam", "rf", "ar", "gbm")
 #'
-#'# We want to perform online prediction of EWA with fixed learning rate
-#'mod <- mixture(Y = Y, experts = X, model = "EWA", parameter = list(eta = 1), 
-#'               loss.type = "square", loss.gradient = FALSE, awake = awake)
+#'Y <- data_test$Load
+#'T <- cbind(Y, X)
 #'
-#'# plot weights assigned to both experts (when an expert is not available its weight is 0)
-#'matplot(mod$weights, type = "l", main = "EWA with fixed learning rate", col = 2:3)
-#'cat("EWA mod, rmse :", rmse(mod$prediction, Y), "\n")
+#'matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load", xlab = "Week")
 #'
 #'
-#'# Fixed-share with automatic tuning of learning rate
-#'mod <- mixture(Y = Y, experts = X, model = "FS", awake = awake)
+#'# How good are the expert? Look at the oracles
 #'
-#'# plot weights assigned to both experts (when an expert is not available its weight is 0)
-#'matplot(mod$weights, type = "l", main = "Fixed-share with automatic tuning", col = 2:3) 
-#' 
-#' 
-#' 
+#'oracle.convex <- oracle(Y = Y, experts = X, loss.type = "percentage", model = "convex")
+#'plot(oracle.convex)
+#'oracle.convex
+#'
+#'# Is a single expert the best over time ? Are there breaks ?
+#'oracle.shift <- oracle(Y = Y, experts = X, loss.type = "percentage", model = "shifting")
+#'plot(oracle.shift)
+#'oracle.shift
+#'
+#'# Online aggregation of the experts with MLpol
+#'
+#'# Initialize the aggregation rule
+#'m0.MLpol <- mixture(model = "MLprod", loss.type = "percentage")
+#'
+#'# Perform online prediction using EWA There are 3 equivalent possibilities 1)
+#'# start with an empty model and update the model sequentially
+#'m1.MLpol <- m0.MLpol
+#'for (i in 1:length(Y)) {
+#'  m1.MLpol <- predict(m1.MLpol, newexperts = X[i, ], newY = Y[i])
+#'}
+#'
+#'# 2) perform online prediction directly from the empty model
+#'m2.MLpol <- predict(m0.MLpol, newexpert = X, newY = Y, online = TRUE)
+#'
+#'# 3) perform the online aggregation directly
+#'m3.MLpol <- mixture(Y = Y, experts = X, model = "MLpol", loss.type = "percentage")
+#'
+#'# These predictions are equivalent:
+#'identical(m1.MLpol, m2.MLpol)  # TRUE
+#'identical(m1.MLpol, m3.MLpol)  # TRUE
+#'
+#'# Display the results
+#'summary(m1.MLpol)
+#'plot(m1.MLpol) 
+
 NULL 

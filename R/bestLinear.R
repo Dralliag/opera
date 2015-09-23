@@ -1,12 +1,13 @@
 # best linear oracle
-bestLinear <- function(y, experts, lambda = 0, loss.type = list(name = "square"), niter = 1, ...) {
+bestLinear <- function(y, experts, lambda = 0, loss.type = list(name = "square"), 
+  niter = 1, ...) {
   experts <- as.matrix(experts)
   N <- ncol(experts)
   
   coefficients <- NULL
   if (loss.type$name == "square") {
-    coefficients <- solve(lambda * diag(1, ncol(experts)) + t(experts) %*% experts, t(experts) %*% 
-      y)
+    coefficients <- solve(lambda * diag(1, ncol(experts)) + t(experts) %*% experts, 
+      t(experts) %*% y)
     
   } else if (loss.type$name == "pinball") {
     if (is.null(loss.type$tau)) {
@@ -21,7 +22,8 @@ bestLinear <- function(y, experts, lambda = 0, loss.type = list(name = "square")
   if (is.null(coefficients)) {
     warning("The best linear oracle is only approximated (using optim).")
     lossu <- function(u) {
-      return(mean(loss(x = experts %*% matrix(u, nrow = ncol(experts)), y = y, loss.type = loss.type)))
+      return(mean(loss(x = experts %*% matrix(u, nrow = ncol(experts)), y = y, 
+        loss.type = loss.type)))
     }
     
     best_u <- rep(0, N)

@@ -15,26 +15,26 @@
 #' @param model A character string specifying the oracle to use or a list with a component \code{name} specifying the oracle and any additional parameter needed.
 #' Currently available oracles are:
 #' \describe{
-#'    \item{"expert"}{The best fixed (constant over time) expert oracle.}
-#'    \item{"convex"}{The best fixed convex combination (vector of non-negative weights that sum to 1)}
-#'    \item{"linear"}{The best fixed linear combination of expert}
-#'    \item{"shifting"}{It computes for all number $m$ of stwitches the
+#'    \item{'expert'}{The best fixed (constant over time) expert oracle.}
+#'    \item{'convex'}{The best fixed convex combination (vector of non-negative weights that sum to 1)}
+#'    \item{'linear'}{The best fixed linear combination of expert}
+#'    \item{'shifting'}{It computes for all number $m$ of stwitches the
 #' sequence of experts with at most $m$ shifts that would have performed the
 #' best to predict the sequence of observations in \code{Y}.}
 #' }
-#' @param loss.type A string or a list with a component "name" specifying
+#' @param loss.type A string or a list with a component 'name' specifying
 #' the loss function considered to evaluate the performance. It can be
-#' "square", "absolute", "percentage", or "pinball". In the case of the pinball loss, the quantile 
+#' 'square', 'absolute', 'percentage', or 'pinball'. In the case of the pinball loss, the quantile 
 #' can be provided by assigning to loss.type a list of two elements: 
 #' \describe{
-#'      \item{name}{A string defining the name of the loss function (i.e., "pinball")}
+#'      \item{name}{A string defining the name of the loss function (i.e., 'pinball')}
 #'      \item{tau}{ A number in \code{[0,1]} defining the quantile to be predicted. The default value is 0.5 to predict the median.}
 #' } 
 #' 
-#' @param lambda A positive number used by the "linear" oracle only. 
+#' @param lambda A positive number used by the 'linear' oracle only. 
 #' A possible $L_2$ regularization parameter for computing the linear oracle 
 #' (if the design matrix is not identifiable)
-#' @param niter A positive integer for "convex" and "linear" oracles 
+#' @param niter A positive integer for 'convex' and 'linear' oracles 
 #' if direct computation of the oracle is not implemented. 
 #' It defines the number of optimization steps to perform in 
 #' order to approximate the oracle (default value is 3).
@@ -51,8 +51,8 @@
 #' that are passed to \code{\link{optim}} function is order to perform convex optimization 
 #' (see parameter \code{niter}).
 #'
-#' @return An object of class "oracle" that contains:
-#' \item{loss}{ The average loss suffered by the oracle. For the "shifting" oracle,
+#' @return An object of class 'oracle' that contains:
+#' \item{loss}{ The average loss suffered by the oracle. For the 'shifting' oracle,
 #' it is a vector of length \code{T} where
 #' \code{T} is the number of instance to be predicted (i.e., the length of the
 #' sequence \code{Y}). The value of $loss(m)$ is the loss
@@ -60,8 +60,8 @@
 #' best sequence of expert with at
 #' most $m-1$ shifts.
 #' }
-#' \item{coefficients}{ Not for the "shifting" oracle. A vector containing the best weight vector corresponding to the oracle. }
-#' \item{prediction}{ Not for the "shifting" oracle. A vector containing the
+#' \item{coefficients}{ Not for the 'shifting' oracle. A vector containing the best weight vector corresponding to the oracle. }
+#' \item{prediction}{ Not for the 'shifting' oracle. A vector containing the
 #' predictions of the oracle.  }
 #' \item{rmse}{If loss.type is the square loss (default) only.
 #' The root mean square error (i.e., it is the square root of \code{loss}.}
@@ -69,37 +69,37 @@
 #' @author Pierre Gaillard <pierre@@gaillard.me>
 #' @export oracle
 
-oracle <- function(Y, experts, model = "convex", loss.type = "square", awake = NULL, lambda = NULL, niter = NULL, 
-  ...) UseMethod("oracle")
+oracle <- function(Y, experts, model = "convex", loss.type = "square", awake = NULL, 
+  lambda = NULL, niter = NULL, ...) UseMethod("oracle")
 
 
 #' @export 
-oracle.default <- function(Y, experts, model = "convex", loss.type = "square", awake = NULL, lambda = NULL, 
-  niter = NULL, ...) {
+oracle.default <- function(Y, experts, model = "convex", loss.type = "square", awake = NULL, 
+  lambda = NULL, niter = NULL, ...) {
   
-   # Test that Y and experts have correct dimensions
-   if (is.null(Y) || is.null(experts)) {
-      stop("Y and experts should not be null")
-   }
-   if (length(Y) == 1) {
-      experts <- as.matrix(experts)
-      if (nrow(experts) == 1 || ncol(experts) == 1) {
-         experts <- matrix(experts, nrow = 1)
-      } else {
-         stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
-      }
-   }
-   if (!(length(Y) == nrow(experts))) {
+  # Test that Y and experts have correct dimensions
+  if (is.null(Y) || is.null(experts)) {
+    stop("Y and experts should not be null")
+  }
+  if (length(Y) == 1) {
+    experts <- as.matrix(experts)
+    if (nrow(experts) == 1 || ncol(experts) == 1) {
+      experts <- matrix(experts, nrow = 1)
+    } else {
       stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
-   }
-   
+    }
+  }
+  if (!(length(Y) == nrow(experts))) {
+    stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
+  }
+  
   if (is.null(loss.type)) {
     loss.type <- list(name = "square")
   }
   if (!is.list(loss.type)) {
     loss.type <- list(name = loss.type)
   }
-  if (!(loss.type$name %in% c("pinball","square","percentage","absolute"))) {
+  if (!(loss.type$name %in% c("pinball", "square", "percentage", "absolute"))) {
     stop("loss.type should be one of these: 'absolute', 'percentage', 'square', 'pinball'")
   }
   if (!is.null(loss.type$tau) && loss.type$name != "pinball") {
@@ -117,7 +117,8 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
   if (is.null(niter)) 
     niter <- 3
   
-  if ((!is.null(awake) || sum(is.na(experts) > 0)) && model != "convex" && model != "shifting") {
+  if ((!is.null(awake) || sum(is.na(experts) > 0)) && model != "convex" && model != 
+    "shifting") {
     stop(paste("Sleeping or missing values not allowed for best", model, "oracle."))
   }
   
@@ -127,9 +128,14 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
   if (min(Y) <= 0 && loss.type$name == "percentage") {
     stop("Y should be non-negative for percentage loss function")
   }
+  names.experts <- colnames(experts)
+  experts <- matrix(as.numeric(as.matrix(experts)), nrow = length(Y))
+  colnames(experts) <- names.experts
+  
   # if we are looking for the best convex combination of experts
   if (model == "convex") {
-    res <- bestConvex(Y, experts, awake = awake, loss.type = loss.type, niter = niter, ...)
+    res <- bestConvex(Y, experts, awake = awake, loss.type = loss.type, niter = niter, 
+      ...)
   }
   
   if (model == "linear") {
@@ -140,16 +146,16 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
     res <- bestShifts(Y, experts, awake = awake, loss.type = loss.type)
   }
   
-    loss.experts <- apply(apply(experts, 2, function(x) {
-      loss(x, Y, loss.type = loss.type)
-    }), 2, mean)
-
+  loss.experts <- apply(apply(experts, 2, function(x) {
+    loss(x, Y, loss.type = loss.type)
+  }), 2, mean)
+  
   if (model == "expert") {
     best.loss <- min(loss.experts)
     coefficients <- (loss.experts == best.loss)/sum(loss.experts == best.loss)
     best.expert <- which(coefficients > 0)[1]
-    res <- list(loss = best.loss, coefficients = coefficients, prediction = experts[, best.expert],
-      loss.experts = loss.experts)
+    res <- list(loss = best.loss, coefficients = coefficients, prediction = experts[, 
+      best.expert], loss.experts = loss.experts)
   }
   
   res$loss.experts <- loss.experts

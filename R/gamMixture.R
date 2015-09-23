@@ -1,11 +1,12 @@
 
-gamMixture <- function(y, experts, z, lambda, nknots = 5, degree = 3, loss.type = "square", uniform = FALSE, 
-  knots = NULL) {
+gamMixture <- function(y, experts, z, lambda, nknots = 5, degree = 3, loss.type = "square", 
+  uniform = FALSE, knots = NULL) {
   
   # building the design matrix with splines (experts that may smoothly depend on z)
   if (is.null(knots)) {
     if (!uniform) {
-      knots <- quantile(z, probs = seq(0, 1, length.out = nknots + 2)[-c(1, nknots + 2)])
+      knots <- quantile(z, probs = seq(0, 1, length.out = nknots + 2)[-c(1, 
+        nknots + 2)])
     } else {
       knots <- seq(min(z), max(z), length = nknots + 2)[-c(1, nknots + 2)]
     }

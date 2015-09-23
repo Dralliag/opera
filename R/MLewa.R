@@ -1,5 +1,6 @@
 
-MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, w0 = NULL, training = NULL) {
+MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
+  w0 = NULL, training = NULL) {
   experts <- as.matrix(experts)
   N <- ncol(experts)
   T <- nrow(experts)
@@ -8,7 +9,7 @@ MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
   if (is.null(w0)) {
     w0 <- rep(1, N)
   }
-
+  
   awake <- as.matrix(awake)
   idx.na <- which(is.na(experts))
   awake[idx.na] <- 0
@@ -54,7 +55,8 @@ MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
   }
   w <- w/sum(w)
   
-  object <- list(model = "MLewa", loss.type = loss.type, loss.gradient = loss.gradient, coefficients = w/sum(w))
+  object <- list(model = "MLewa", loss.type = loss.type, loss.gradient = loss.gradient, 
+    coefficients = w/sum(w))
   
   object$parameters <- list(eta = eta[1:T, ])
   object$weights <- weights

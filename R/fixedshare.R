@@ -1,6 +1,6 @@
 
-fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-  w0 = NULL, training = NULL) {
+fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square", 
+  loss.gradient = TRUE, w0 = NULL, training = NULL) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -16,7 +16,7 @@ fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square
   awake[idx.na] <- 0
   experts[idx.na] <- 0
   
-  R <- log(w0)/eta  
+  R <- log(w0)/eta
   pred <- rep(0, T)  # Prediction vector
   cumulativeLoss <- 0  # Cumulative loss of the mixture
   weights <- matrix(0, ncol = N, nrow = T)
@@ -45,7 +45,8 @@ fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square
   w <- t(truncate1(exp(eta * R)))
   w <- w/sum(w)
   
-  object <- list(model = "FS", loss.type = loss.type, loss.gradient = loss.gradient, coefficients = w)
+  object <- list(model = "FS", loss.type = loss.type, loss.gradient = loss.gradient, 
+    coefficients = w)
   
   object$parameters <- list(eta = eta, alpha = alpha)
   object$weights <- weights

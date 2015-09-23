@@ -1,4 +1,5 @@
-MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, w0 = NULL, training = NULL) {
+MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
+  w0 = NULL, training = NULL) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -62,7 +63,8 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
   w <- truncate1(exp(R))
   w <- eta[T + 1, ] * w/sum(eta[T + 1, ] * w)
   
-  object <- list(model = "MLprod", loss.type = loss.type, loss.gradient = loss.gradient, coefficients = w)
+  object <- list(model = "MLprod", loss.type = loss.type, loss.gradient = loss.gradient, 
+    coefficients = w)
   
   object$parameters <- list(eta = eta[1:T, ])
   object$weights <- weights

@@ -1,5 +1,6 @@
 # Ridge aggregation rule with automatic calibration of smoothing parameters
-ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, gamma = 2, training = NULL) {
+ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, gamma = 2, 
+  training = NULL) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -47,13 +48,14 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
     if (!(t%%floor(T/10)) && trace) 
       cat(floor(10 * t/T) * 10, "% -- ")
     
-    # Weights, prediction forme by Ridge(lambda[t]) where lambda[t] is the learning rate calibrated
-    # online
+    # Weights, prediction forme by Ridge(lambda[t]) where lambda[t] is the learning
+    # rate calibrated online
     weights[t, ] <- wlambda[, bestlambda]
     prediction[t] <- experts[t, ] %*% weights[t, ]
     lambda[t] <- grid.lambda[bestlambda]
     
-    # Weights, predictions formed by each Ridge(lambda) for lambda in the grid "grid.lambda"
+    # Weights, predictions formed by each Ridge(lambda) for lambda in the grid
+    # 'grid.lambda'
     pred.lambda[t, ] <- experts[t, ] %*% wlambda
     cumulativeLoss <- cumulativeLoss + (pred.lambda[t, ] - y[t])^2
     
@@ -72,15 +74,15 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
       grid.lambda <- c(grid.lambda, newlambda)
       nlambda <- nlambda + length(newlambda)
       for (k in 1:length(newlambda)) {
-        perfnewlambda <- tryCatch(ridge(y = c(training$oldY,y[1:t]), 
-          experts = rbind(training$oldexperts, matrix(experts[1:t, ], ncol = N)), 
-          lambda = newlambda[k], 
-          w0 = w0), error = function(e) {
+        perfnewlambda <- tryCatch(ridge(y = c(training$oldY, y[1:t]), experts = rbind(training$oldexperts, 
+          matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0), 
+          error = function(e) {
           list(prediction = rep(0, t))
-        })
+          })
         newcumulativeLoss <- sum((perfnewlambda$prediction - y[1:t])^2)
         cumulativeLoss <- c(cumulativeLoss, newcumulativeLoss)
-        pred.lambda <- cbind(pred.lambda, c(perfnewlambda$prediction, rep(0, (T - t))))
+        pred.lambda <- cbind(pred.lambda, c(perfnewlambda$prediction, rep(0, 
+          (T - t))))
       }
     }
     if (bestlambda == 1) {
@@ -91,16 +93,15 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
       bestlambda <- bestlambda + length(newlambda)
       for (k in 1:length(newlambda)) {
         grid.lambda <- c(newlambda[k], grid.lambda)
-        perfnewlambda <- tryCatch(
-          y = ridge(c(training$oldY,y[1:t]), 
-          experts = rbind(training$oldexperts, matrix(experts[1:t, ], ncol = N)), 
-          lambda = newlambda[k], 
-          w0 = w0), error = function(e) {
+        perfnewlambda <- tryCatch(y = ridge(c(training$oldY, y[1:t]), experts = rbind(training$oldexperts, 
+          matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0), 
+          error = function(e) {
           list(prediction = rep(NA, t))
-        })
+          })
         newcumulativeLoss <- sum((perfnewlambda$prediction - y[1:t])^2)
         cumulativeLoss <- c(newcumulativeLoss, cumulativeLoss)
-        pred.lambda <- cbind(c(perfnewlambda$prediction, rep(NA, (T - t))), pred.lambda)
+        pred.lambda <- cbind(c(perfnewlambda$prediction, rep(NA, (T - t))), 
+          pred.lambda)
       }
     }
     wlambda <- matrix(0, nrow = N, ncol = nlambda)
@@ -110,19 +111,23 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
         NA
       })
     }
-    # the smoothing parameter has to big large enough in order to have invertible design matrix
+    # the smoothing parameter has to big large enough in order to have invertible
+    # design matrix
     lambda.min <- which(!(is.na(wlambda[1, ])))[1]
     bestlambda <- max(lambda.min, bestlambda)
   }
   
-  object <- list(model = "Ridge", loss.type = list(name = "square"), coefficients = wlambda[, bestlambda])
+  object <- list(model = "Ridge", loss.type = list(name = "square"), coefficients = wlambda[, 
+    bestlambda])
   
   object$parameters <- list(lambda = c(lambda[1:T]), grid.lambda = c(grid.lambda))
   object$weights <- weights
   object$prediction <- prediction
   
-  object$training <- list(T = T0 + T, wlambda = wlambda, w0 = w0, At = At, bt = bt, bestlambda = bestlambda, 
-    cumulativeLoss = cumulativeLoss, grid.loss = cumulativeLoss/(T0 + T), oldexperts = rbind(training$oldexperts,experts), oldY = c(training$oldY,y))
+  object$training <- list(T = T0 + T, wlambda = wlambda, w0 = w0, At = At, bt = bt, 
+    bestlambda = bestlambda, cumulativeLoss = cumulativeLoss, grid.loss = cumulativeLoss/(T0 + 
+      T), oldexperts = rbind(training$oldexperts, experts), oldY = c(training$oldY, 
+      y))
   
   if (trace) 
     cat("\n")

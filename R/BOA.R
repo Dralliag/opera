@@ -1,5 +1,6 @@
 
-BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, w0 = NULL, training = NULL) {
+BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
+  w0 = NULL, training = NULL) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -42,14 +43,16 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
       # if some losses still have not been observed
       r <- awake[t, ] * (lpred - lexp)
     } else {
-      r <- awake[t, ] * (lpred - lexp) - eta[t, ] * (awake[t, ] * (lpred - lexp))^2
+      r <- awake[t, ] * (lpred - lexp) - eta[t, ] * (awake[t, ] * (lpred - 
+        lexp))^2
     }
     R <- R + r
     eta[t + 1, ] <- sqrt(log(N)/(log(N)/eta[t, ]^2 + (awake[t, ] * (lpred - lexp))^2))
     w <- truncate1(exp(log(w0) + eta[t + 1, ] * R))
   }
   
-  object <- list(model = "BOA", loss.type = loss.type, loss.gradient = loss.gradient, coefficients = w/sum(w))
+  object <- list(model = "BOA", loss.type = loss.type, loss.gradient = loss.gradient, 
+    coefficients = w/sum(w))
   
   object$parameters <- list(eta = eta[1:T, ])
   object$weights <- weights

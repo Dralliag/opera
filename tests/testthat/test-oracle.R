@@ -45,7 +45,8 @@ test_that("Best convex oracle is ok", {
   m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "absolute", awake = awake)
   expect_true(abs(m$coefficients[1] - 0.6) < 0.1)
   l <- getAnywhere(lossConv)$objs[[1]]
-  expect_equal(mean(loss(m$prediction, Y, "absolute")), l(m$coefficients, Y, X, awake, "absolute"))
+  expect_equal(mean(loss(m$prediction, Y, "absolute")), l(m$coefficients, Y, X, 
+    awake, "absolute"))
   expect_equal(m$loss, mean(loss(m$prediction, Y, "absolute")))
 })
 
