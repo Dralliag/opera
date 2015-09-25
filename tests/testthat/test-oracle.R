@@ -22,7 +22,7 @@ test_that("Best expert oracle is ok", {
   expect_that(m$coefficients[1], equals(1))
   expect_that(m$loss, equals(mean((X[, 1] - Y)^2)))
   expect_that(sum(m$prediction), equals(sum(X[, 1])))
-  expect_that(m$rmse, equals(rmse(X[, 1], Y)))
+  expect_that(m$rmse, equals(sqrt(mean((X[, 1]- Y)^2))))
   
   expect_error(oracle(Y = Y, experts = X, model = "expert", awake = awake), "Sleeping or missing values not allowed")
   expect_warning(oracle(Y = Y, experts = X, model = "expert", lambda = 3), "Unused lambda parameter")

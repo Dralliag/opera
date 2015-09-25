@@ -62,7 +62,6 @@
 #'gam.fit <- gam(Load ~ s(IPI) + s(Temp) + s(Time, k=3) + 
 #'                s(Load1) + as.factor(NumWeek), data = data_train)
 #'gam.forecast <- predict(gam.fit, newdata = data_test)
-#'rmse(gam.forecast,data_test$Load)
 #'
 #'# An online autoregressive model on the residuals of the medium term model
 #'ar.forecast <- numeric(length(idx_data_test))
@@ -70,13 +69,11 @@
 #'  ar.fit <- ar(electric_load$Load.detrend[1:(idx_data_test[i] - 1)])
 #'  ar.forecast[i] <- as.numeric(predict(ar.fit)$pred) + electric_load$Trend[idx_data_test[i]]
 #'}
-#'rmse(ar.forecast,data_test$Load) 
 #'
 #'# A GBM
 #'gbm0.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek, 
 #'                  data = data_train, method = 'gbm')
 #'gbm.forecast <- predict(gbm0.fit, newdata = data_test)
-#'rmse(gbm.forecast,data_test$Load) 
 #'
 #'
 #'# Aggregation of experts
@@ -84,7 +81,6 @@
 #'
 #'X <- cbind(gam.forecast, ar.forecast, gbm.forecast)
 #'colnames(X) <- c('gam', 'ar', 'gbm')
-#'
 #'Y <- data_test$Load
 #'
 #'matplot(cbind(Y, X), type = 'l', col = 1:6, ylab = 'Weekly load', xlab = 'Week')

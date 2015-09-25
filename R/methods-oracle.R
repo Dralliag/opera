@@ -24,7 +24,7 @@ summary.oracle <- function(object, ...) {
     T <- length(object$Y)
     K <- ncol(object$experts)
     
-    rmse.algo <- rmse(object$prediction, object$Y)
+    rmse.algo <- sqrt(mean(loss(object$prediction, object$Y)))
     mape.algo <- mean(loss(object$prediction, object$Y, loss.type = "percentage"))
     rmse.unif <- sqrt(lossConv(rep(1/K, K), object$Y, object$experts, awake = object$awake))
     mape.unif <- lossConv(rep(1/K, K), object$Y, object$experts, awake = object$awake, 
@@ -40,7 +40,7 @@ summary.oracle <- function(object, ...) {
     x <- summary(oracle(object$Y, object$experts, model = "expert", loss.type = object$loss.type), 
       awake = object$awake)
     
-    rmse.algo <- rmse(object$prediction, object$Y)
+    rmse.algo <- sqrt(mean(loss(object$prediction, object$Y)))
     mape.algo <- mean(loss(object$prediction, object$Y, loss.type = "percentage"))
     
     TAB.lin <- data.frame(rmse = rmse.algo, mape = mape.algo)

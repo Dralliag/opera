@@ -26,7 +26,7 @@ summary.mixture <- function(object, ...) {
     T <- length(object$Y)
     K <- length(object$coefficients)
     
-    rmse.algo <- rmse(object$prediction, object$Y)
+    rmse.algo <- sqrt(mean(loss(object$prediction, object$Y, loss.type = "square")))
     mape.algo <- mean(loss(object$prediction, object$Y, loss.type = "percentage"))
     rmse.unif <- sqrt(lossConv(rep(1/K, K), object$Y, object$experts, awake = object$awake))
     mape.unif <- lossConv(rep(1/K, K), object$Y, object$experts, awake = object$awake, 

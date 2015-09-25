@@ -8,3 +8,5 @@ opera.Rproj
 .Rapp.history
 NAMESPACE
 inst/doc
+*.html
+examples/
