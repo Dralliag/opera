@@ -7,3 +7,4 @@ opera.Rproj
 *.Rd
 .Rapp.history
 NAMESPACE
+inst/doc

@@ -1,9 +1,6 @@
-- faire une vignette ou des slides
 - fonctions de pertes: 
 	- vérifier les gradient de la perte mape !!! comportement bizarre
 - shifting oracle et pinball loss
-- faire un exemple pour oracle --> fonction exemple ?
-- jeu de données de Yannig
 
 
 # Plus long terme

@@ -48,7 +48,7 @@
 #'
 #'# a few graphs to display the data
 #'attach(data_train)
-#'plot(Load, type = "l")
+#'plot(Load, type = 'l')
 #'plot(Temp, Load, pch = 16, cex = 0.5)
 #'plot(NumWeek, Load, pch = 16, cex = 0.5)
 #'plot(Load, Load1, pch = 16, cex = 0.5)
@@ -74,7 +74,7 @@
 #'
 #'# A GBM
 #'gbm0.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek, 
-#'                  data = data_train, method = "gbm")
+#'                  data = data_train, method = 'gbm')
 #'gbm.forecast <- predict(gbm0.fit, newdata = data_test)
 #'rmse(gbm.forecast,data_test$Load) 
 #'
@@ -83,21 +83,20 @@
 #'###########################
 #'
 #'X <- cbind(gam.forecast, ar.forecast, gbm.forecast)
-#'colnames(X) <- c("gam", "ar", "gbm")
+#'colnames(X) <- c('gam', 'ar', 'gbm')
 #'
 #'Y <- data_test$Load
-#'T <- cbind(Y, X)
 #'
-#'matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load", xlab = "Week")
+#'matplot(cbind(Y, X), type = 'l', col = 1:6, ylab = 'Weekly load', xlab = 'Week')
 #'
 #'
 #'# How good are the expert? Look at the oracles
-#'oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "convex")
+#'oracle.convex <- oracle(Y = Y, experts = X, loss.type = 'square', model = 'convex')
 #'plot(oracle.convex)
 #'oracle.convex
 #'
 #'# Is a single expert the best over time ? Are there breaks ?
-#'oracle.shift <- oracle(Y = Y, experts = X, loss.type = "percentage", model = "shifting")
+#'oracle.shift <- oracle(Y = Y, experts = X, loss.type = 'percentage', model = 'shifting')
 #'plot(oracle.shift)
 #'oracle.shift
 #'
@@ -105,9 +104,9 @@
 #'#############################################
 #'
 #'# Initialize the aggregation rule
-#'m0.MLpol <- mixture(model = "MLpol", loss.type = "square")
+#'m0.MLpol <- mixture(model = 'MLpol', loss.type = 'square')
 #'
-#'# Perform online prediction using EWA There are 3 equivalent possibilities 1)
+#'# Perform online prediction using MLpol There are 3 equivalent possibilities 1)
 #'# start with an empty model and update the model sequentially
 #'m1.MLpol <- m0.MLpol
 #'for (i in 1:length(Y)) {
@@ -118,7 +117,7 @@
 #'m2.MLpol <- predict(m0.MLpol, newexpert = X, newY = Y, online = TRUE)
 #'
 #'# 3) perform the online aggregation directly
-#'m3.MLpol <- mixture(Y = Y, experts = X, model = "MLpol", loss.type = "square")
+#'m3.MLpol <- mixture(Y = Y, experts = X, model = 'MLpol', loss.type = 'square')
 #'
 #'# These predictions are equivalent:
 #'identical(m1.MLpol, m2.MLpol)  # TRUE

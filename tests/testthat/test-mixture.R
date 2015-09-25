@@ -267,5 +267,4 @@ test_that("Predict method is ok", {
     m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = awake)
     expect_equal(m1$prediction, m2)
   }
-})
- 
+}) 

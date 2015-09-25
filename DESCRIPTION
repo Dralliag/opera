@@ -10,5 +10,7 @@ Description: This package implements, for regression-oriented time-series, onlin
 License: GPL (>= 2)
 Depends: R (>= 3.1.0)
 Imports: quadprog, quantreg
-Suggests: testthat, splines, caret, mgcv, survival
+Suggests: testthat, splines, caret, mgcv, survival,
+    knitr
 LazyData: true
+VignetteBuilder: knitr
