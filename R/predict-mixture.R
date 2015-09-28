@@ -37,9 +37,6 @@
 #'    be obtained from the last rows of object$weights.}
 #'    \item{all}{return a list containing 'model', 'response', and 'weights'.}
 #'    }
-#'    
-#' @param z A vector of covariates in which 'gamMixture' model is looking to 
-#' predict.
 #' 
 #' @param ...  further arguments are ignored
 #' 
@@ -49,7 +46,7 @@
 #' 
 #' @export 
 predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL, 
-  online = TRUE, type = c("model", "response", "weights", "all"), z = NULL, ...) {
+  online = TRUE, type = c("model", "response", "weights", "all"), ...) {
   
   type <- match.arg(type)
   
@@ -112,13 +109,12 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
     warning("Unused parameter tau (loss.type$name != 'pinball)")
   }
   
-  if (object$loss.type$name != "square" && (object$model == "Ridge" || object$model == 
-    "gamMixture")) {
+  if (object$loss.type$name != "square" && object$model == "Ridge") {
     stop(paste("Square loss is require for", object$model, "model."))
   }
   
   if (!is.null(awake) && !identical(awake, matrix(1, nrow = T, ncol = N)) && (object$model == 
-    "Ridge" || object$model == "gamMixture")) {
+    "Ridge")) {
     stop(paste("Sleeping or missing values not allowed for", object$model, "model."))
   }
   
@@ -128,9 +124,6 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
   if (is.null(newexperts)) {
     if (!is.null(newY)) {
       stop("Expert advice should be provided if newY is non null")
-    }
-    if (object$loss.type$name == "gamMixture") {
-      stop("Method predict is currently not implemented for 'gamMixture' aggregation rule")
     }
     result <- switch(type, model = object, response = object$prediction, weights = object$weights, 
       all = list(model = object, response = object$prediction, weights = object$weights))
@@ -225,31 +218,6 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
       }
     }
     
-    if ((object$model == "gamMixture")) {
-      warning("This aggregation rule is not stable in the current version")
-      if (is.null(parameters$lambda)) {
-        stop("gamMixture cannot handle automatic calibration")
-      }
-      if (is.null(z)) {
-        stop("A matrix (or vector) of exogeneous variables z must be provided")
-      }
-      if (is.null(parameters$nknots)) {
-        parameters$nknots <- 5
-      }
-      if (is.null(parameters$degree)) {
-        parameters$degree <- 3
-      }
-      if (is.null(parameters$uniform)) {
-        parameters$uniform <- FALSE
-      }
-      if (is.null(parameters$knots)) {
-        parameters$knots <- NULL
-      }
-      
-      newobject <- gamMixture(y = newY, experts = newexperts, z = z, parameters$lambda, 
-        nknots = parameters$nknots, degree = parameters$degree, loss.type = object$loss.type$name, 
-        uniform = parameters$uniform, knots = parameters$knots)
-    }
     
     newobject$Y <- c(object$Y, newY)
     newobject$experts <- rbind(object$experts, newexperts)

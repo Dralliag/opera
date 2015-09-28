@@ -1,4 +1,4 @@
-#' Online Prediction by ExpeRts Aggregation
+#' Online Prediction by ExpeRt Aggregation
 #' 
 #' The package \code{opera} performs, for regression-oriented time-series,
 #' predictions by combining a finite set of forecasts provided by the user.
@@ -25,7 +25,7 @@
 #' \cr
 #'  
 #' Contributions to online robust aggregation: work on the approximation error and on 
-#' probabilistic forecasting. Pierre Gaillard. PhD Thesis, Université Paris-Sud, 2015.
+#' probabilistic forecasting. Pierre Gaillard. PhD Thesis, University Paris-Sud, 2015.
 #' \cr
 #'
 #' 

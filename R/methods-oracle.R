@@ -165,11 +165,7 @@ predict.oracle <- function(object, newexpert = NULL, ...) {
   }
   K <- ncol(newexpert)
   
-  if (object$model == "gamMixture") {
-    stop("Predict method is not yet available for gamMixture")
-  } else {
-    w <- matrix(object$coefficients, ncol = 1)
-    pred <- newexpert %*% w
-    return(pred)
-  }
+  w <- matrix(object$coefficients, ncol = 1)
+  pred <- newexpert %*% w
+  return(pred)
 } 

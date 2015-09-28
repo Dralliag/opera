@@ -70,9 +70,6 @@ plot.mixture <- function(x, ...) {
   names(x$weights) <- names(x$experts)
   l.names <- max(nchar(names(x$experts))) / 3 + 1.7
   
-  if (x$model == "gamMixture") {
-    stop("Plot method is not yet available for gamMixture")
-  }
   if (x$model == "Ridge") {
     # Linear aggregation rule
     par(mar = c(3, 3, 1.6, l.names/2), mgp = c(1, 0.5, 0))

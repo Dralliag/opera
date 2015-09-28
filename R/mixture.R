@@ -21,32 +21,34 @@
 #' @param model A character string specifying the aggregation rule to use. 
 #' Currently available aggregation rules are:
 #' \describe{
-#'    \item{'EWA'}{Exponentially weighted average aggregation rule. A positive learning rate \strong{eta} can be chosen by the user. The
+#'    \item{'EWA'}{Exponentially weighted average aggregation rule. A positive learning rate \strong{eta} 
+#' can be chosen by the user. The
 #' bigger it is the faster the aggregation rule will learn from observations
 #' and experts performances. However, too hight values lead to unstable weight
 #' vectors and thus unstable predictions. If it is not specified, the learning rate is calibrated online. 
 #' A finite grid of potential learning rates to be optimized online can be specified with \strong{grid.eta}.}
-#'    \item{'FS'}{Fixed-share aggregation rule. As for \code{ewa}, a learning rate \strong{eta} can be chosen by the user or calibrated online. The main difference with \code{ewa} aggregation
+#'    \item{'FS'}{Fixed-share aggregation rule. As for \code{ewa}, a learning rate \strong{eta} 
+#' can be chosen by the user or calibrated online. The main difference with \code{ewa} aggregation
 #' rule rely in the mixing rate \strong{alpha}\eqn{\in [0,1]} wich considers at
 #' each instance a small probability \code{alpha} to have a rupture in the
 #' sequence and that the best expert may change. Fixed-share aggregation rule
 #' can thus compete with the best sequence of experts that can change a few
 #' times (see \code{\link{oracle}}), while \code{ewa} can only
 #' compete with the best fixed expert. The mixing rate \strong{alpha} is either chosen by the user either calibrated online.
-#' Finite grids of learning rates and mixing rates to be optimized can be specified with parameters \strong{grid.eta} and \strong{grid.alpha}.}
+#' Finite grids of learning rates and mixing rates to be optimized can be specified with 
+#' parameters \strong{grid.eta} and \strong{grid.alpha}.}
 #'    \item{'Ridge'}{Ridge regression. It minimizes at
 #' each instance a penalized criterion.  It forms at each instance linear
 #' combination of the experts' forecasts and can assign negative weights that
 #' not necessarily sum to one.  It is useful if the experts are biased or
-#' correlated. It cannot be used with specialized experts. A positive regularization coefficient \strong{lambda} can either be chosen by the user or calibrated online. 
+#' correlated. It cannot be used with specialized experts. A positive regularization coefficient \strong{lambda} 
+#' can either be chosen by the user or calibrated online. 
 #' A finite grid of coefficient to be optimized can be specified with a parameter \strong{grid.lambda}.}
 #'    \item{'MLpol'}{Polynomial Potential aggregation rule
 #' with different learning rates for each expert.  The learning rates are
-#' calibrated using theoretical values. There are similar aggregation rules like 'BOA' (Bernstein online Aggregation see [Wintenberger, 2014] 'MLewa', and 'MLprod' (see [Gaillard, Erven, and Stoltz, 2014])}
-#'    \item{'gamMixture'}{#'  Fits a general additive model (GAM) on the data
-#' to form weight vectors for the experts that can depend on exogeneous data.
-#' The process is however not currently stable. We advice not using it yet. Use
-#' only at most one covariate.}
+#' calibrated using theoretical values. There are similar aggregation rules 
+#' like 'BOA' (Bernstein online Aggregation see [Wintenberger, 2014] 'MLewa', and 'MLprod' 
+#' (see [Gaillard, Erven, and Stoltz, 2014])}
 #' }
 #' 
 #' @param loss.type A string or a list with a component 'name' specifying
@@ -55,8 +57,9 @@
 #' can be provided by assigning to loss.type a list of two elements: 
 #' \describe{
 #'      \item{name}{A string defining the name of the loss function (i.e., 'pinball')}
-#'      \item{tau}{ A number in \code{[0,1]} defining the quantile to be predicted. The default value is 0.5 to predict the median.}
-#' }. 'Ridge' and 'gamMixture' aggregation rules are restricted to square loss.
+#'      \item{tau}{ A number in \code{[0,1]} defining the quantile to be predicted. 
+#' The default value is 0.5 to predict the median.}
+#' }. 'Ridge' aggregation rule is restricted to square loss.
 #' 
 #' @param loss.gradient A boolean. If
 #' TRUE (default) the aggregation rule will not be directly applied to the loss

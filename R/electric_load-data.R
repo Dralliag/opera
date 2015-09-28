@@ -1,7 +1,7 @@
 #' Electricity forecasting data set
 #'
 #'
-#' Electricity forecasting data set provided by the French National Institute of Statistics and Economic Studies (Insee).
+#' Electricity forecasting data set provided by EDF R&D.
 #' It contains weekly measurements of the total electricity consumption in France from 1996 to 2009,
 #' together with several covariates, including temperature, industrial production indices.
 #'
@@ -11,7 +11,6 @@
 #'
 #' @keywords datasets
 #'
-#' @source \href{http://www.bdm.insee.fr}{INSEE Archive}
 #'
 #'
 #' @examples

@@ -10,3 +10,4 @@ NAMESPACE
 inst/doc
 *.html
 examples/
+.Rd2pdf*
