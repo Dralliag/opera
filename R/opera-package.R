@@ -9,8 +9,6 @@
 #' observation in \code{y}. This package proposes several adaptive and robust
 #' methods to combine the expert forecasts based on their past performance.
 #' 
-#' \tabular{ll}{ Package: \tab opera\cr Type: \tab Package\cr Version: \tab
-#' 1.0\cr Date: \tab 2014-02\cr License: \tab Property of EDF R&D and CNRS\cr }
 #' 
 #' @name opera-package
 #' @aliases opera-package opera
@@ -24,6 +22,13 @@
 #' application to Slovakian an French contry-wide one-day-ahead (half-)hourly
 #' predictions, Machine Learning, in press, 2012. Marie Devaine, Pierre
 #' Gaillard, Yannig Goude, and Gilles Stoltz
+#' \cr
+#'  
+#' Contributions to online robust aggregation: work on the approximation error and on 
+#' probabilistic forecasting. Pierre Gaillard. PhD Thesis, Université Paris-Sud, 2015.
+#' \cr
+#'
+#' 
 #' @keywords package
 #' @examples
 #' 

@@ -112,7 +112,7 @@
 #' aggregation rule to be updated and to perform predictions.}
 #' @author Pierre Gaillard <pierre@@gaillard.me>
 #' @keywords ~kwd1 ~kwd2
-#' @seealso See \code{\link{opera-package}}.
+#' @seealso See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.
 #'  
 #' @export mixture
 
