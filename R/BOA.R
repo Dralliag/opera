@@ -17,21 +17,28 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
   experts[idx.na] <- 0
   
   R <- rep(0, N)
+  R.reg <- R
   weights <- matrix(0, ncol = N, nrow = T)
   prediction <- rep(0, T)
   w <- w0
   eta <- matrix(exp(350), ncol = N, nrow = T + 1)
+  V <- 0
+  B <- 0
   
   if (!is.null(training)) {
     w0 <- training$w0
     R <- training$R
-    w <- truncate1(exp(log(w0) + training$eta * R))
+    R.reg <- training$R.reg
+    w <- truncate1(exp(log(w0) + training$eta * R.reg))
     eta[1, ] <- training$eta
+    B <- training$B
+    V <- training$V
   }
   
   for (t in 1:T) {
     p <- awake[t, ] * w/sum(awake[t, ] * w)
     pred <- experts[t, ] %*% p
+    
     
     weights[t, ] <- p
     prediction[t] <- pred
@@ -39,16 +46,27 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
     lpred <- lossPred(pred, y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
     lexp <- lossPred(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
     
-    if (max(eta[t, ]) > exp(300)) {
+    # Instantaneous regret
+    r <-  awake[t, ] * (lpred - lexp)
+    
+    # Update the learning rates
+    B <- pmax(B, abs(r))
+    V <- V + r^2
+    eta[t + 1, ] <- pmin(pmin(1/(2 * B), sqrt(log(N)/V)),exp(350))
+    
+    if (max(eta[t+1, ]) > exp(300)) {
       # if some losses still have not been observed
-      r <- awake[t, ] * (lpred - lexp)
+      r.reg <- r
     } else {
-      r <- awake[t, ] * (lpred - lexp) - eta[t, ] * (awake[t, ] * (lpred - 
-        lexp))^2
+      r.reg <- r - eta[t+1, ] * r^2
     }
+    
+    # Update the regret and the regularized regret used by BOA
     R <- R + r
-    eta[t + 1, ] <- sqrt(log(N)/(log(N)/eta[t, ]^2 + (awake[t, ] * (lpred - lexp))^2))
-    w <- truncate1(exp(log(w0) + eta[t + 1, ] * R))
+    R.reg <- R.reg + r.reg
+    
+    w <- truncate1(exp(log(w0) + eta[t + 1, ] * R.reg))
+    
   }
   
   object <- list(model = "BOA", loss.type = loss.type, loss.gradient = loss.gradient, 
@@ -58,7 +76,7 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
   object$weights <- weights
   object$prediction <- prediction
   
-  object$training <- list(eta = eta[T + 1, ], R = R, w0 = w0)
+  object$training <- list(eta = eta[T + 1, ], R = R, w0 = w0, R.reg = R.reg, V= V, B=B)
   class(object) <- "mixture"
   return(object)
 } 

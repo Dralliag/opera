@@ -46,7 +46,7 @@
 #' 
 #' @export 
 predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL, 
-  online = TRUE, type = c("model", "response", "weights", "all"), ...) {
+                            online = TRUE, type = c("model", "response", "weights", "all"), ...) {
   
   type <- match.arg(type)
   
@@ -74,7 +74,7 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
     
     if (is.null(newexperts)) {
       result <- switch(type, model = object, response = NULL, weights = NULL, 
-        all = list(model = object, response = NULL, weights = NULL))
+                       all = list(model = object, response = NULL, weights = NULL))
       return(result)
     }
   }
@@ -93,7 +93,7 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
   
   # test possible warnings and errors
   if (is.null(object$training) && (object$coefficients != "Uniform") && (object$model == 
-    "MLpol")) {
+                                                                         "MLpol")) {
     stop(paste(object$model, "cannot handle non-uniform prior weight vector"))
   }
   
@@ -114,10 +114,9 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
   }
   
   if (!is.null(awake) && !identical(awake, matrix(1, nrow = T, ncol = N)) && (object$model == 
-    "Ridge")) {
+                                                                              "Ridge" || object$model == "OGD")) {
     stop(paste("Sleeping or missing values not allowed for", object$model, "model."))
   }
-  
   
   
   # if no expert advice is provided, it returns the fitted object
@@ -126,7 +125,7 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
       stop("Expert advice should be provided if newY is non null")
     }
     result <- switch(type, model = object, response = object$prediction, weights = object$weights, 
-      all = list(model = object, response = object$prediction, weights = object$weights))
+                     all = list(model = object, response = object$prediction, weights = object$weights))
     return(result)
   }
   
@@ -151,29 +150,43 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
       stop("Y should be non-negative for percentage loss function")
     }
     
+    
+    ## If averaged is true, the models do not use coefficient as the next weight
+    if (!is.null(object$parameters$averaged) && object$parameters$averaged && !is.null(object$training)) {
+      object$coefficients <- object$training$next.weights
+    }
+    
     if (object$model == "Ridge") {
       if (is.null(object$parameters$lambda) || !is.null(object$parameters$grid.lambda)) {
         newobject <- ridgeCalib(y = newY, experts = newexperts, w0 = object$coefficients, 
-          gamma = object$parameters$gamma, grid.lambda = object$parameters$grid.lambda, 
-          training = object$training)
+                                gamma = object$parameters$gamma, grid.lambda = object$parameters$grid.lambda, 
+                                training = object$training)
         newobject$parameters$lambda <- c(object$parameters$lambda, newobject$parameters$lambda)
       } else {
         newobject <- ridge(y = newY, experts = newexperts, lambda = object$parameters$lambda, 
-          w0 = object$coefficients, training = object$training)
+                           w0 = object$coefficients, training = object$training)
       }
     }
     
     if (object$model == "MLpol") {
       newobject <- MLpol(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
-        loss.gradient = object$loss.gradient, training = object$training)
+                         loss.gradient = object$loss.gradient, training = object$training)
       newobject$parameters <- list(eta = rbind(object$parameters$eta, newobject$parameters$eta))
     }
     
+    if (object$model == "OGD") {
+      if (is.null(object$parameters$alpha)) {object$parameters$alpha = 0.75}
+      if (is.null(object$parameters$simplex)) {object$parameters$simplex = TRUE}
+      newobject <- OGD(y = newY, experts = newexperts, loss.type = object$loss.type, 
+                       training = object$training, alpha = object$parameters$alpha, simplex = object$parameters$simplex,
+                       w0 = object$coefficients)
+    }
+    
     if ((object$model == "BOA") || (object$model == "MLewa") || (object$model == 
-      "MLprod")) {
+                                                                 "MLprod")) {
       algo <- eval(parse(text = object$model))
       newobject <- algo(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
-        loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training)
+                        loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training)
       newobject$parameters <- list(eta = rbind(object$parameters$eta, newobject$parameters$eta))
     }
     
@@ -184,20 +197,20 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
         }
         
         newobject <- ewaCalib(y = newY, experts = newexperts, awake = awake, 
-          loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
-          w0 = object$coefficients, gamma = object$parameters$gamma, grid.eta = sort(object$parameters$grid.eta), 
-          training = object$training)
+                              loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
+                              w0 = object$coefficients, gamma = object$parameters$gamma, grid.eta = sort(object$parameters$grid.eta), 
+                              training = object$training)
         newobject$parameters$eta <- c(object$parameters$eta, newobject$parameters$eta)
       } else {
         newobject <- ewa(y = newY, experts = newexperts, eta = object$parameters$eta, 
-          awake = awake, loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
-          w0 = object$coefficients, training = object$training)
+                         awake = awake, loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
+                         w0 = object$coefficients, training = object$training)
       }
     }
     
     if (object$model == "FS") {
       if (is.null(object$parameters$eta) || is.null(object$parameters$alpha) || 
-        !is.null(object$parameters$grid.eta) || !is.null(object$parameters$grid.alpha)) {
+          !is.null(object$parameters$grid.eta) || !is.null(object$parameters$grid.alpha)) {
         if (is.null(object$parameters$grid.eta)) {
           object$parameters$grid.eta <- 1
         }
@@ -205,16 +218,16 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
           object$parameters$grid.alpha <- 10^(-4:-1)
         }
         newobject <- fixedshareCalib(y = newY, experts = newexperts, awake = awake, 
-          loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
-          w0 = object$coefficients, gamma = object$parameters$gamma, grid.eta = object$parameters$grid.eta, 
-          grid.alpha = object$parameters$grid.alpha, training = object$training)
+                                     loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
+                                     w0 = object$coefficients, gamma = object$parameters$gamma, grid.eta = object$parameters$grid.eta, 
+                                     grid.alpha = object$parameters$grid.alpha, training = object$training)
         newobject$parameters$eta <- c(object$parameters$eta, newobject$parameters$eta)
         newobject$parameters$alpha <- c(object$parameters$alpha, newobject$parameters$alpha)
       } else {
         newobject <- fixedshare(y = newY, experts = newexperts, eta = object$parameters$eta, 
-          alpha = object$parameters$alpha, awake = awake, loss.type = object$loss.type, 
-          loss.gradient = object$loss.gradient, w0 = object$coefficients, 
-          training = object$training)
+                                alpha = object$parameters$alpha, awake = awake, loss.type = object$loss.type, 
+                                loss.gradient = object$loss.gradient, w0 = object$coefficients, 
+                                training = object$training)
       }
     }
     
@@ -228,23 +241,49 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
     colnames(newobject$weights) <- object$names.experts
     colnames(newobject$awake) <- object$names.experts
     
+    # Averaging of the weights if asked by the averaged parameter
+    if (is.null(object$parameters$averaged)) {
+      newobject$parameters$averaged = FALSE
+    } else {
+      newobject$parameters$averaged = object$parameters$averaged
+    }
+    
+    if (newobject$parameters$averaged) {
+      if (object$T == 0) {
+        newweights.avg <- apply(newobject$weights, 2, cumsum) / (1:T)
+      } else {
+        newweights.avg <- (object$training$sumweights + apply(newobject$weights, 2, cumsum)) / (object$T + 1:T)
+      }
+      
+      newobject$training$sumweights <- (object$T + T) * newweights.avg[T,] + newobject$coefficients
+      newobject$training$next.weights <- newobject$coefficients
+      newobject$coefficients <- newobject$training$sumweights / (object$T + T + 1)
+    }
+    
     # If online is true, we use online prediction
     if (online) {
-      newpred <- newobject$prediction
-      newweights <- newobject$weights
+      if (newobject$parameters$averaged) {
+        newweights <- newweights.avg
+        newpred <- apply(newweights.avg * newexperts,1,sum)
+      } else {
+        newweights <- newobject$weights
+        newpred <- newobject$prediction
+      }
     }
     
     newobject$prediction <- c(object$prediction, newpred)
     newobject$weights <- rbind(object$weights, newweights)
     newobject$loss <- mean(loss(newobject$prediction, newobject$Y, loss.type = newobject$loss.type))
-    
+    newobject$T <- object$T + T
   } else {
     newobject <- object
   }
   class(newobject) <- "mixture"
   
+
+  
   result <- switch(type, model = newobject, response = newpred, weights = newweights, 
-    all = list(model = newobject, response = newpred, weights = newweights))
+                   all = list(model = newobject, response = newpred, weights = newweights))
   
   return(result)
 } 

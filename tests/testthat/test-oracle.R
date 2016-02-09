@@ -37,12 +37,12 @@ test_that("Best convex oracle is ok", {
   expect_true(sum(abs(m$prediction - Y)) < 1e-10)
   expect_equal(m$rmse, 0)
   
-  m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "percentage")
+  expect_warning(m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "percentage"))
   expect_true(abs(m$coefficients[1] - 0.6) < 1e-04)
   expect_true(m$loss < 1e-04)
   expect_true(sum(abs(m$prediction - Y)) < 1e-04)
   
-  m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "absolute", awake = awake)
+  expect_warning(m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "absolute", awake = awake))
   expect_true(abs(m$coefficients[1] - 0.6) < 0.1)
   l <- getAnywhere(lossConv)$objs[[1]]
   expect_equal(mean(loss(m$prediction, Y, "absolute")), l(m$coefficients, Y, X, 
@@ -59,7 +59,7 @@ test_that("Best linear oracle is ok", {
   expect_equal(m$rmse, 0)
   expect_error(oracle(Y = Y, experts = X, model = "linear", awake = awake), "Sleeping or missing values not allowed")
   
-  m <- oracle(Y = Y, experts = X, model = "linear", loss.type = "percentage")
+  expect_warning(m <- oracle(Y = Y, experts = X, model = "linear", loss.type = "percentage"))
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = "percentage")))
 })
 
@@ -80,13 +80,13 @@ test_that("Quantile oracles are ok", {
   expect_equal(m.best_expert$loss, mean(loss(m.best_expert$prediction, Y, loss.type = l)))
   
   # best convex oracle
-  m <- oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l)
+  expect_warning(m <- oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
   expect_less_than(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.1)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_warning(oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
   
   # best linear oracle (with singular matrix)
-  m <- oracle(Y = Y, experts = X[, c(1, K)], model = "linear", loss.type = l, niter = 10)
+  expect_warning(m <- oracle(Y = Y, experts = X[, c(1, K)], model = "linear", loss.type = l, niter = 10))
   expect_less_than(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.1)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_warning(oracle(Y = Y, experts = X[, c(1, K)], model = "linear", loss.type = l))

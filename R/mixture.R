@@ -47,8 +47,12 @@
 #'    \item{'MLpol'}{Polynomial Potential aggregation rule
 #' with different learning rates for each expert.  The learning rates are
 #' calibrated using theoretical values. There are similar aggregation rules 
-#' like 'BOA' (Bernstein online Aggregation see [Wintenberger, 2014] 'MLewa', and 'MLprod' 
-#' (see [Gaillard, Erven, and Stoltz, 2014])}
+#' like 'BOA' (Bernstein online Aggregation see [Wintenberger, 2014], 'MLewa', and 'MLprod' 
+#' (see [Gaillard, Erven, and Stoltz, 2014])} 
+#'  \item{'OGD'}{Online Gradient descent (see Zinkevich, 2003). The optimization is performed with a time-varying learning rate. 
+#'  At time step \eqn{t \geq 1}, the learning rate is chosen to be \eqn{t^{-\alpha}}, where \eqn{\alpha} is provided by alpha in the parameters argument.
+#'  The algorithm may or not perform a projection step into the simplex space (non-negative weights that sum to one) according to
+#'  the value of the parameter 'simplex' provided by the user.}
 #' }
 #' 
 #' @param loss.type A string or a list with a component 'name' specifying
@@ -59,7 +63,7 @@
 #'      \item{name}{A string defining the name of the loss function (i.e., 'pinball')}
 #'      \item{tau}{ A number in \code{[0,1]} defining the quantile to be predicted. 
 #' The default value is 0.5 to predict the median.}
-#' }. 'Ridge' aggregation rule is restricted to square loss.
+#' } 'Ridge' aggregation rule is restricted to square loss.
 #' 
 #' @param loss.gradient A boolean. If
 #' TRUE (default) the aggregation rule will not be directly applied to the loss
@@ -89,11 +93,19 @@
 #'    the grid. The grid may be extended online if needed by the aggregation rule.}
 #'    \item{gamma}{A positive number defining the exponential step of extension 
 #'    of grid.eta when it is needed. The default value is 2.}
-#'    \item{alpha}{A number in [0,1] defining the mixing rate for 'FS'.}
+#'    \item{alpha}{A number in [0,1]. If the model is 'FS', it defines the mixing rate. 
+#'    If the model is 'OGD', it defines the order of the learning rate: \eqn{\eta_t = t^{-\alpha}}.}
 #'    \item{grid.alpha}{A vector of numbers in [0,1] defining potential mixing rates for 'FS'
 #'    to be optimized online. The grid is fixed over time. The default value is \code{[0.0001,0.001,0.01,0.1]}.}
 #'    \item{lambda}{A positive number defining the smoothing parameter of 'Ridge' aggregation rule.}
 #'    \item{grid.lambda}{Similar to \code{grid.eta} for the parameter \code{lambda}.}
+#'    \item{simplex}{A boolean that specifies if 'OGD' does a project on the simplex. In other words,
+#'    if TRUE (default) the online gradient descent will be under the constraint that the weights sum to 1
+#'    and are non-negative. If FALSE, 'OGD' performs an online gradient descent on N dimensional real space.
+#'    without any projection step.}
+#'    \item{averaged}{A boolean (default is FALSE). If TRUE the coefficients and the weights 
+#'    returned (and used to form the predictions) are averaged over the past. It leads to more stability on the time evolution of the weights but needs
+#'    more regularity assumption on the underlying process genearting the data (i.i.d. for instance). }
 #' }
 #' 
 #' 
@@ -110,7 +122,7 @@
 #' predictions outputted by the aggregation rule.  } 
 #' \item{loss}{ The average loss (as stated by parameter \code{loss.type}) suffered
 #' by the aggregation rule.}
-#' \item{parameters}{The learning parameters chosen by the aggregation rule.}
+#' \item{parameters}{The learning parameters chosen by the aggregation rule or by the user.}
 #' \item{training}{A list that contains useful temporary information of the 
 #' aggregation rule to be updated and to perform predictions.}
 #' @author Pierre Gaillard <pierre@@gaillard.me>
@@ -136,7 +148,7 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
   
   object <- list(model = model, loss.type = loss.type, loss.gradient = loss.gradient, 
     coefficients = coefficients, parameters = parameters, Y = NULL, experts = NULL, 
-    awake = NULL, training = NULL, names.experts = colnames(experts))
+    awake = NULL, training = NULL, names.experts = colnames(experts), T = 0)
   class(object) <- "mixture"
   
   # Test that Y and experts have correct dimensions

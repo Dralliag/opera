@@ -6,11 +6,21 @@ Date: 2015-09-10
 Author: Pierre Gaillard
 Maintainer: Pierre Gaillard <pierre@gaillard.me>
 Copyright: EDF R&D 2015
-Description: This package implements, for regression-oriented time-series, online predictions by combining a finite set of forecasts provided by the user.
+Description: This package implements, for regression-oriented time-series,
+    online predictions by combining a finite set of forecasts provided by the user.
 License: GPL (>= 2)
-Depends: R (>= 3.1.0)
-Imports: quadprog, quantreg
-Suggests: testthat, splines, caret, mgcv, survival,
+Depends:
+    R (>= 3.1.0)
+Imports:
+    quadprog,
+    quantreg
+Suggests:
+    testthat,
+    splines,
+    caret,
+    mgcv,
+    survival,
     knitr
 LazyData: true
 VignetteBuilder: knitr
+RoxygenNote: 5.0.1

@@ -1,7 +1,7 @@
 - fonctions de pertes: 
 	- vérifier les gradient de la perte mape !!! comportement bizarre
 - shifting oracle et pinball loss
-
+- plot remettre les paramètres par défault à la fin ? Ce n'est pas déjà fait ?
 
 # Plus long terme
 - ajouter la possibilité de faire de la classification

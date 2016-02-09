@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 *.DS_Store
-*.Rbuildignore
 opera.Rproj
 *.Rd
 .Rapp.history

@@ -88,7 +88,7 @@ print.summary.oracle <- function(x, ...) {
 }
 
 #' @export 
-plot.oracle <- function(x, ...) {
+plot.oracle <- function(x, sort = TRUE, ...) {
   
   x$experts <- data.frame(x$experts)
   x$weights <- data.frame(x$weights)
@@ -101,15 +101,21 @@ plot.oracle <- function(x, ...) {
   
   if (x$model == "expert") {
     err.unif <- lossConv(rep(1/K, K), x$Y, x$experts, awake = x$awake, loss.type = x$loss.type)
-    idx.sorted <- order(c(x$loss.experts, err.unif))
+    if (sort) {
+      idx.sorted <- order(c(x$loss.experts, err.unif))
+      i.min <- 1
+    } else {
+      idx.sorted = c(K+1,1:K)
+      i.min <- order(x$loss.experts)[1]
+    }
     my.col <- rep(1, K + 1)
     my.col[which(idx.sorted == K + 1)] <- 2
-    my.col[which(idx.sorted != K + 1)[1]] <- 4
+    my.col[which(idx.sorted != K + 1)[i.min]] <- 4
     
     par(mar = c(4.5, 4, 2, 2), mgp = c(3, 1, 0))
-    plot(c(x$loss.experts, err.unif)[idx.sorted], xlab = "Experts", ylab = paste(x$loss.type, 
+    plot(c(x$loss.experts, err.unif)[idx.sorted], xlab = "Experts", ylab = paste(x$loss.type$name, 
       "loss"), main = "Average loss suffered by the experts", axes = F, pch = 3, 
-      col = my.col, lwd = 2)
+      col = my.col, lwd = 2,...)
     axis(1, at = 1:(K + 1), labels = FALSE)
     mtext(at = 1:(K + 1), text = c(names(x$experts), "Uniform")[idx.sorted], 
       side = 1, las = 2, col = my.col, line = 0.8)
@@ -127,7 +133,7 @@ plot.oracle <- function(x, ...) {
     y.max <- c(x$loss.experts, err.unif, x$loss)[idx.sorted]
     
     par(mar = c(4.5, 4, 2, 2), mgp = c(3, 1, 0))
-    plot(c(x$loss.experts, err.unif, x$loss)[idx.sorted], xlab = "Experts", ylab = paste(x$loss.type, 
+    plot(c(x$loss.experts, err.unif, x$loss)[idx.sorted], xlab = "Experts", ylab = paste(x$loss.type$name, 
       "loss"), main = "Average loss suffered by the experts", axes = F, pch = 3, 
       col = my.col, lwd = 2)
     axis(1, at = 1:(K + 2), labels = FALSE)

@@ -55,6 +55,7 @@ MLpol <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     # Update the learning rate
     newB <- max(B, max(r^2))
     eta[t + 1, ] <- 1/(1/eta[t, ] + r^2 + newB - B)
+    B <- newB
   }
   # We check if there is at least one expert with positive weight
   if (max(R) > 0) {

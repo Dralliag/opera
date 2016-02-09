@@ -264,7 +264,22 @@ test_that("Predict method is ok", {
     m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, awake = awake)
     expect_equal(m1$coefficients, m2$coefficients)
     
-    m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = awake)
+    expect_warning(m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = awake))
     expect_equal(m1$prediction, m2)
   }
 }) 
+
+# test that regret and cumulative loss of the expert are coherent
+test_that("Regrets and Losses are coherent", {
+  for (model in c("BOA", "MLpol", "MLprod", "MLewa", "FS", "EWA")) {
+    l <- sample(c("square", "pinball", "percentage", "absolute"), 1)
+    
+    m <- mixture(Y = Y, experts = X, model = "EWA", loss.type = l, loss.gradient = FALSE,parameters = list(eta = 1, alpha = 0.1))
+    o <- oracle(Y = Y, experts = X, model = "expert", loss.type = l)
+    l1 <- m$loss*n - m$training$R
+    l2 <- o$loss.experts*n
+    l3 = apply(loss(X,Y,loss.type=l),2,sum)
+    expect_equal(l1,l2)
+    expect_equal(l2,l3)
+  }
+})

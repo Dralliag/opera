@@ -150,7 +150,7 @@ The results can be displayed with method `summary` and `plot`.
 
 ```{r,fig.height=3,fig.width=4.5}
 summary(MLpol)
-plot(MLpol)
+plot(MLpol, pause = TRUE)
 ```
 
 
