@@ -81,13 +81,13 @@ test_that("Quantile oracles are ok", {
   
   # best convex oracle
   expect_warning(m <- oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
-  expect_less_than(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.1)
+  expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.1)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_warning(oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
   
   # best linear oracle (with singular matrix)
   expect_warning(m <- oracle(Y = Y, experts = X[, c(1, K)], model = "linear", loss.type = l, niter = 10))
-  expect_less_than(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.1)
+  expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.1)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_warning(oracle(Y = Y, experts = X[, c(1, K)], model = "linear", loss.type = l))
   
@@ -96,7 +96,7 @@ test_that("Quantile oracles are ok", {
   X[n, ] <- 1
   Y[n] <- 1
   m <- oracle(Y = Y, experts = X[, c(1, K)], model = "linear", loss.type = l)
-  expect_less_than(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.1)
+  expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.1)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
 })
 

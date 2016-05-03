@@ -188,56 +188,56 @@ test_that("Quantile mixture are ok", {
   m <- mixture(Y = Y, experts = X, model = "EWA", loss.type = l, loss.gradient = FALSE, 
     parameters = list(eta = 1, gamma = 100))
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_less_than(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
+  expect_lt(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
   # e <- rnorm(K) expect_equal(c(predict(m,e)), sum(c(e)*c(m$coefficients)))
   
   m <- mixture(Y = Y, experts = X[, c(1, K)], model = "EWA", loss.type = l, parameters = list(gamma = 100))
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_less_than(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.4)
+  expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.4)
   
   # Fixed share
   m <- mixture(Y = Y, experts = X, model = "FS", loss.type = l, loss.gradient = FALSE, 
     parameters = list(eta = 1, alpha = 0.01))
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_less_than(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
+  expect_lt(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
   
   m <- mixture(Y = Y, experts = X[, c(1, K)], model = "FS", loss.type = l, parameters = list(gamma = 10))
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_less_than(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.4)
+  expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.4)
   
   m <- mixture(Y = Y, experts = X, model = "MLpol", loss.type = l, loss.gradient = FALSE)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_less_than(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
+  expect_lt(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
   
   m <- mixture(Y = Y, experts = X[, c(1, K)], model = "MLpol", loss.type = l)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_less_than(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.8)
+  expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.8)
   
   m <- mixture(Y = Y, experts = X, model = "MLprod", loss.type = l, loss.gradient = FALSE)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_less_than(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
+  expect_lt(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
   
   m <- mixture(Y = Y, experts = X[, c(1, K)], model = "MLprod", loss.type = l)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_less_than(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.8)
+  expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.8)
   
   # expect_equal(c(predict(m,e[c(1,K)])), sum(c(e[c(1,K)])*c(m$coefficients)))
   
   m <- mixture(Y = Y, experts = X, model = "MLewa", loss.type = l, loss.gradient = FALSE)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_less_than(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
+  expect_lt(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
   
   m <- mixture(Y = Y, experts = X[, c(1, K)], model = "MLewa", loss.type = l)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_less_than(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.8)
+  expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.8)
   
   m <- mixture(Y = Y, experts = X, model = "BOA", loss.type = l, loss.gradient = FALSE)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_less_than(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
+  expect_lt(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
   
   m <- mixture(Y = Y, experts = X[, c(1, K)], model = "BOA", loss.type = l)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_less_than(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.8)
+  expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.8)
 })
 
 # test of predict function

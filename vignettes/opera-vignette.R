@@ -62,7 +62,7 @@ for (i in 1:length(Y)) {
 
 ## ----fig.height=3,fig.width=4.5------------------------------------------
 summary(MLpol)
-plot(MLpol)
+plot(MLpol, pause = TRUE)
 
 ## ---- eval = FALSE-------------------------------------------------------
 #  MLpol <- predict(MLpol0, newexpert = X, newY = Y, online = TRUE)
