@@ -3,5 +3,5 @@
 
 AC_PREREQ([2.69])
 AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
-Rscript -e "library(roxygen2);roxygenize()"
+Rscript -e "library(devtools);document()"
 AC_OUTPUT
