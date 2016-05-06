@@ -10,12 +10,12 @@
 #' predict. If omitted, the past predictions of the object are returned and the
 #' object is not updated.
 #' 
-#' @param newY An optional vector of observations to be predicted. If provided, it 
-#' should have the same length as the number of rows of \code{newexperts}.
+#' @param newY An optional matrix with d columns (or vector if \eqn{d=1}) of observations to be predicted. If provided, it 
+#' should have the same number of rows as the number of rows of \code{newexperts}.
 #' If omitted, the object (i.e, the aggregation rule) is not updated.
 #' 
-#' @param awake An optional matrix specifying the
-#' activation coefficients of the experts. Its entries lie in \code{[0,1]}.
+#' @param awake An optional array specifying the
+#' activation coefficients of the experts. It must have the same dimension as experts. Its entries lie in \code{[0,1]}.
 #' Possible if some experts are specialists and do not always form and suggest
 #' prediction. If the expert number \code{k} at instance \code{t} does not
 #' form any prediction of observation \code{Y_t}, we can put
@@ -40,7 +40,7 @@
 #' 
 #' @param ...  further arguments are ignored
 #' 
-#' @return \code{predict.mixture} produces a vector of predictions 
+#' @return \code{predict.mixture} produces a matrix of predictions 
 #' (type = 'response'), an updated object (type = 'model'), or a matrix of
 #' weights (type = 'weights').
 #' 
@@ -48,242 +48,48 @@
 predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL, 
                             online = TRUE, type = c("model", "response", "weights", "all"), ...) {
   
-  type <- match.arg(type)
-  
-  if (is.null(object$names.experts)) {
-    if (!is.null(colnames(newexperts))) {
-      object$names.experts <- colnames(newexperts)
-    } else {
-      object$names.experts <- names(newexperts)
-    }
-  }
-  
-  # Number of instant and number of experts
-  if (!is.null(newY)) {
-    T <- length(newY)
-    newexperts <- matrix(newexperts, nrow = T)
-    N <- ncol(newexperts)
-  } else if (object$coefficients[1] != "Uniform") {
-    N <- length(object$coefficients)
-    newexperts <- matrix(newexperts, ncol = N)
-    T <- nrow(newexperts)
+  result <- object
+  d <- object$d
+  if ((d == 1) || (d == "unknown" && is.null(dim(newY)))) {
+    object$d <- 1
+    return(predictReal(object, newexperts, newY, awake, 
+                online, type, ...))
   } else {
-    warning("You should provide observations to train non trivial model")
-    N <- ncol(newexperts)
-    T <- nrow(newexperts)
-    
-    if (is.null(newexperts)) {
-      result <- switch(type, model = object, response = NULL, weights = NULL, 
-                       all = list(model = object, response = NULL, weights = NULL))
-      return(result)
-    }
-  }
-  
-  if (!is.null(awake)) {
-    awake <- matrix(awake, nrow = T)
-    if (!identical(dim(awake), dim(newexperts))) {
-      stop("Bad dimensions: awake and newexperts should have same dimensions")
-    }
-  } else {
-    awake <- matrix(1, nrow = T, ncol = N)
-  }
-  idx.na <- which(is.na(newexperts))
-  awake[idx.na] <- 0
-  newexperts[idx.na] <- 0
-  
-  # test possible warnings and errors
-  if (is.null(object$training) && (object$coefficients != "Uniform") && (object$model == 
-                                                                         "MLpol")) {
-    stop(paste(object$model, "cannot handle non-uniform prior weight vector"))
-  }
-  
-  if (object$coefficients[1] == "Uniform") {
-    object$coefficients <- rep(1/N, N)
-  }
-  
-  if (length(object$coefficients) != N) {
-    stop("Bad number of experts: (length(object$coefficients) != nrow(newexperts))")
-  }
-  
-  if (!is.null(object$loss.type$tau) && object$loss.type$name != "pinball") {
-    warning("Unused parameter tau (loss.type$name != 'pinball)")
-  }
-  
-  if (object$loss.type$name != "square" && object$model == "Ridge") {
-    stop(paste("Square loss is require for", object$model, "model."))
-  }
-  
-  if (!is.null(awake) && !identical(awake, matrix(1, nrow = T, ncol = N)) && (object$model == 
-                                                                              "Ridge" || object$model == "OGD")) {
-    stop(paste("Sleeping or missing values not allowed for", object$model, "model."))
-  }
-  
-  
-  # if no expert advice is provided, it returns the fitted object
-  if (is.null(newexperts)) {
-    if (!is.null(newY)) {
-      stop("Expert advice should be provided if newY is non null")
-    }
-    result <- switch(type, model = object, response = object$prediction, weights = object$weights, 
-                     all = list(model = object, response = object$prediction, weights = object$weights))
-    return(result)
-  }
-  
-  if (!is.null(newexperts) && is.null(newY) && online) {
-    stop("newY cannot be null to perform online prediction. Provide newY or set online = FALSE")
-  }
-  
-  newexperts <- matrix(as.numeric(as.matrix(newexperts)), nrow = T)
-  
-  # Batch prediction and weights
-  if (!online) {
-    w <- matrix(object$coefficients, ncol = 1)
-    pond <- c(awake %*% w)
-    newpred <- c(((newexperts * awake) %*% w)/pond)
-    newweights <- t(matrix(rep(w, T), ncol = T))/pond
-  }
-  
-  # Online prediction and weights if newY is provided
-  if (!is.null(newY)) {
-    
-    if (min(newY) <= 0 && object$loss.type$name == "percentage") {
-      stop("Y should be non-negative for percentage loss function")
-    }
-    
-    
-    ## If averaged is true, the models do not use coefficient as the next weight
-    if (!is.null(object$parameters$averaged) && object$parameters$averaged && !is.null(object$training)) {
-      object$coefficients <- object$training$next.weights
-    }
-    
-    if (object$model == "Ridge") {
-      if (is.null(object$parameters$lambda) || !is.null(object$parameters$grid.lambda)) {
-        newobject <- ridgeCalib(y = newY, experts = newexperts, w0 = object$coefficients, 
-                                gamma = object$parameters$gamma, grid.lambda = object$parameters$grid.lambda, 
-                                training = object$training)
-        newobject$parameters$lambda <- c(object$parameters$lambda, newobject$parameters$lambda)
-      } else {
-        newobject <- ridge(y = newY, experts = newexperts, lambda = object$parameters$lambda, 
-                           w0 = object$coefficients, training = object$training)
-      }
-    }
-    
-    if (object$model == "MLpol") {
-      newobject <- MLpol(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
-                         loss.gradient = object$loss.gradient, training = object$training)
-      newobject$parameters <- list(eta = rbind(object$parameters$eta, newobject$parameters$eta))
-    }
-    
-    if (object$model == "OGD") {
-      if (is.null(object$parameters$alpha)) {object$parameters$alpha = 0.75}
-      if (is.null(object$parameters$simplex)) {object$parameters$simplex = TRUE}
-      newobject <- OGD(y = newY, experts = newexperts, loss.type = object$loss.type, 
-                       training = object$training, alpha = object$parameters$alpha, simplex = object$parameters$simplex,
-                       w0 = object$coefficients)
-    }
-    
-    if ((object$model == "BOA") || (object$model == "MLewa") || (object$model == 
-                                                                 "MLprod")) {
-      algo <- eval(parse(text = object$model))
-      newobject <- algo(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
-                        loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training)
-      newobject$parameters <- list(eta = rbind(object$parameters$eta, newobject$parameters$eta))
-    }
-    
-    if (object$model == "EWA") {
-      if (is.null(object$parameters$eta) || !is.null(object$parameters$grid.eta)) {
-        if (is.null(object$parameters$grid.eta)) {
-          object$parameters$grid.eta <- 1
+    if (d == "unknown") {
+      d = dim(newY)[2]
+      T = dim(newY)[1]
+      # Bad dimension for experts
+      if (T > 1 && length(dim(newexperts)) < 3) {
+        stop("Bad dimensions: nrow(experts) should be equal to dim(experts)[3]")
+      } 
+      if (length(dim(newexperts)) == 3) {
+        if ((dim(newexperts)[1] != T) || (dim(newexperts)[2] != d)){
+          stop("Bad dimensions between Y and experts")
         }
-        
-        newobject <- ewaCalib(y = newY, experts = newexperts, awake = awake, 
-                              loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
-                              w0 = object$coefficients, gamma = object$parameters$gamma, grid.eta = sort(object$parameters$grid.eta), 
-                              training = object$training)
-        newobject$parameters$eta <- c(object$parameters$eta, newobject$parameters$eta)
-      } else {
-        newobject <- ewa(y = newY, experts = newexperts, eta = object$parameters$eta, 
-                         awake = awake, loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
-                         w0 = object$coefficients, training = object$training)
       }
-    }
-    
-    if (object$model == "FS") {
-      if (is.null(object$parameters$eta) || is.null(object$parameters$alpha) || 
-          !is.null(object$parameters$grid.eta) || !is.null(object$parameters$grid.alpha)) {
-        if (is.null(object$parameters$grid.eta)) {
-          object$parameters$grid.eta <- 1
+      if (T == 1) {
+        if (length(dim(newexperts)) == 2) {
+          if (dim(newexperts)[1] != d) {
+            stop("Bad dimensions between Y and experts")
+          } else {
+            newexperts = array(newexperts, dim = c(1,dim(newexperts)))
+          }
         }
-        if (is.null(object$parameters$grid.alpha)) {
-          object$parameters$grid.alpha <- 10^(-4:-1)
-        }
-        newobject <- fixedshareCalib(y = newY, experts = newexperts, awake = awake, 
-                                     loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
-                                     w0 = object$coefficients, gamma = object$parameters$gamma, grid.eta = object$parameters$grid.eta, 
-                                     grid.alpha = object$parameters$grid.alpha, training = object$training)
-        newobject$parameters$eta <- c(object$parameters$eta, newobject$parameters$eta)
-        newobject$parameters$alpha <- c(object$parameters$alpha, newobject$parameters$alpha)
-      } else {
-        newobject <- fixedshare(y = newY, experts = newexperts, eta = object$parameters$eta, 
-                                alpha = object$parameters$alpha, awake = awake, loss.type = object$loss.type, 
-                                loss.gradient = object$loss.gradient, w0 = object$coefficients, 
-                                training = object$training)
       }
     }
-    
-    
-    newobject$Y <- c(object$Y, newY)
-    newobject$experts <- rbind(object$experts, newexperts)
-    newobject$names.experts <- object$names.experts
-    newobject$awake <- rbind(object$awake, awake)
-    
-    colnames(newobject$experts) <- object$names.experts
-    colnames(newobject$weights) <- object$names.experts
-    colnames(newobject$awake) <- object$names.experts
-    
-    # Averaging of the weights if asked by the averaged parameter
-    if (is.null(object$parameters$averaged)) {
-      newobject$parameters$averaged = FALSE
-    } else {
-      newobject$parameters$averaged = object$parameters$averaged
-    }
-    
-    if (newobject$parameters$averaged) {
-      if (object$T == 0) {
-        newweights.avg <- apply(newobject$weights, 2, cumsum) / (1:T)
-      } else {
-        newweights.avg <- (object$training$sumweights + apply(newobject$weights, 2, cumsum)) / (object$T + 1:T)
+    result$d <- d
+    awakei <- NULL
+    for (i in 1:nrow(newY)) {
+      if (!online){
+        stop("Batch prediction are currently not supported for dimension > 1")
       }
-      
-      newobject$training$sumweights <- (object$T + T) * newweights.avg[T,] + newobject$coefficients
-      newobject$training$next.weights <- newobject$coefficients
-      newobject$coefficients <- newobject$training$sumweights / (object$T + T + 1)
-    }
-    
-    # If online is true, we use online prediction
-    if (online) {
-      if (newobject$parameters$averaged) {
-        newweights <- newweights.avg
-        newpred <- apply(newweights.avg * newexperts,1,sum)
-      } else {
-        newweights <- newobject$weights
-        newpred <- newobject$prediction
+      if (!is.null(awake)){
+        awakei <- as.matrix(awake[i,,])
       }
+      result <- predictReal(result, newexperts = as.matrix(newexperts[i,,]), newY = c(newY[i,]), awake = awakei, 
+                            online = FALSE, type, ...)
     }
-    
-    newobject$prediction <- c(object$prediction, newpred)
-    newobject$weights <- rbind(object$weights, newweights)
-    newobject$loss <- mean(loss(newobject$prediction, newobject$Y, loss.type = newobject$loss.type))
-    newobject$T <- object$T + T
-  } else {
-    newobject <- object
   }
-  class(newobject) <- "mixture"
-  
-
-  
-  result <- switch(type, model = newobject, response = newpred, weights = newweights, 
-                   all = list(model = newobject, response = newpred, weights = newweights))
   
   return(result)
-} 
+}

@@ -6,17 +6,18 @@
 #' If observations \code{Y} and expert advice \code{experts} are provided, 
 #' \code{mixture} is trained by predicting the observations in \code{Y}
 #' sequentially with the help of the expert advice in \code{experts}.  
-#' At each time instance \code{t}, the mixture forms a prediction by assigning 
+#' At each time instance \eqn{t=1,2,\dots,T}, the mixture forms a prediction of \code{Y[t,]} by assigning 
 #' a weight to each expert and by combining the expert advice.
 #' 
 #' 
-#' @param Y  A vector of length T (a non negative integer) containing the observations to be predicted sequentially
-#' in order to train the aggregation rule.
+#' @param Y  A matrix with T rows and d columns. Each row \code{Y[t,]} contains a d-dimensional 
+#' observation to be predicted sequentially.
 #'  
-#' @param experts A matrix containing the expert
-#' forecasts. Each column corresponds to the predictions proposed by an expert
-#' to predict \code{Y}.  It has as many columns as there are experts.
-#' Its number of row should be \code{T}.
+#' @param experts An array of dimension \code{c(T,d,K)}, where \code{T} is the length of the data-set, 
+#' \code{d} the dimension of the observations, and \code{K} is the number of experts. It contains the expert
+#' forecasts. Each vector \code{experts[t,,k]} corresponds to the d-dimensional prediction of \code{Y[t,]} 
+#' proposed by expert k at time \eqn{t=1,\dots,T}.
+#' In the case of real prediction (i.e., \eqn{d = 1}), \code{experts} is a matrix with \code{T} rows and \code{K} columns.
 #' 
 #' @param model A character string specifying the aggregation rule to use. 
 #' Currently available aggregation rules are:
@@ -70,8 +71,8 @@
 #' function at hand but to a gradient version of it.  The aggregation rule is
 #' then similar to gradient descent aggregation rule. 
 #' 
-#' @param coefficients A vector containing the prior weights of the experts
-#' (not possible for 'MLpol').
+#' @param coefficients A probability vector of length K containing the prior weights of the experts
+#' (not possible for 'MLpol'). The weights must be non-negative and sum to 1.
 #' 
 #' @param awake A matrix specifying the
 #' activation coefficients of the experts. Its entries lie in \code{[0,1]}.
@@ -101,7 +102,7 @@
 #'    \item{grid.lambda}{Similar to \code{grid.eta} for the parameter \code{lambda}.}
 #'    \item{simplex}{A boolean that specifies if 'OGD' does a project on the simplex. In other words,
 #'    if TRUE (default) the online gradient descent will be under the constraint that the weights sum to 1
-#'    and are non-negative. If FALSE, 'OGD' performs an online gradient descent on N dimensional real space.
+#'    and are non-negative. If FALSE, 'OGD' performs an online gradient descent on K dimensional real space.
 #'    without any projection step.}
 #'    \item{averaged}{A boolean (default is FALSE). If TRUE the coefficients and the weights 
 #'    returned (and used to form the predictions) are averaged over the past. It leads to more stability on the time evolution of the weights but needs
@@ -115,10 +116,10 @@
 #' \item{coefficients}{A vector of coefficients 
 #' assigned to each expert to perform the next prediction.}
 #' 
-#' \item{weights }{ A matrix of dimension \code{c(T,N)}, with
-#' \code{T} the number of instances to be predicted and \code{N} the number of
+#' \item{weights }{ A matrix of dimension \code{c(T,K)}, with
+#' \code{T} the number of instances to be predicted and \code{K} the number of
 #' experts.  Each row contains the convex combination to form the predictions }
-#' \item{prediction }{ A vector of length \code{T} that contains the
+#' \item{prediction }{ A matrix with \code{T} rows and \code{d} columns that contains the
 #' predictions outputted by the aggregation rule.  } 
 #' \item{loss}{ The average loss (as stated by parameter \code{loss.type}) suffered
 #' by the aggregation rule.}
@@ -139,6 +140,7 @@ mixture <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "squa
 mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square", 
   loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list()) {
   
+  
   if (!is.list(loss.type)) {
     loss.type <- list(name = loss.type)
   }
@@ -146,17 +148,45 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
     stop("loss.type should be one of these: 'absolute', 'percentage', 'square', 'pinball'")
   }
   
+  
   object <- list(model = model, loss.type = loss.type, loss.gradient = loss.gradient, 
     coefficients = coefficients, parameters = parameters, Y = NULL, experts = NULL, 
-    awake = NULL, training = NULL, names.experts = colnames(experts), T = 0)
+    awake = NULL, training = NULL, names.experts = colnames(experts), T = 0, d = "unknown")
+  
   class(object) <- "mixture"
   
   # Test that Y and experts have correct dimensions
   if ((is.null(Y) && !is.null(experts)) || (!is.null(Y) && is.null(experts))) {
     stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
   }
+  
   if (!is.null(Y)) {
-    if (length(Y) == 1) {
+    
+    # Test the dimension of Y: if Y is a matrix, the number of columns is the space of prediction
+    if (is.null(dim(Y))) {
+      d = 1
+      T = length(Y)
+    } else {
+      d = ncol(Y)
+      T = nrow(Y)
+      if (d > 1 && T > 1 && length(dim(experts)) < 3) {
+        stop("Bad dimensions: nrow(experts) should be equal to dim(experts)[3]")
+      } 
+      if (length(dim(experts)) == 3) {
+        if ((dim(experts)[1] != T) || (dim(experts)[2] != d)){
+          stop("Bad dimensions between Y and experts")
+        }
+      }
+      if (T == 1 && d>1) {
+        if (length(dim(experts)) == 2) {
+          if (dim(experts)[1] != d) {
+            stop("Bad dimensions between Y and experts")
+          }
+        }
+      }
+    }
+    
+    if (T == 1 && d == 1) {
       experts <- as.matrix(experts)
       if (nrow(experts) == 1 || ncol(experts) == 1) {
         experts <- matrix(as.numeric(experts), nrow = 1)
@@ -164,10 +194,11 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
         stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
       }
     }
-    if (!(length(Y) == nrow(experts))) {
+    
+    if (dim(experts)[1] != T) {
       stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
     }
-    
+    object$d <- d
     object <- predict(object, newY = Y, newexperts = experts, awake = awake, 
       type = "model")
     

@@ -4,7 +4,7 @@ print.mixture <- function(x, ...) {
   cat(x$model, "\n")
   cat("Loss function: ", x$loss.type$name, "loss", "\n")
   cat("Gradient trick: ", x$loss.gradient, "\n")
-  cat("Coefficients:")
+  cat("Coefficients: ")
   if (x$coefficients[1] != "Uniform") {
     cat("\n")
     x$coefficients <- data.frame(signif(matrix(as.matrix(x$coefficients), nrow = 1)))
@@ -21,15 +21,17 @@ summary.mixture <- function(object, ...) {
   if (is.null(object$Y)) {
     K <- "Unknown"
     T <- 0
+    d <- "Unknown"
     TAB <- c("No losses yet")
   } else {
-    T <- length(object$Y)
+    T <- object$T
     K <- length(object$coefficients)
+    d <- object$d
     
-    rmse.algo <- sqrt(mean(loss(object$prediction, object$Y, loss.type = "square")))
-    mape.algo <- mean(loss(object$prediction, object$Y, loss.type = "percentage"))
-    rmse.unif <- sqrt(lossConv(rep(1/K, K), object$Y, object$experts, awake = object$awake))
-    mape.unif <- lossConv(rep(1/K, K), object$Y, object$experts, awake = object$awake, 
+    rmse.algo <- sqrt(mean(loss(c(object$prediction), c(object$Y), loss.type = "square")))
+    mape.algo <- mean(loss(c(object$prediction), c(object$Y), loss.type = "percentage"))
+    rmse.unif <- sqrt(lossConv(rep(1/K, K), c(t(object$Y)), object$experts, awake = object$awake))
+    mape.unif <- lossConv(rep(1/K, K), c(t(object$Y)), object$experts, awake = object$awake, 
                           loss.type = "percentage")
     
     TAB <- data.frame(rmse = c(rmse.algo, rmse.unif), mape = c(mape.algo, mape.unif))
@@ -37,7 +39,7 @@ summary.mixture <- function(object, ...) {
   }
   
   res <- list(object = object, coefficients = object$coefficients, losses = TAB, 
-              n.experts = K, n.observations = T)
+              n.experts = K, n.observations = T, n.dimension = d)
   class(res) <- "summary.mixture"
   res
 }
@@ -46,7 +48,8 @@ summary.mixture <- function(object, ...) {
 print.summary.mixture <- function(x, ...) {
   print(x$object)
   cat("\nNumber of experts: ", x$n.experts)
-  cat("\nNumber of observations: ", x$n.observations, "\n\n")
+  cat("\nNumber of observations: ", x$n.observations)
+  cat("\nDimension of the data: ", x$n.dimension, "\n\n")
   
   if (!is.null(dim(x$losses))) {
     print(signif(x$losses, digits = 3))
@@ -77,8 +80,11 @@ plot.mixture <- function(x, pause = FALSE, losses = FALSE, col = NULL, ...) {
     }
     par(mar = c(3, 3, 1.6, 0.1), mgp = c(2, 0.5, 0))
     x$experts <- data.frame(x$experts)
+    x$Y <- c(t(x$Y))
+    x$prediction <- c(t(x$prediction))
     x$weights <- data.frame(x$weights)
-    T <- nrow(x$experts)
+    T <- x$T
+    d <- x$d
     
     if (is.null(names(x$experts))) {
       names(x$experts) <- colnames(x$experts)
@@ -146,10 +152,11 @@ plot.mixture <- function(x, pause = FALSE, losses = FALSE, col = NULL, ...) {
     
     # Cumulative loss
     par(mar = c(3, 3, 1.6, l.names/2), mgp = c(1, 0.5, 0))
-    cumul.losses <- apply(loss(x$experts, x$Y, x$loss.type), 2, cumsum)
+    cumul.losses <- apply(loss(x$experts, x$Y, x$loss.type), 2, cumsum)[seq(3,T*d,by=d),]
+    cumul.exploss <- cumsum(loss(x$prediction, x$Y, x$loss.type))[seq(3,T*d,by=d)]
     matplot(cumul.losses, type = "l", lty = 1, xlab = "", ylab = "", 
-            main = paste("Cumulative", x$loss.type$name, "loss"), col = makeTransparent(col))
-    lines(cumsum(loss(x$prediction, x$Y, x$loss.type)), col = 1, lwd = 2)
+            main = paste("Cumulative", x$loss.type$name, "loss"), col = makeTransparent(col), ylim = range(c(cumul.losses,cumul.exploss)))
+    lines(cumul.exploss, col = 1, lwd = 2)
     mtext(side = 2, text = "Cumulative loss", line = 1.8, cex = 1)
     mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)
     mtext(side = 4, text = names(x$experts), at = cumul.losses[T,], las = 2, col = 2:(K+1), cex= 0.5, line = 0.3)
@@ -162,10 +169,11 @@ plot.mixture <- function(x, pause = FALSE, losses = FALSE, col = NULL, ...) {
     
     # Cumulative residuals
     par(mar = c(3, 3, 1.6,l.names/2), mgp = c(1, 0.5, 0))
-    cumul.residuals <- apply(x$Y - x$experts, 2, cumsum)
+    cumul.residuals <- apply(x$Y - x$experts, 2, cumsum)[seq(3,T*d,by=d),]
+    cumul.expres <- cumsum(x$Y - x$prediction)[seq(3,T*d,by=d)]
     matplot(cumul.residuals, type = "l", lty = 1, xlab = "", ylab = "", 
-            main = paste("Cumulative residuals"), col = makeTransparent(col))
-    lines(cumsum(x$Y - x$prediction), col = 1, lwd = 2)
+            main = paste("Cumulative residuals"), col = makeTransparent(col), ylim = range(c(cumul.residuals,cumul.expres)))
+    lines(cumul.expres, col = 1, lwd = 2)
     mtext(side = 2, text = "Cumulative residuals", line = 1.8, cex = 1)
     mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)
     if (max(cumul.residuals) > abs(min(cumul.residuals))) {

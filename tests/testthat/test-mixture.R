@@ -3,6 +3,7 @@
 context("Testing mixture function")
 
 # load some basic data to perform tests
+set.seed(3)
 n <- 50
 X <- cbind(rep(0, n), rep(1, n))
 Y <- rep(0.4, n)
@@ -28,26 +29,24 @@ test_that("EWA is ok", {
   possible_loss_type <- c("percentage", "absolute", "square", "pinball")
   i.loss <- sample(1:4, 1)
   m <- mixture(Y = Y, experts = X, model = "EWA", loss.type = possible_loss_type[i.loss], 
-    coefficients = w0)
+               coefficients = w0)
   expect_true(abs(m$coefficients[1] - 0.6) < 0.1)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = possible_loss_type[i.loss])))
-  expect_identical(m$weights[1, ], w0)
-  # expect_null(predict(m)) e <- c(0.3,0.5) expect_equal(c(predict(m,e)),
-  # sum(c(e)*c(m$coefficients)))
+  expect_identical(as.numeric(m$weights[1, ]), w0)
   
   
   m <- mixture(Y = Y, experts = X, model = "EWA", loss.type = possible_loss_type[i.loss], 
-    coefficients = w0)
+               coefficients = w0)
   
   
   eta <- 0.5
   m.fixed <- mixture(Y = Y, experts = X, model = "EWA", parameters = list(eta = eta), 
-    loss.type = possible_loss_type[i.loss], coefficients = w0)
+                     loss.type = possible_loss_type[i.loss], coefficients = w0)
   idx.eta <- which(m$parameters$grid.eta == eta)
   expect_equal(m$training$grid.loss[idx.eta], mean(loss(m.fixed$prediction, Y, 
-    loss.type = possible_loss_type[i.loss])))
+                                                        loss.type = possible_loss_type[i.loss])))
   expect_equal(m.fixed$loss, m$training$grid.loss[idx.eta])
-  expect_identical(m.fixed$weights[1, ], w0)
+  expect_identical(as.numeric(m.fixed$weights[1, ]), w0)
   
   m <- mixture(Y = Y, experts = X, model = "EWA", awake = awake)
   expect_true(abs(m$coefficients[1] - 0.6) < 0.1)
@@ -56,13 +55,12 @@ test_that("EWA is ok", {
   
   grid.eta <- runif(5)
   m <- mixture(Y = Y, experts = X, model = "EWA", parameters = list(grid.eta = grid.eta), 
-    awake = awake)
+               awake = awake)
   expect_equal(sum(!(grid.eta %in% m$parameters$grid.eta)), 0)
   
   m1 <- mixture(Y = Y[1:10], experts = X[1:10, ], model = "EWA", parameters = list(grid.eta = grid.eta), 
-    awake = awake[1:10, ])
-  m1 <- predict(object = m1, newexperts = X[-c(1:10), ], newY = Y[-c(1:10)], awake = awake[-c(1:10), 
-    ], online = TRUE, type = "model")
+                awake = awake[1:10, ])
+  m1 <- predict(object = m1, newexperts = X[-c(1:10), ], newY = Y[-c(1:10)], awake = awake[-c(1:10),], online = TRUE, type = "model")
   expect_equal(m, m1)
   
 })
@@ -73,22 +71,22 @@ test_that("Fixed-share is ok", {
   possible_loss_type <- c("percentage", "absolute", "square", "pinball")
   i.loss <- sample(1:4, 1)
   m <- mixture(Y = Y, experts = X, model = "FS", loss.type = possible_loss_type[i.loss], 
-    coefficients = w0)
+               coefficients = w0)
   expect_true(abs(m$coefficients[1] - 0.6) < 0.1)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = possible_loss_type[i.loss])))
-  expect_identical(m$weights[1, ], w0)
+  expect_identical(as.numeric(m$weights[1, ]), w0)
   
   # e <- c(0.3,0.5) expect_equal(c(predict(m,e)), sum(c(e)*c(m$coefficients)))
   eta <- 2
   alpha <- 0.01
   m.fixed <- mixture(Y = Y, experts = X, model = "FS", parameters = list(eta = eta, 
-    alpha = alpha), loss.type = possible_loss_type[i.loss], coefficients = w0)
+                                                                         alpha = alpha), loss.type = possible_loss_type[i.loss], coefficients = w0)
   idx.eta <- which(m$parameters$grid.eta == eta)
   idx.alpha <- which(m$parameters$grid.alpha == alpha)
   expect_equal(m$training$grid.loss[idx.eta, idx.alpha], mean(loss(m.fixed$prediction, 
-    Y, loss.type = possible_loss_type[i.loss])))
+                                                                   Y, loss.type = possible_loss_type[i.loss])))
   expect_equal(m.fixed$loss, m$training$grid.loss[idx.eta, idx.alpha])
-  expect_identical(m.fixed$weights[1, ], w0)
+  expect_identical(as.numeric(m.fixed$weights[1, ]), w0)
   
   m <- mixture(Y = Y, experts = X, model = "FS", awake = awake)
   expect_true(abs(m$coefficients[1] - 0.6) < 0.1)
@@ -97,7 +95,7 @@ test_that("Fixed-share is ok", {
   grid.eta <- runif(5)
   grid.alpha <- runif(3)
   m <- mixture(Y = Y, experts = X, model = "FS", parameters = list(grid.eta = grid.eta, 
-    grid.alpha = grid.alpha), awake = awake)
+                                                                   grid.alpha = grid.alpha), awake = awake)
   expect_equal(sum(!(grid.eta %in% m$parameters$grid.eta)), 0)
   expect_identical(grid.alpha, m$parameters$grid.alpha)
 })
@@ -107,23 +105,23 @@ test_that("Ridge is ok", {
   w0 <- c(0.5, 0.5)
   m <- mixture(Y = Y, experts = X, model = "Ridge", coefficients = w0)
   expect_equal(m$loss, mean(loss(m$prediction, Y)))
-  expect_identical(m$weights[1, ], w0)
+  expect_identical(as.numeric(m$weights[1, ]), w0)
   expect_true(!is.na(sum(m$weights)))
   
   # e <- c(0.3,0.5) expect_equal(c(predict(m,e)), sum(c(e)*c(m$coefficients)))
   
   lambda <- 2
   m.fixed <- mixture(Y = Y, experts = X, model = "Ridge", parameters = list(lambda = lambda), 
-    coefficients = w0)
+                     coefficients = w0)
   idx.lambda <- which(m$parameters$grid.lambda == lambda)
   expect_equal(m$training$grid.loss[idx.lambda], mean(loss(m.fixed$prediction, 
-    Y)))
+                                                           Y)))
   expect_equal(m.fixed$loss, m$training$grid.loss[idx.lambda])
-  expect_identical(m.fixed$weights[1, ], w0)
+  expect_identical(as.numeric(m.fixed$weights[1, ]), w0)
   
   grid.lambda <- runif(3)
   m <- mixture(Y = Y, experts = X, model = "Ridge", parameters = list(grid.lambda = grid.lambda, 
-    gamma = 100))
+                                                                      gamma = 100))
   expect_equal(sum(!(grid.lambda %in% m$parameters$grid.lambda)), 0)
 })
 
@@ -141,19 +139,19 @@ test_that("MLpol, MLprod, MLewa, and BOA are ok", {
   
   m1 <- mixture(Y = Y[1:10], experts = X[1:10, ], loss.type = possible_loss_type[i.loss])
   m1 <- predict(object = m1, newexperts = X[-c(1:10), ], newY = Y[-c(1:10)], online = TRUE, 
-    type = "model")
+                type = "model")
   expect_equal(m, m1)
   
   w0 <- c(0.3, 0.7)
   m <- mixture(Y = Y, experts = X, model = "MLprod", coefficients = w0, loss.type = possible_loss_type[i.loss])
   expect_true(abs(m$coefficients[1] - 0.6) < 0.2)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = possible_loss_type[i.loss])))
-  expect_identical(m$weights[1, ], w0)
+  expect_identical(as.numeric(m$weights[1, ]), w0)
   
   m <- mixture(Y = Y, experts = X, model = "MLewa", coefficients = w0, loss.type = possible_loss_type[i.loss])
   expect_true(abs(m$coefficients[1] - 0.6) < 0.2)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = possible_loss_type[i.loss])))
-  expect_identical(m$weights[1, ], w0)
+  expect_identical(as.numeric(m$weights[1, ]), w0)
   e <- c(0.3, 0.5)
   # expect_equal(c(predict(m,e)), sum(c(e)*c(m$coefficients))) à vérifier plus tard
   
@@ -161,13 +159,13 @@ test_that("MLpol, MLprod, MLewa, and BOA are ok", {
   m <- mixture(Y = Y, experts = X, model = "BOA", coefficients = w0, loss.type = possible_loss_type[i.loss])
   expect_true(abs(m$coefficients[1] - 0.6) < 0.2)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = possible_loss_type[i.loss])))
-  expect_identical(m$weights[1, ], w0)
+  expect_identical(as.numeric(m$weights[1, ]), w0)
   
   
   m <- mixture(Y = Y[1:5], experts = X[1:5, ], model = "MLewa", awake = awake[1:5, 
-    ])
+                                                                              ])
   m <- predict(m, newexperts = X[-c(1:5), ], newY = Y[-c(1:5)], awake = awake[-c(1:5), 
-    ])
+                                                                              ])
   expect_true(abs(m$coefficients[1] - 0.6) < 0.2)
   expect_equal(m$loss, mean(loss(m$prediction, Y)))
   
@@ -186,7 +184,7 @@ test_that("Quantile mixture are ok", {
   i <- sample(1:K, 1)
   l <- list(name = "pinball", tau = quantiles[i])
   m <- mixture(Y = Y, experts = X, model = "EWA", loss.type = l, loss.gradient = FALSE, 
-    parameters = list(eta = 1, gamma = 100))
+               parameters = list(eta = 1, gamma = 100))
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_lt(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
   # e <- rnorm(K) expect_equal(c(predict(m,e)), sum(c(e)*c(m$coefficients)))
@@ -197,7 +195,7 @@ test_that("Quantile mixture are ok", {
   
   # Fixed share
   m <- mixture(Y = Y, experts = X, model = "FS", loss.type = l, loss.gradient = FALSE, 
-    parameters = list(eta = 1, alpha = 0.01))
+               parameters = list(eta = 1, alpha = 0.01))
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_lt(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
   
@@ -256,7 +254,7 @@ test_that("Predict method is ok", {
     m2 <- m
     for (t in 1:n) {
       m2 <- predict(m2, newY = Y[t], newexperts = X[t, ], online = TRUE, type = "model", 
-        awake = awake[t, ])
+                    awake = awake[t, ])
     }
     expect_equal(m1, m2)
     
@@ -281,5 +279,53 @@ test_that("Regrets and Losses are coherent", {
     l3 = apply(loss(X,Y,loss.type=l),2,sum)
     expect_equal(l1,l2)
     expect_equal(l2,l3)
+  }
+})
+
+# test multi-dimensional data
+test_that("Dimension d>1 is ok",{
+  # load some basic data to perform tests
+  n <- 10
+  d <- 3
+  for (algo in c("BOA", "MLpol", "MLprod", "MLewa", "FS", "Ridge","OGD")) {
+    l <- sample(c("square", "pinball", "percentage", "absolute"), 1)
+    if (algo == "Ridge") {
+      l <- "square"
+      awake <- NULL
+    }
+    # Une petite fonction pour creer les prévisions de la base canonique
+    base_predictions = function(d,n) {
+      decimals <- c(0:(2^d-1))
+      m <- cbind(diag(d),-diag(d))
+      return(t(matrix(rep(t(m),n),nrow = 2*d)))
+    }
+    X <- base_predictions(d,n) # X is the canonical basis
+    theta.star <- sign(rnorm(d)) * runif(d) # point to be predicted
+    theta.star <- runif(1) * theta.star / sum(abs(theta.star))  # the target point is in the L1 unit ball
+    if (l == "percentage") {
+      X <- abs(X)
+      theta.star <- abs(theta.star)
+    }
+    Y <- rep(theta.star, n)
+    
+    m <- mixture(model = algo, loss.type = l)
+    for (i in seq(1,n*d,by=d)) {
+      idx = i + 0:(d-1)
+      m <- predict(object = m, newY = Y[idx],newexperts = X[idx,], online = FALSE)
+    }
+    # theta.star - predict(m,newexperts = X[1:3,], online = FALSE, type = "response")
+    m$d <- d
+    m$T <- m$T / d
+    m$prediction <- t(matrix(m$prediction,nrow = d))
+    m$Y <- t(matrix(m$Y,nrow = d))
+    m$weights <- m$weights[seq(1,n*d,by=d),]
+    
+    
+    summary(m)
+    plot(m)
+    X1 <- seriesToBlock(X, d = d)
+    Y1 <- seriesToBlock(Y, d = d)
+    m1 <- mixture(Y = Y1, experts= X1, model = algo, loss.type = l)
+    expect_equal(m,m1)
   }
 })
