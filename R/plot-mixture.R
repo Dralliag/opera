@@ -1,61 +1,7 @@
-#' @export 
-print.mixture <- function(x, ...) {
-  cat("Aggregation rule: ")
-  cat(x$model, "\n")
-  cat("Loss function: ", x$loss.type$name, "loss", "\n")
-  cat("Gradient trick: ", x$loss.gradient, "\n")
-  cat("Coefficients: ")
-  if (x$coefficients[1] != "Uniform") {
-    cat("\n")
-    x$coefficients <- data.frame(signif(matrix(as.matrix(x$coefficients), nrow = 1)))
-    names(x$coefficients) <- colnames(x$experts)
-    rownames(x$coefficients) <- ""
-    print(signif(x$coefficients, digits = 3))
-  } else {
-    print("Uniform mixture")
-  }
-}
-
-#' @export 
-summary.mixture <- function(object, ...) {
-  if (is.null(object$Y)) {
-    K <- "Unknown"
-    T <- 0
-    d <- "Unknown"
-    TAB <- c("No losses yet")
-  } else {
-    T <- object$T
-    K <- length(object$coefficients)
-    d <- object$d
-    
-    rmse.algo <- sqrt(mean(loss(c(object$prediction), c(object$Y), loss.type = "square")))
-    mape.algo <- mean(loss(c(object$prediction), c(object$Y), loss.type = "percentage"))
-    rmse.unif <- sqrt(lossConv(rep(1/K, K), c(t(object$Y)), object$experts, awake = object$awake))
-    mape.unif <- lossConv(rep(1/K, K), c(t(object$Y)), object$experts, awake = object$awake, 
-                          loss.type = "percentage")
-    
-    TAB <- data.frame(rmse = c(rmse.algo, rmse.unif), mape = c(mape.algo, mape.unif))
-    rownames(TAB) <- c(object$model, "Uniform")
-  }
-  
-  res <- list(object = object, coefficients = object$coefficients, losses = TAB, 
-              n.experts = K, n.observations = T, n.dimension = d)
-  class(res) <- "summary.mixture"
-  res
-}
-
-#' @export 
-print.summary.mixture <- function(x, ...) {
-  print(x$object)
-  cat("\nNumber of experts: ", x$n.experts)
-  cat("\nNumber of observations: ", x$n.observations)
-  cat("\nDimension of the data: ", x$n.dimension, "\n\n")
-  
-  if (!is.null(dim(x$losses))) {
-    print(signif(x$losses, digits = 3))
-  }
-}
-
+#' Plot an aggregation procedure
+#' @describeIn mixture \code{plot}. It has two optional arguments. 
+#' The argument pause = TRUE displays the plots separately.
+#' The argument losses = TRUE prints only the performance achieved by the aggregation procedures and the experts.
 #' @export 
 plot.mixture <- function(x, pause = FALSE, losses = FALSE, col = NULL, ...) {
   def.par <- par(no.readonly = TRUE) # save default, for resetting...
@@ -196,7 +142,7 @@ plot.mixture <- function(x, pause = FALSE, losses = FALSE, col = NULL, ...) {
     
     par(mar = c(4.5, 4, 2, 2))
     plot(c(x$loss.experts, err.unif, err.mixt)[idx.sorted], xlab = "", ylab = paste(x$loss.type$name, 
-                                                                                 "loss"), main = "Average loss suffered by the experts", axes = F, pch = 3, 
+                                                                                    "loss"), main = "Average loss suffered by the experts", axes = F, pch = 3, 
          col = my.col, lwd = 2)
     axis(1, at = 1:(K + 2), labels = FALSE)
     mtext(at = 1:(K + 2), text = c(names(x$experts), "Uniform", x$model)[idx.sorted], 

@@ -130,6 +130,7 @@
 #' @keywords ~kwd1 ~kwd2
 #' @seealso See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.
 #'  
+#' @template example
 #' @export mixture
 
 mixture <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square", 
