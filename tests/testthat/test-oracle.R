@@ -106,3 +106,43 @@ test_that("Best shifting oracle is ok", {
   expect_equal(class(m), "oracle")
   expect_equal(class(summary(m)), "summary.oracle")
 }) 
+
+# test multi-dimensional data
+test_that("Dimension d>1 is ok",{
+  # load some basic data to perform tests
+  n <- 10
+  d <- 3
+  for (model in c("expert", "convex", "linear")) {
+    l <- sample(c("square", "pinball", "percentage", "absolute"), 1)
+    
+    # Une petite fonction pour creer les prévisions de la base canonique
+    base_predictions = function(d,n) {
+      decimals <- c(0:(2^d-1))
+      m <- cbind(diag(d),-diag(d))
+      return(t(matrix(rep(t(m),n),nrow = 2*d)))
+    }
+    X <- base_predictions(d,n) # X is the canonical basis
+    theta.star <- sign(rnorm(d)) * runif(d) # point to be predicted
+    theta.star <- runif(1) * theta.star / sum(abs(theta.star))  # the target point is in the L1 unit ball
+    if (l == "percentage") {
+      X <- abs(X)
+      theta.star <- abs(theta.star)
+    }
+    Y <- rep(theta.star, n)
+    
+    m <- oracle(Y = Y,experts = X, model = model, loss.type = l)
+    m$d <- d
+    m$prediction <- seriesToBlock(m$prediction,d)
+    m$Y <- seriesToBlock(m$Y,d)
+    m$residuals <- seriesToBlock(m$residuals,d)
+    m$experts <- seriesToBlock(m$experts,d)
+    summary(m)
+    plot(m)
+    
+    X <- seriesToBlock(X, d = d)
+    Y <- seriesToBlock(Y, d = d)
+    m1 <- oracle(Y = Y, experts= X, model = model, loss.type = l)
+    expect_equal(m$experts,m1$experts)
+    expect_true(mean(abs(m$prediction - m1$prediction)) < mean(abs(Y))/10)  
+  }
+})

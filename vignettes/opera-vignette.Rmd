@@ -36,15 +36,16 @@ the French [National Institute of Statistics and Economic Studies (Insee)][Insee
 
 ### The data set
 
-First, we load the data and we cut it into two subsets: a training set used to build the experts (base forecasting methods) and a testing set (here the last year) used to evaluate the performance and to run the combining algorithms. 
+First, we load the data and we cut it into two subsets: a training set used to build the experts (base forecasting methods) and a testing set (here the last two years) used to evaluate the performance and to run the combining algorithms. 
 
 ```{r, echo=FALSE}
 library(opera)
+set.seed(1)
 ```
 
 ```{r}
 data(electric_load)
-idx_data_test <- 680:nrow(electric_load)
+idx_data_test <- 620:nrow(electric_load)
 data_train <- electric_load[-idx_data_test, ] 
 data_test <- electric_load[idx_data_test, ]  
 ```

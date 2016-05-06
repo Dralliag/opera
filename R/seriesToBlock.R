@@ -15,7 +15,7 @@ seriesToBlock <- function(X, d) {
   f <- function(Y){
     matrix(Y, byrow = TRUE, ncol = d)
   }
-  if (is.null(dim(X))) {
+  if (is.null(dim(X)) || dim(X)[2] == 1) {
     if ((length(X) %% d) != 0) {
       stop("length(X) must be a multiple of d")
     }

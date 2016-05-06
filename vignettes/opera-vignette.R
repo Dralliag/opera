@@ -1,9 +1,10 @@
 ## ---- echo=FALSE---------------------------------------------------------
 library(opera)
+set.seed(1)
 
 ## ------------------------------------------------------------------------
 data(electric_load)
-idx_data_test <- 680:nrow(electric_load)
+idx_data_test <- 620:nrow(electric_load)
 data_train <- electric_load[-idx_data_test, ] 
 data_test <- electric_load[idx_data_test, ]  
 

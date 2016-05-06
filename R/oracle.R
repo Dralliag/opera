@@ -89,6 +89,19 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
       stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
     }
   }
+  d = 1
+  # We convert the data to 1-dimensional data if needed
+  if (length(dim(Y)) == 2 && length(dim(experts)) == 3) {
+    d = dim(Y)[2]
+    T = dim(Y)[1]
+    
+    Y = blockToSeries(Y)
+    experts = blockToSeries(experts)
+    if (!is.null(awake)) {
+      awake = blockToSeries(awake)
+    }
+  }
+  
   if (!(length(Y) == nrow(experts))) {
     stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
   }
@@ -158,6 +171,7 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
       best.expert], loss.experts = loss.experts)
   }
   
+  res$d <- d
   res$loss.experts <- loss.experts
   res$model <- model
   res$loss.type <- loss.type
@@ -166,6 +180,19 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
     res$residuals <- Y - res$prediction
     res$loss <- mean(loss(res$prediction, Y, loss.type))
     res$rmse <- sqrt(mean(loss(res$prediction, Y, "square")))
+  }
+  
+  # we convert the data back to d-dimensional series if needed
+  if (d>1){
+    Y <- seriesToBlock(Y,d)
+    experts <- seriesToBlock(experts,d)
+    if (!is.null(res$residuals)) {
+      res$residuals <- seriesToBlock(res$residuals,d)
+    }
+    res$prediction <- seriesToBlock(res$prediction,d)
+    if (!is.null(awake)) {
+      awake <- seriesToBlock(awake,d)
+    }
   }
   res$Y <- Y
   res$experts <- experts
