@@ -329,3 +329,13 @@ test_that("Dimension d>1 is ok",{
     expect_equal(m,m1)
   }
 })
+
+test_that("Names are correctly rendered",{
+  colnames(X) <- c("bob","alice")
+  m <- mixture(Y = Y, experts=X)
+  expect_equal(m$names.experts,colnames(X))
+  
+  m <- mixture()
+  m <- predict(m,newY = Y[1],newexperts = X[1,])
+  expect_equal(m$names.experts,colnames(X))
+})

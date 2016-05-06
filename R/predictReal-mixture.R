@@ -6,6 +6,9 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
   # Number of instant and number of experts
   if (!is.null(newY)) {
     T <- length(newY)
+    if (is.null(object$names.experts) && T == 1) {
+      object$names.experts <- names(newexperts)
+    }
     newexperts <- matrix(newexperts, nrow = T)
     N <- ncol(newexperts)
   } else if (object$coefficients[1] != "Uniform") {
