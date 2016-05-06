@@ -152,8 +152,8 @@ plot.mixture <- function(x, pause = FALSE, losses = FALSE, col = NULL, ...) {
     
     # Cumulative loss
     par(mar = c(3, 3, 1.6, l.names/2), mgp = c(1, 0.5, 0))
-    cumul.losses <- apply(loss(x$experts, x$Y, x$loss.type), 2, cumsum)[seq(3,T*d,by=d),]
-    cumul.exploss <- cumsum(loss(x$prediction, x$Y, x$loss.type))[seq(3,T*d,by=d)]
+    cumul.losses <- apply(loss(x$experts, x$Y, x$loss.type), 2, cumsum)[seq(d,T*d,by=d),]
+    cumul.exploss <- cumsum(loss(x$prediction, x$Y, x$loss.type))[seq(d,T*d,by=d)]
     matplot(cumul.losses, type = "l", lty = 1, xlab = "", ylab = "", 
             main = paste("Cumulative", x$loss.type$name, "loss"), col = makeTransparent(col), ylim = range(c(cumul.losses,cumul.exploss)))
     lines(cumul.exploss, col = 1, lwd = 2)
@@ -169,8 +169,8 @@ plot.mixture <- function(x, pause = FALSE, losses = FALSE, col = NULL, ...) {
     
     # Cumulative residuals
     par(mar = c(3, 3, 1.6,l.names/2), mgp = c(1, 0.5, 0))
-    cumul.residuals <- apply(x$Y - x$experts, 2, cumsum)[seq(3,T*d,by=d),]
-    cumul.expres <- cumsum(x$Y - x$prediction)[seq(3,T*d,by=d)]
+    cumul.residuals <- apply(x$Y - x$experts, 2, cumsum)[seq(d,T*d,by=d),]
+    cumul.expres <- cumsum(x$Y - x$prediction)[seq(d,T*d,by=d)]
     matplot(cumul.residuals, type = "l", lty = 1, xlab = "", ylab = "", 
             main = paste("Cumulative residuals"), col = makeTransparent(col), ylim = range(c(cumul.residuals,cumul.expres)))
     lines(cumul.expres, col = 1, lwd = 2)
