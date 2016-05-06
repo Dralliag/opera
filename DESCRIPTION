@@ -1,8 +1,8 @@
 Package: opera
 Type: Package
 Title: Online Prediction by ExpeRts Aggregation
-Version: 0.01
-Date: 2015-09-10
+Version: 0.02
+Date: 2016-05-06
 Author: Pierre Gaillard
 Maintainer: Pierre Gaillard <pierre@gaillard.me>
 Copyright: EDF R&D 2015
