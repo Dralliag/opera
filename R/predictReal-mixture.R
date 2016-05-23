@@ -88,8 +88,8 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     w <- matrix(object$coefficients, ncol = 1)
     pond <- c(awake %*% w)
     newpred <- c(((newexperts * awake) %*% w)/pond)
-    newweights <- t(matrix(rep(w, T/object$d), ncol = T/object$d))/pond
-  }
+    newweights <- (t(t(awake) * c(w)) / pond)[seq(1,T,by=object$d),]
+  }  
   
   # Online prediction and weights if newY is provided
   if (!is.null(newY)) {

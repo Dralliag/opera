@@ -7,13 +7,18 @@ plot.mixture <- function(x, pause = FALSE, losses = FALSE, col = NULL, ...) {
   def.par <- par(no.readonly = TRUE) # save default, for resetting...
   x$experts <- data.frame(x$experts)
   K <- length(x$experts)
-  if (K <= 9) {
-    col.palette <- RColorBrewer::brewer.pal(n = K,name = "Set1")  
-  } else {
-    col.palette <- RColorBrewer::brewer.pal(n = K,name = "Paired")  
-  }
   if (is.null(col)) {
-    col <- col.palette
+    if (K <= 9) {
+      col <- RColorBrewer::brewer.pal(n = K,name = "Set1")  
+    } else {
+      c0 <- RColorBrewer::brewer.pal(n = 12,name = "Set3")  
+      c1 <- RColorBrewer::brewer.pal(n = 9,name = "Set1") 
+      c3 <- RColorBrewer::brewer.pal(n = 8,name = "Dark2") 
+      c4 <- RColorBrewer::brewer.pal(n = 12,name = "Paired")
+      
+      c2 <- c(c3,c(c0[1],c(rbind(c1,c0[1:9]))),c4)
+      col <- rep(c2,ceiling(K/length(c2)))[1:K]
+    }
   }
   
   if (is.null(names(x$experts))) {
