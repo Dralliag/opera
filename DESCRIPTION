@@ -3,7 +3,7 @@ Type: Package
 Title: Online Prediction by ExpeRts Aggregation
 Version: 0.03
 Date: 2016-05-23
-Authors@R: if (file.exists('DESCRIPTION') && !file.exists('man')) {library(roxygen2); devtools::document()};
+Authors@R: if (file.exists('DESCRIPTION') && !file.exists('man')) {roxygen2::roxygenize('.');};
     c(person('Pierre', 'Gaillard', role=c('cre','aut'), email='pierre@gaillard.me'),
     person('Yannig','Goude', role='aut'))
 Copyright: EDF R&D 2012-2015
