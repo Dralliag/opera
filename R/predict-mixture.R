@@ -90,6 +90,7 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
                             online = FALSE, type, ...)
     }
   }
+  result$weights <- matrix(result$weights, nrow = result$T)
   
   return(result)
 }

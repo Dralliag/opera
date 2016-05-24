@@ -123,7 +123,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     }
     
     if (object$model == "OGD") {
-      if (is.null(object$parameters$alpha)) {object$parameters$alpha = 0.75}
+      if (is.null(object$parameters$alpha)) {object$parameters$alpha = 0.5}
       if (is.null(object$parameters$simplex)) {object$parameters$simplex = TRUE}
       newobject <- OGD(y = newY, experts = newexperts, loss.type = object$loss.type, 
                        training = object$training, alpha = object$parameters$alpha, simplex = object$parameters$simplex,

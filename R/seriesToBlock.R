@@ -9,6 +9,9 @@
 #' given to the aggregation rule procedure to perform \code{d}-dimensional predictions (i.e., day predictions).
 #' 
 #' The function blockToSeries performs the inverse operation.
+#' @param X An array or a vector to be converted.
+#' @param d A positive integer defining the block size.
+#' 
 #' 
 #' @export seriesToBlock
 seriesToBlock <- function(X, d) {

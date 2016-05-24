@@ -7,17 +7,20 @@ plot.mixture <- function(x, pause = FALSE, losses = FALSE, col = NULL, ...) {
   def.par <- par(no.readonly = TRUE) # save default, for resetting...
   x$experts <- data.frame(x$experts)
   K <- length(x$experts)
+  w.order <- order(apply(x$weights,2,mean),decreasing = TRUE)
+  
   if (is.null(col)) {
     if (K <= 9) {
       col <- RColorBrewer::brewer.pal(n = K,name = "Set1")  
     } else {
-      c0 <- RColorBrewer::brewer.pal(n = 12,name = "Set3")  
-      c1 <- RColorBrewer::brewer.pal(n = 9,name = "Set1") 
-      c3 <- RColorBrewer::brewer.pal(n = 8,name = "Dark2") 
-      c4 <- RColorBrewer::brewer.pal(n = 12,name = "Paired")
+      c0 <- RColorBrewer::brewer.pal(n = 9,name = "Set1") 
+      c1 <- RColorBrewer::brewer.pal(n = 12,name = "Set3")  
+      c2 <- RColorBrewer::brewer.pal(n = 8,name = "Dark2") 
+      c3 <- RColorBrewer::brewer.pal(n = 12,name = "Paired")
       
-      c2 <- c(c3,c(c0[1],c(rbind(c1,c0[1:9]))),c4)
-      col <- rep(c2,ceiling(K/length(c2)))[1:K]
+      my.colors <- c(c0,c1,c2,c3)
+      col <- numeric(K)
+      col[w.order] <- rep(my.colors,ceiling(K/length(my.colors)))[1:K]
     }
   }
   
@@ -41,7 +44,7 @@ plot.mixture <- function(x, pause = FALSE, losses = FALSE, col = NULL, ...) {
       names(x$experts) <- colnames(x$experts)
     }
     if (is.null(names(x$experts))) {
-      names(x$experts) <- paste("Expert", 1:K)
+      names(x$experts) <- paste("X", 1:K,sep="")
     }
     names(x$weights) <- names(x$experts)
     l.names <- max(nchar(names(x$experts))) / 3 + 1.7
@@ -62,16 +65,28 @@ plot.mixture <- function(x, pause = FALSE, losses = FALSE, col = NULL, ...) {
       mtext(side = 2, text = "Weights", line = 1.8, cex = 1)
       mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)
       x.idx <- c(1, 1:T, T:1)
+      w.summed <- rep(1,T)
+      i.remaining = rep(TRUE,K)
+      i.order <- rep(0,K)
       for (i in 1:K) {
-        w.summed <- apply(matrix(as.matrix(x$weights[, i:K]), nrow = T), 1, sum)
+        if (i <K){
+          j <- which(i.remaining)[which.min(apply(x$weights[,i.remaining],2,function(p){sqrt(var(w.summed-p))}))]
+        } else {
+          j <- which(i.remaining)
+        }
+        i.order[i] <- j
         y.idx <- c(0, w.summed, rep(0, T))
-        polygon(x = x.idx, y = y.idx, col = col[i])
+        polygon(x = x.idx, y = y.idx, col = col[j])
+        w.summed.old <- w.summed
+        w.summed <- w.summed - x$weights[,j]
+        i.remaining[j] <- FALSE
+        writeLegend(f = w.summed.old,w.summed,tau = 0.05,name = names(x$experts)[j])
       }
       axis(1)
       axis(2)
       box()
-      mtext(side = 4, text = names(x$experts), 
-            at = (1-cumsum(c(x$weights[T,])))  + x$weights[T,]/2, las = 2, col = col, cex= 0.5, line = 0.3)
+      mtext(side = 4, text = names(x$experts)[i.order], 
+            at = (1-cumsum(c(x$weights[T,i.order])))  + x$weights[T,i.order]/2, las = 2, col = col[i.order], cex= 0.5, line = 0.3)
     }
     
     if (pause) { # break
@@ -80,11 +95,12 @@ plot.mixture <- function(x, pause = FALSE, losses = FALSE, col = NULL, ...) {
     }
     
     # Box plot
+    i.order <- w.order[1:min(K,20)]
     par(mar = c(l.names, 3, 1.6, 0.1))
-    boxplot(x$weights, main = "Weights associated with the experts", col = col, axes = FALSE)
+    boxplot(x$weights[,i.order], main = "Weights associated with the experts", col = col[i.order], axes = FALSE)
     mtext(side = 2, text = "Weights", line = 1.8, cex = 1)
-    axis(1, at = 1:(K + 1), labels = FALSE)
-    mtext(at = 1:K, text = names(x$weights), side = 1, las = 2, col = col, line = 0.8)
+    axis(1, at = 1:(min(K,20)), labels = FALSE)
+    mtext(at = 1:min(K,20), text = names(x$weights)[i.order], side = 1, las = 2, col = col[i.order], line = 0.8)
     axis(2)
     box()
     
@@ -157,3 +173,23 @@ plot.mixture <- function(x, pause = FALSE, losses = FALSE, col = NULL, ...) {
   }
   par(def.par)
 } 
+
+writeLegend <- function(f,g, tau, name) {
+  Tab = matrix(0,ncol = 2, nrow = 100)
+  for (i in 1:100) {
+    x = 0.01 * i
+    sel = which(g < x & f > x + tau)
+    temp <- cumsum(c(1, diff(sel) - 1))
+    temp2 <- rle(temp)
+    Tab[i,1] <- max(temp2$lengths)
+    Tab[i,2] <- sel[which(temp == with(temp2, values[which.max(lengths)]))][1]
+  }
+  id = which.max(Tab[,1])
+  x <- id * 0.01
+  l <- Tab[id,1]
+  v <- Tab[id,2]
+  if (l > length(f)/20){
+    j = floor(60 *l/length(f))
+    text(v+l/2,x+tau/2,substr(name,1,j),cex = 0.8,)
+  }
+}
