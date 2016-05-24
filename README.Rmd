@@ -63,6 +63,17 @@ These algorithms come with finite time worst-case guarantees. The monograph of [
 The package `opera` provides three important functions: `mixture` to build the algorithm object, `predict` to make a prediction by using the algorithm, and `oracle` to evaluate the performance of the experts and compare the performance of the combining algorithm.
 
 
+## Installation
+To install the package, you need to install first the R-packages `devtools` and `roxygen2`.
+Then, you can enter the following commands in R
+```{r,eval=FALSE}
+library(devtools)
+library(roxygen2)
+install_github("dralliag/opera")
+```
+You may be asked to install additional necessary packages for the compilation. You can install package vignette with option: build_vignettes = TRUE.
+
+
 ## Example: predict the weekly electricity consumption.
 
 Here, we provide a concrete example on how to use the package.

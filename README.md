@@ -14,6 +14,19 @@ Consider a sequence of real bounded observations \(y_1,\dots,y_n\) to be predict
 
 The package `opera` provides three important functions: `mixture` to build the algorithm object, `predict` to make a prediction by using the algorithm, and `oracle` to evaluate the performance of the experts and compare the performance of the combining algorithm.
 
+Installation
+------------
+
+To install the package, you need to install first the R-packages `devtools` and `roxygen2`. Then, you can enter the following commands in R
+
+``` r
+library(devtools)
+library(roxygen2)
+install_github("dralliag/opera")
+```
+
+You may be asked to install additional necessary packages for the compilation. You can install package vignette with option: build\_vignettes = TRUE.
+
 Example: predict the weekly electricity consumption.
 ----------------------------------------------------
 
@@ -37,19 +50,19 @@ attach(electric_load)
 plot(Load, type = "l", main = "The electric Load")
 ```
 
-![](inst/img/unnamed-chunk-4-1.png)<!-- -->
+![](inst/img/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 plot(Temp, Load, pch = 16, cex = 0.5, main = "Temperature vs Load")
 ```
 
-![](inst/img/unnamed-chunk-4-2.png)<!-- -->
+![](inst/img/unnamed-chunk-5-2.png)<!-- -->
 
 ``` r
 plot(NumWeek, Load, pch = 16, cex = 0.5, main = "Annual seasonality")
 ```
 
-![](inst/img/unnamed-chunk-4-3.png)<!-- -->
+![](inst/img/unnamed-chunk-5-3.png)<!-- -->
 
 ### First: build the expert forecasts
 
@@ -97,7 +110,7 @@ X <- cbind(gam.forecast, ar.forecast, gbm.forecast)
 matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load", xlab = "Week", main = "Expert forecasts and observations")
 ```
 
-![](inst/img/unnamed-chunk-7-1.png)<!-- -->
+![](inst/img/unnamed-chunk-8-1.png)<!-- -->
 
 ### How good are the expert? Look at the oracles
 
@@ -108,7 +121,7 @@ oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "conve
 plot(oracle.convex)
 ```
 
-![](inst/img/unnamed-chunk-9-1.png)<!-- -->
+![](inst/img/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 print(oracle.convex)
@@ -167,19 +180,19 @@ summary(MLpol)
 plot(MLpol, pause = TRUE)
 ```
 
-![](inst/img/unnamed-chunk-12-1.png)<!-- -->
+![](inst/img/unnamed-chunk-13-1.png)<!-- -->
 
     #> Hit <Return> to see next plot:
 
-![](inst/img/unnamed-chunk-12-2.png)<!-- -->
+![](inst/img/unnamed-chunk-13-2.png)<!-- -->
 
     #> Hit <Return> to see next plot:
 
-![](inst/img/unnamed-chunk-12-3.png)<!-- -->
+![](inst/img/unnamed-chunk-13-3.png)<!-- -->
 
     #> Hit <Return> to see next plot:
 
-![](inst/img/unnamed-chunk-12-4.png)<!-- -->
+![](inst/img/unnamed-chunk-13-4.png)<!-- -->
 
 The same results can be obtained more directly: \* by giving the whole time series to `predict` specifying `online = TRUE` to perform online prediction.
 
