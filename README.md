@@ -194,7 +194,9 @@ plot(MLpol, pause = TRUE)
 
 ![](inst/img/unnamed-chunk-13-4.png)<!-- -->
 
-The same results can be obtained more directly: \* by giving the whole time series to `predict` specifying `online = TRUE` to perform online prediction.
+The same results can be obtained more directly: 
+
+-   by giving the whole time series to `predict` specifying `online = TRUE` to perform online prediction.
 
 ``` r
 MLpol <- predict(MLpol0, newexpert = X, newY = Y, online = TRUE)
