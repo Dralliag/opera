@@ -3,9 +3,7 @@
 .RData
 *.DS_Store
 opera.Rproj
-*.Rd
 .Rapp.history
-NAMESPACE
 inst/doc
 *.html
 examples/
