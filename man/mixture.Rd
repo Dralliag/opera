@@ -11,7 +11,7 @@ mixture(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square",
   loss.gradient = TRUE, coefficients = "Uniform", awake = NULL,
   parameters = list())
 
-\method{plot}{mixture}(x, pause = FALSE, losses = FALSE, col = NULL, ...)
+\method{plot}{mixture}(x, pause = FALSE, col = NULL, ...)
 
 \method{print}{mixture}(x, ...)
 

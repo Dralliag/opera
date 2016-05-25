@@ -3,3 +3,4 @@
 ^.*\.txt$
 man-roxygen
 .gitignore
+README.Rmd

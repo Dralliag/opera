@@ -180,21 +180,9 @@ summary(MLpol)
 plot(MLpol, pause = TRUE)
 ```
 
-![](inst/img/unnamed-chunk-13-1.png)<!-- -->
+![](inst/img/unnamed-chunk-13-1.png)<!-- -->![](inst/img/unnamed-chunk-13-2.png)<!-- -->![](inst/img/unnamed-chunk-13-3.png)<!-- -->![](inst/img/unnamed-chunk-13-4.png)<!-- -->![](inst/img/unnamed-chunk-13-5.png)<!-- -->![](inst/img/unnamed-chunk-13-6.png)<!-- -->
 
-    #> Hit <Return> to see next plot:
-
-![](inst/img/unnamed-chunk-13-2.png)<!-- -->
-
-    #> Hit <Return> to see next plot:
-
-![](inst/img/unnamed-chunk-13-3.png)<!-- -->
-
-    #> Hit <Return> to see next plot:
-
-![](inst/img/unnamed-chunk-13-4.png)<!-- -->
-
-The same results can be obtained more directly: 
+The same results can be obtained more directly:
 
 -   by giving the whole time series to `predict` specifying `online = TRUE` to perform online prediction.
 
