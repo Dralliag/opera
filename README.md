@@ -177,7 +177,7 @@ summary(MLpol)
 #>         rmse   mape
 #> MLpol   1460 0.0189
 #> Uniform 1520 0.0197
-plot(MLpol, pause = TRUE)
+plot(MLpol, pause = TRUE, col = brewer.pal(3,name = "Set1"))
 ```
 
 ![](inst/img/unnamed-chunk-13-1.png)<!-- -->![](inst/img/unnamed-chunk-13-2.png)<!-- -->![](inst/img/unnamed-chunk-13-3.png)<!-- -->![](inst/img/unnamed-chunk-13-4.png)<!-- -->![](inst/img/unnamed-chunk-13-5.png)<!-- -->![](inst/img/unnamed-chunk-13-6.png)<!-- -->
