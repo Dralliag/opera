@@ -1,7 +1,7 @@
 opera
 =====
 
-`opera` is a R package that provides several algorithm to perform robust online prediction of time series with the help of expert advice. In this vignette, we provide an example of how to use the package.
+`opera` is a R package that provides several algorithms to perform robust online prediction of time series with the help of expert advice. In this vignette, we provide an example of how to use the package.
 
 Setting: when is the package `opera` useful?
 --------------------------------------------
