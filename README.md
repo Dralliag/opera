@@ -6,7 +6,7 @@ opera
 Setting: when is the package `opera` useful?
 --------------------------------------------
 
-Consider a sequence of real bounded observations ![](http://mathurl.com/hnop4u8.png) to be predicted step by step. Suppose that you have at your disposal a finite set of methods ![](http://mathurl.com/jartbdm.png) (henceforth referred to as experts) that provide you before each time step ![](http://mathurl.com/zd8abat.png) predictions ![](http://mathurl.com/j8qs936.png) of the next observation ![](http://mathurl.com/p6z655g.png). You can form your prediction ![](http://mathurl.com/gn56aep.png) using only knowledge of the past observations ![](http://mathurl.com/z34bdlt.png) and past and current expert advice ![](http://mathurl.com/zhrp7kh.png) for ![](http://mathurl.com/jmmmd6r.png). The package `opera` implements several algorithms of the online learning literature that form predictions ![](http://mathurl.com/gn56aep.png) by combining the expert advice according to there past performance. That is, 
+Consider a sequence of real bounded observations ![](http://mathurl.com/hnop4u8.png) to be predicted step by step. Suppose that you have at your disposal a finite set of methods ![](http://mathurl.com/jartbdm.png) (henceforth referred to as experts) that provides you before each time step ![](http://mathurl.com/zd8abat.png) predictions ![](http://mathurl.com/j8qs936.png) of the next observation ![](http://mathurl.com/p6z655g.png). You can form your prediction ![](http://mathurl.com/gn56aep.png) using only knowledge of the past observations ![](http://mathurl.com/z34bdlt.png) and past and current expert advice ![](http://mathurl.com/zhrp7kh.png) for ![](http://mathurl.com/jmmmd6r.png). The package `opera` implements several algorithms of the online learning literature that form predictions ![](http://mathurl.com/gn56aep.png) by combining the expert advices according to their past performance. That is, 
 
 <p align="center">
   <img src="http://mathurl.com/zzn3ove.png">
@@ -115,12 +115,13 @@ gbm.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek,
 gbm.forecast <- predict(gbm.fit, newdata = data_test)
 ```
 
-Once the expert forecasts have been created (note that they can also be formed online), we build the matrix of expert and the time series to be predicted online
+Once the expert forecasts have been created (note that they can also be formed online), we build the matrix of expert and the time series to be predicted online:
 
 ``` r
 Y <- data_test$Load
 X <- cbind(gam.forecast, ar.forecast, gbm.forecast)
-matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load", xlab = "Week", main = "Expert forecasts and observations")
+matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load",
+xlab = "Week", main = "Expert forecasts and observations")
 ```
 <p align="center">
   <img src="inst/img/unnamed-chunk-8-1.png">
