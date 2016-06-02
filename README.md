@@ -121,7 +121,7 @@ Once the expert forecasts have been created (note that they can also be formed o
 Y <- data_test$Load
 X <- cbind(gam.forecast, ar.forecast, gbm.forecast)
 matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load",
-xlab = "Week", main = "Expert forecasts and observations")
+        xlab = "Week", main = "Expert forecasts and observations")
 ```
 <p align="center">
   <img src="inst/img/unnamed-chunk-8-1.png">
