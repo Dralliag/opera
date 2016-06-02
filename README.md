@@ -64,13 +64,18 @@ plot(Load, type = "l", main = "The electric Load")
 plot(Temp, Load, pch = 16, cex = 0.5, main = "Temperature vs Load")
 ```
 
-![](inst/img/unnamed-chunk-5-2.png)<!-- -->
+<p align="center">
+  <img src="inst/img/unnamed-chunk-5-2.png">
+</p>
+
 
 ``` r
 plot(NumWeek, Load, pch = 16, cex = 0.5, main = "Annual seasonality")
 ```
+<p align="center">
+  <img src="inst/img/unnamed-chunk-5-3.png">
+</p>
 
-![](inst/img/unnamed-chunk-5-3.png)<!-- -->
 
 ### First: build the expert forecasts
 
@@ -117,8 +122,10 @@ Y <- data_test$Load
 X <- cbind(gam.forecast, ar.forecast, gbm.forecast)
 matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load", xlab = "Week", main = "Expert forecasts and observations")
 ```
+<p align="center">
+  <img src="inst/img/unnamed-chunk-8-1.png">
+</p>
 
-![](inst/img/unnamed-chunk-8-1.png)<!-- -->
 
 ### How good are the expert? Look at the oracles
 
@@ -128,8 +135,9 @@ To evaluate the performance of the experts and see if the aggregation rules may 
 oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "convex")
 plot(oracle.convex)
 ```
-
-![](inst/img/unnamed-chunk-10-1.png)<!-- -->
+<p align="center">
+  <img src="inst/img/unnamed-chunk-10-1.png">
+</p>
 
 ``` r
 print(oracle.convex)
@@ -188,7 +196,26 @@ summary(MLpol)
 plot(MLpol, pause = TRUE, col = brewer.pal(3,name = "Set1"))
 ```
 
-![](inst/img/unnamed-chunk-13-1.png)<!-- -->![](inst/img/unnamed-chunk-13-2.png)<!-- -->![](inst/img/unnamed-chunk-13-3.png)<!-- -->![](inst/img/unnamed-chunk-13-4.png)<!-- -->![](inst/img/unnamed-chunk-13-5.png)<!-- -->![](inst/img/unnamed-chunk-13-6.png)<!-- -->
+
+<p align="center">
+  <img src="inst/img/unnamed-chunk-13-1.png">
+</p>
+<p align="center">
+  <img src="inst/img/unnamed-chunk-13-2.png">
+</p>
+<p align="center">
+  <img src="inst/img/unnamed-chunk-13-3.png">
+</p>
+<p align="center">
+  <img src="inst/img/unnamed-chunk-13-4.png">
+</p>
+<p align="center">
+  <img src="inst/img/unnamed-chunk-13-5.png">
+</p>
+<p align="center">
+  <img src="inst/img/unnamed-chunk-13-6.png">
+</p>
+
 
 The same results can be obtained more directly:
 
