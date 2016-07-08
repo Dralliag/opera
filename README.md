@@ -6,9 +6,14 @@ opera
 Setting: when is the package `opera` useful?
 --------------------------------------------
 
-Consider a sequence of real bounded observations \(y_1,\dots,y_n\) to be predicted step by step. Suppose that you have at your disposal a finite set of methods \(k =1,\dots,K\) (henceforth referred to as experts) that provide you before each time step \(t=1,\dots,n\) predictions \(x_{k,t}\) of the next observation \(y_t\). You can form your prediction \(\hat y_t\) using only knowledge of the past observations \(y_1,\dots,y_{t-1}\) and past and current expert advice \(x_{k,1},\dots,x{k,t}\) for \(k=1,\dots,K\). The package `opera` implements several algorithms of the online learning literature that form predictions \(\hat y_t\) by combining the expert advice according to there past performance. That is, \[
-    \hat y_t = \sum_{k=1}^K p_{k,t} x_{k,t} \,.
-\] These algorithms come with finite time worst-case guarantees. The monograph of [Cesa-Bianchi and Lugisi (2006)](http://www.ii.uni.wroc.pl/~lukstafi/pmwiki/uploads/AGT/Prediction_Learning_and_Games.pdf) gives a complete introduction to the setting of prediction of arbitrary sequences with the help of expert advice.
+Consider a sequence of real bounded observations ![](http://mathurl.com/hnop4u8.png) to be predicted step by step. Suppose that you have at your disposal a finite set of methods ![](http://mathurl.com/jartbdm.png) (henceforth referred to as experts) that provides you before each time step ![](http://mathurl.com/zd8abat.png) predictions ![](http://mathurl.com/j8qs936.png) of the next observation ![](http://mathurl.com/p6z655g.png). You can form your prediction ![](http://mathurl.com/gn56aep.png) using only knowledge of the past observations ![](http://mathurl.com/z34bdlt.png) and past and current expert advice ![](http://mathurl.com/zhrp7kh.png) for ![](http://mathurl.com/jmmmd6r.png). The package `opera` implements several algorithms of the online learning literature that form predictions ![](http://mathurl.com/gn56aep.png) by combining the expert advices according to their past performance. That is, 
+
+<p align="center">
+  <img src="http://mathurl.com/zzn3ove.png">
+</p>
+
+
+These algorithms come with finite time worst-case guarantees. The monograph of [Cesa-Bianchi and Lugisi (2006)](http://www.ii.uni.wroc.pl/~lukstafi/pmwiki/uploads/AGT/Prediction_Learning_and_Games.pdf) gives a complete introduction to the setting of prediction of arbitrary sequences with the help of expert advice.
 
 ### What are the more important functions?
 
@@ -50,19 +55,27 @@ attach(electric_load)
 plot(Load, type = "l", main = "The electric Load")
 ```
 
-![](inst/img/unnamed-chunk-5-1.png)<!-- -->
+<p align="center">
+  <img src="inst/img/unnamed-chunk-5-1.png">
+</p>
+
 
 ``` r
 plot(Temp, Load, pch = 16, cex = 0.5, main = "Temperature vs Load")
 ```
 
-![](inst/img/unnamed-chunk-5-2.png)<!-- -->
+<p align="center">
+  <img src="inst/img/unnamed-chunk-5-2.png">
+</p>
+
 
 ``` r
 plot(NumWeek, Load, pch = 16, cex = 0.5, main = "Annual seasonality")
 ```
+<p align="center">
+  <img src="inst/img/unnamed-chunk-5-3.png">
+</p>
 
-![](inst/img/unnamed-chunk-5-3.png)<!-- -->
 
 ### First: build the expert forecasts
 
@@ -102,15 +115,18 @@ gbm.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek,
 gbm.forecast <- predict(gbm.fit, newdata = data_test)
 ```
 
-Once the expert forecasts have been created (note that they can also be formed online), we build the matrix of expert and the time series to be predicted online
+Once the expert forecasts have been created (note that they can also be formed online), we build the matrix of expert and the time series to be predicted online:
 
 ``` r
 Y <- data_test$Load
 X <- cbind(gam.forecast, ar.forecast, gbm.forecast)
-matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load", xlab = "Week", main = "Expert forecasts and observations")
+matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load",
+        xlab = "Week", main = "Expert forecasts and observations")
 ```
+<p align="center">
+  <img src="inst/img/unnamed-chunk-8-1.png">
+</p>
 
-![](inst/img/unnamed-chunk-8-1.png)<!-- -->
 
 ### How good are the expert? Look at the oracles
 
@@ -120,8 +136,9 @@ To evaluate the performance of the experts and see if the aggregation rules may 
 oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "convex")
 plot(oracle.convex)
 ```
-
-![](inst/img/unnamed-chunk-10-1.png)<!-- -->
+<p align="center">
+  <img src="inst/img/unnamed-chunk-10-1.png">
+</p>
 
 ``` r
 print(oracle.convex)
@@ -180,7 +197,26 @@ summary(MLpol)
 plot(MLpol, pause = TRUE, col = brewer.pal(3,name = "Set1"))
 ```
 
-![](inst/img/unnamed-chunk-13-1.png)<!-- -->![](inst/img/unnamed-chunk-13-2.png)<!-- -->![](inst/img/unnamed-chunk-13-3.png)<!-- -->![](inst/img/unnamed-chunk-13-4.png)<!-- -->![](inst/img/unnamed-chunk-13-5.png)<!-- -->![](inst/img/unnamed-chunk-13-6.png)<!-- -->
+
+<p align="center">
+  <img src="inst/img/unnamed-chunk-13-1.png">
+</p>
+<p align="center">
+  <img src="inst/img/unnamed-chunk-13-2.png">
+</p>
+<p align="center">
+  <img src="inst/img/unnamed-chunk-13-3.png">
+</p>
+<p align="center">
+  <img src="inst/img/unnamed-chunk-13-4.png">
+</p>
+<p align="center">
+  <img src="inst/img/unnamed-chunk-13-5.png">
+</p>
+<p align="center">
+  <img src="inst/img/unnamed-chunk-13-6.png">
+</p>
+
 
 The same results can be obtained more directly:
 
