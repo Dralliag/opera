@@ -212,7 +212,17 @@ cumulativePlot<-function(W,X,Y,col.pal=NULL, smooth = FALSE, plot.Y = FALSE, alp
   Agg<-apply(mat,1,sum)
   colnames(mat)<-colnames(X)[o]
   
-  Y.lim = range(Agg,Y,mat)
+  if (!smooth)Y.lim = range(Agg,Y,mat)
+  if (smooth) 
+  {
+    y.lo<-lowess(x = time,y = Y,f = alpha)$y
+    Agg.lo<-lowess(x = time,y = Agg,f = alpha)$y
+    
+    mat.lo<-apply(mat,2,function(z){lowess(x = time,y = z,f = alpha)$y})
+    Y.lim = range(Agg.lo,mat.lo)
+  }
+  
+  
   plot(x = NULL,y = NULL,col=col.pal[1], type='l', xaxt='n',ylim=Y.lim,lty='dotted',
        yaxt='n',xlab="",ylab="",lwd=3,xlim = range(time),
        main = paste("Impact of each expert on prediction"))
