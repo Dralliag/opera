@@ -1,4 +1,5 @@
 # best convex oracle
+#' @importFrom stats runif optim 
 bestConvex <- function(y, experts, awake = NULL, loss.type = list(name = "square"), 
   niter = 1, ...) {
   experts <- matrix(as.numeric(as.matrix(experts)), nrow = length(y))

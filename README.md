@@ -50,19 +50,19 @@ attach(electric_load)
 plot(Load, type = "l", main = "The electric Load")
 ```
 
-![](inst/img/unnamed-chunk-5-1.png)<!-- -->
+![](inst/img/unnamed-chunk-5-1.png)
 
 ``` r
 plot(Temp, Load, pch = 16, cex = 0.5, main = "Temperature vs Load")
 ```
 
-![](inst/img/unnamed-chunk-5-2.png)<!-- -->
+![](inst/img/unnamed-chunk-5-2.png)
 
 ``` r
 plot(NumWeek, Load, pch = 16, cex = 0.5, main = "Annual seasonality")
 ```
 
-![](inst/img/unnamed-chunk-5-3.png)<!-- -->
+![](inst/img/unnamed-chunk-5-3.png)
 
 ### First: build the expert forecasts
 
@@ -110,7 +110,7 @@ X <- cbind(gam.forecast, ar.forecast, gbm.forecast)
 matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load", xlab = "Week", main = "Expert forecasts and observations")
 ```
 
-![](inst/img/unnamed-chunk-8-1.png)<!-- -->
+![](inst/img/unnamed-chunk-8-1.png)
 
 ### How good are the expert? Look at the oracles
 
@@ -121,7 +121,7 @@ oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "conve
 plot(oracle.convex)
 ```
 
-![](inst/img/unnamed-chunk-10-1.png)<!-- -->
+![](inst/img/unnamed-chunk-10-1.png)
 
 ``` r
 print(oracle.convex)
@@ -180,7 +180,7 @@ summary(MLpol)
 plot(MLpol, pause = TRUE, col = brewer.pal(3,name = "Set1"))
 ```
 
-![](inst/img/unnamed-chunk-13-1.png)<!-- -->![](inst/img/unnamed-chunk-13-2.png)<!-- -->![](inst/img/unnamed-chunk-13-3.png)<!-- -->![](inst/img/unnamed-chunk-13-4.png)<!-- -->![](inst/img/unnamed-chunk-13-5.png)<!-- -->![](inst/img/unnamed-chunk-13-6.png)<!-- -->
+![](inst/img/unnamed-chunk-13-1.png)![](inst/img/unnamed-chunk-13-2.png)![](inst/img/unnamed-chunk-13-3.png)![](inst/img/unnamed-chunk-13-4.png)![](inst/img/unnamed-chunk-13-5.png)![](inst/img/unnamed-chunk-13-6.png)
 
 The same results can be obtained more directly:
 

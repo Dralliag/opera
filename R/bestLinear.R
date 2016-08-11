@@ -1,4 +1,5 @@
 # best linear oracle
+#' @importFrom stats rnorm optim 
 bestLinear <- function(y, experts, lambda = 0, loss.type = list(name = "square"), 
   niter = 1, ...) {
   experts <- as.matrix(experts)

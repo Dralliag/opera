@@ -2,6 +2,9 @@
 #' @describeIn mixture \code{plot}. It has two optional arguments. 
 #' The argument pause = TRUE displays the plots separately.
 #' The argument losses = TRUE prints only the performance achieved by the aggregation procedures and the experts.
+#' @importFrom grDevices col2rgb rgb
+#' @importFrom graphics axis box boxplot layout legend lines matplot mtext par plot polygon text
+#' @importFrom stats lowess var
 #' @export 
 plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
   def.par <- par(no.readonly = TRUE) # save default, for resetting...
