@@ -1,7 +1,6 @@
 ---
 title: "README"
 author: Pierre Gaillard, Yannig Goude
-date: May 24, 2016
 output: 
   github_document:
     toc: true

@@ -1,7 +1,6 @@
 README
 ================
 Pierre Gaillard, Yannig Goude
-May 24, 2016
 
 -   [Setting: when is the package `opera` useful?](#setting-when-is-the-package-opera-useful)
 -   [Installation](#installation)
