@@ -12,9 +12,10 @@ Consider a sequence of real bounded observations ![](http://mathurl.com/hnop4u8.
   <img src="http://mathurl.com/zzn3ove.png">
 </p>
 
+
 These algorithms come with finite time worst-case guarantees. The monograph of [Cesa-Bianchi and Lugisi (2006)](http://www.ii.uni.wroc.pl/~lukstafi/pmwiki/uploads/AGT/Prediction_Learning_and_Games.pdf) gives a complete introduction to the setting of prediction of arbitrary sequences with the help of expert advice.
 
-### What are the most important functions?
+### What are the more important functions?
 
 The package `opera` provides three important functions: `mixture` to build the algorithm object, `predict` to make a prediction by using the algorithm, and `oracle` to evaluate the performance of the experts and compare the performance of the combining algorithm.
 
@@ -44,7 +45,7 @@ First, we load the data and we cut it into two subsets: a training set used to b
 data(electric_load)
 idx_data_test <- 620:nrow(electric_load)
 data_train <- electric_load[-idx_data_test, ] 
-data_test <- electric_load[idx_data_test, ]
+data_test <- electric_load[idx_data_test, ]  
 ```
 
 The data is displayed in the following figures.
@@ -53,9 +54,11 @@ The data is displayed in the following figures.
 attach(electric_load)
 plot(Load, type = "l", main = "The electric Load")
 ```
+
 <p align="center">
   <img src="inst/img/unnamed-chunk-5-1.png">
 </p>
+
 
 ``` r
 plot(Temp, Load, pch = 16, cex = 0.5, main = "Temperature vs Load")
@@ -65,12 +68,14 @@ plot(Temp, Load, pch = 16, cex = 0.5, main = "Temperature vs Load")
   <img src="inst/img/unnamed-chunk-5-2.png">
 </p>
 
+
 ``` r
 plot(NumWeek, Load, pch = 16, cex = 0.5, main = "Annual seasonality")
 ```
 <p align="center">
   <img src="inst/img/unnamed-chunk-5-3.png">
 </p>
+
 
 ### First: build the expert forecasts
 
@@ -118,10 +123,10 @@ X <- cbind(gam.forecast, ar.forecast, gbm.forecast)
 matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load",
         xlab = "Week", main = "Expert forecasts and observations")
 ```
-
 <p align="center">
   <img src="inst/img/unnamed-chunk-8-1.png">
 </p>
+
 
 ### How good are the expert? Look at the oracles
 
@@ -131,7 +136,6 @@ To evaluate the performance of the experts and see if the aggregation rules may 
 oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "convex")
 plot(oracle.convex)
 ```
-
 <p align="center">
   <img src="inst/img/unnamed-chunk-10-1.png">
 </p>
@@ -193,6 +197,7 @@ summary(MLpol)
 plot(MLpol, pause = TRUE, col = brewer.pal(3,name = "Set1"))
 ```
 
+
 <p align="center">
   <img src="inst/img/unnamed-chunk-13-1.png">
 </p>
@@ -211,6 +216,7 @@ plot(MLpol, pause = TRUE, col = brewer.pal(3,name = "Set1"))
 <p align="center">
   <img src="inst/img/unnamed-chunk-13-6.png">
 </p>
+
 
 The same results can be obtained more directly:
 
