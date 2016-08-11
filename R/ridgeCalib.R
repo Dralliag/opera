@@ -59,7 +59,7 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
     pred.lambda[t, ] <- experts[t, ] %*% wlambda
     cumulativeLoss <- cumulativeLoss + (pred.lambda[t, ] - y[t])^2
     
-    # Mise à jour
+    # Parameter update
     At <- At + experts[t, ] %*% t(experts[t, ])
     bt <- bt + y[t] * experts[t, ]
     
