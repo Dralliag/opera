@@ -47,6 +47,7 @@ First, we load the data and we cut it into two subsets: a training set used to b
 
 ``` r
 data(electric_load)
+attach(electric_load)
 idx_data_test <- 620:nrow(electric_load)
 data_train <- electric_load[-idx_data_test, ] 
 data_test <- electric_load[idx_data_test, ]  
@@ -55,24 +56,26 @@ data_test <- electric_load[idx_data_test, ]
 The data is displayed in the following figures.
 
 ``` r
-attach(electric_load)
 plot(Load, type = "l", main = "The electric Load")
 ```
 
-<img src="inst/img/data-1.png" style="display: block; margin: auto;" />
-
+<p align="center">
+<img src="inst/img/Load-1.png" style="display: block; margin: auto;" />
+</p>
 ``` r
 plot(Temp, Load, pch = 16, cex = 0.5, main = "Temperature vs Load")
 ```
 
-<img src="inst/img/data-2.png" style="display: block; margin: auto;" />
-
+<p align="center">
+<img src="inst/img/Temp-1.png" style="display: block; margin: auto;" />
+</p>
 ``` r
 plot(NumWeek, Load, pch = 16, cex = 0.5, main = "Annual seasonality")
 ```
 
-<img src="inst/img/data-3.png" style="display: block; margin: auto;" />
-
+<p align="center">
+<img src="inst/img/NumWeek-1.png" style="display: block; margin: auto;" />
+</p>
 ### First: build the expert forecasts
 
 Here, we build three base forecasting methods to be combined later.
@@ -120,8 +123,9 @@ matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load",
         xlab = "Week", main = "Expert forecasts and observations")
 ```
 
+<p align="center">
 <img src="inst/img/loadAndForecasts-1.png" style="display: block; margin: auto;" />
-
+</p>
 ### How good are the experts? Look at the oracles
 
 To evaluate the performance of the experts and see if the aggregation rules may perform well, you can look at the oracles (rules that are used only for analysis and cannot be design online).
@@ -131,8 +135,9 @@ oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "conve
 plot(oracle.convex)
 ```
 
+<p align="center">
 <img src="inst/img/oracle-1.png" style="display: block; margin: auto;" />
-
+</p>
 ``` r
 print(oracle.convex)
 #> Call:
@@ -187,11 +192,15 @@ summary(MLpol)
 #>         rmse   mape
 #> MLpol   1460 0.0189
 #> Uniform 1520 0.0197
+```
+
+``` r
 plot(MLpol, pause = TRUE, col = brewer.pal(3,name = "Set1"))
 ```
 
+<p align="center">
 <img src="inst/img/MLpol-1.png" style="display: block; margin: auto;" /><img src="inst/img/MLpol-2.png" style="display: block; margin: auto;" /><img src="inst/img/MLpol-3.png" style="display: block; margin: auto;" /><img src="inst/img/MLpol-4.png" style="display: block; margin: auto;" /><img src="inst/img/MLpol-5.png" style="display: block; margin: auto;" /><img src="inst/img/MLpol-6.png" style="display: block; margin: auto;" />
-
+</p>
 The same results can be obtained more directly:
 
 -   by giving the whole time series to `predict` specifying `online = TRUE` to perform online prediction.
