@@ -31,9 +31,6 @@ knitr::knit_hooks$set(imgcenter = function(before, options, envir){
     HTML("</p>")
   }
 })
-q_inc <- function(q_exp) {
-  return(p(pre(deparse(substitute(q_exp)), q_exp), align="center"))
-}
 ```
 
 `opera` is a R package that provides several algorithms to perform robust online prediction of time series with the help of expert advice. In this vignette, we provide an example of how to use the package. 
