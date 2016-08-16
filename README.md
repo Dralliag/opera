@@ -2,6 +2,8 @@ README
 ================
 Pierre Gaillard, Yannig Goude
 
+<img src="inst/img/opera-logo.jpg" align="right" width="200">
+
 -   [Setting: when is the package `opera` useful?](#setting-when-is-the-package-opera-useful)
 -   [Installation](#installation)
 -   [Example: predict the weekly electricity consumption.](#example-predict-the-weekly-electricity-consumption.)
