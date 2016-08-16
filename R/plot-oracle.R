@@ -16,11 +16,7 @@ plot.oracle <- function(x, sort = TRUE, col = NULL, ...) {
   
   T <- nrow(x$experts)
   K <- ncol(x$experts)
-  if (K <= 9) {
-    col.palette <- RColorBrewer::brewer.pal(n = K,name = "Set1")  
-  } else {
-    col.palette <- RColorBrewer::brewer.pal(n = K,name = "Paired")  
-  }
+  col.palette <-RColorBrewer::brewer.pal(n = 3,name = "Set1")
   if (is.null(col)) {
     col <- col.palette
   }

@@ -28,7 +28,7 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
   K <- length(x$experts)
   w.order <- order(apply(x$weights,2,mean),decreasing = TRUE)
   
-  if (is.null(col)) col <- rev(RColorBrewer::brewer.pal(n = min(K,11),name = "Spectral")  )
+  if (is.null(col)) col <- rev(RColorBrewer::brewer.pal(n = max(min(K,11),4),name = "Spectral"))
   my.colors <- col
   
   col <- numeric(K)
@@ -177,12 +177,12 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
   # cumulative plot of the series
   par(mar = c(2, 3, 2.5,l.names/2), mgp = c(1, 0.5, 0))
   if (x$d ==1) {
-    cumulativePlot(W = x$weights,X = x$experts, Y = x$Y,smooth = TRUE,alpha = 0.01,plot.Y = TRUE,col.pal = rev(my.colors))
+    cumulativePlot(W = x$weights,X = x$experts, Y = x$Y,smooth = TRUE,alpha = 0.01,plot.Y = TRUE, col.pal = col)
   } else {
     X <- apply(seriesToBlock(X = x$experts,d = x$d),c(1,3),mean)
     Y <- apply(seriesToBlock(x$Y,d = x$d),1,mean)
     colnames(X) <- x$names.experts
-    cumulativePlot(W = x$weights,X = X, Y = Y,smooth = TRUE,alpha = 0.01,plot.Y = TRUE,col.pal = rev(my.colors))    
+    cumulativePlot(W = x$weights,X = X, Y = Y,smooth = TRUE,alpha = 0.01,plot.Y = TRUE, col.pal = col)    
   }
   par(def.par)
 } 
