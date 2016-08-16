@@ -1,6 +1,8 @@
 #' Plot an aggregation procedure
-#' @describeIn mixture \code{plot}. It has one optional arguments. 
-#' The argument sort = TRUE sort the experts by performance before the plots.
+#' @describeIn oracle \code{plot}. It has one optional arguments. 
+#' @param x An object of class \code{oracle}. 
+#' @param sort if set to TRUE (default), it sorts the experts by performance before the plots.
+#' @param col colors
 #' @importFrom graphics axis box mtext par plot
 #' @export 
 plot.oracle <- function(x, sort = TRUE, col = NULL, ...) {

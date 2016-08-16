@@ -1,6 +1,8 @@
 #' Summary of an aggregation procedure
 #' 
 #' @describeIn mixture \code{summary} 
+#' @param object An object of class mixture
+#' @param ... Additional parameters
 #' @export 
 summary.mixture <- function(object, ...) {
   if (is.null(object$Y)) {

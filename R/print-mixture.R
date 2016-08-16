@@ -1,5 +1,6 @@
 #' Print an aggregation procedure
 #' @describeIn mixture \code{print}
+#' @param x An object of class mixture
 #' @export 
 print.mixture <- function(x, ...) {
   cat("Aggregation rule: ")

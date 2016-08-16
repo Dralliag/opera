@@ -1,11 +1,10 @@
 #' Plot an object of class mixture
 #' 
 #' provides different diagnostic plots for an aggregation procedure.
-#' 
+#' @param x an object of class mixture
 #' @param pause if set to TRUE (default) displays the plots separately, otherwise on a single page
-#' @param losses if set to TRUE (default) prints only the performance achieved by the aggregation procedures and the experts
 #' @param col the color to use to represent each experts, if set to NULL (default) use R\code{RColorBrewer::brewer.pal(...,"Spectral"}
-#' 
+#' @param ... additional plotting parameters
 #' 
 #' 
 #' @return plots representing: plot of weights of each expert in function of time, boxplots of these weights,
@@ -16,7 +15,9 @@
 #' @author Pierre Gaillard <pierre@@gaillard.me>
 #' @author Yannig  Goude <yannig.goude@edf.fr>
 #' @seealso See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.
-#' 
+#' @importFrom grDevices col2rgb rgb
+#' @importFrom graphics axis box boxplot layout legend lines matplot mtext par plot polygon text
+#' @importFrom stats lowess var
 #' @export 
 #' 
 #'
