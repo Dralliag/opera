@@ -1,11 +1,25 @@
-#' Plot an aggregation procedure
-#' @describeIn mixture \code{plot}. It has two optional arguments. 
-#' The argument pause = TRUE displays the plots separately.
-#' The argument losses = TRUE prints only the performance achieved by the aggregation procedures and the experts.
-#' @importFrom grDevices col2rgb rgb
-#' @importFrom graphics axis box boxplot layout legend lines matplot mtext par plot polygon text
-#' @importFrom stats lowess var
+#' Plot an object of class mixture
+#' 
+#' provides different diagnostic plots for an aggregation procedure.
+#' 
+#' @param pause if set to TRUE (default) displays the plots separately, otherwise on a single page
+#' @param losses if set to TRUE (default) prints only the performance achieved by the aggregation procedures and the experts
+#' @param col the color to use to represent each experts, if set to NULL (default) use R\code{RColorBrewer::brewer.pal(...,"Spectral"}
+#' 
+#' 
+#' 
+#' @return plots representing: plot of weights of each expert in function of time, boxplots of these weights,
+#' cumulative loss \eqn{L_T=\sum_{t=1}^T l_{i,t}} of each expert in function of time, cumulative residuals \eqn{\sum_{t=1}^T (y_t-f_{i,t})} of each 
+#' expert's forecast in function of time, average loss suffered by the experts and the contribution of each expert to the aggregation 
+#' \eqn{p_{i,t}f_{i,t}} in function of time.
+#' 
+#' @author Pierre Gaillard <pierre@@gaillard.me>
+#' @author Yannig  Goude <yannig.goude@edf.fr>
+#' @seealso See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.
+#' 
 #' @export 
+#' 
+#'
 plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
   def.par <- par(no.readonly = TRUE) # save default, for resetting...
   if (pause) par(ask=TRUE)
@@ -228,7 +242,7 @@ cumulativePlot<-function(W,X,Y,col.pal=NULL, smooth = FALSE, plot.Y = FALSE, alp
   
   plot(x = NULL,y = NULL,col=col.pal[1], type='l', xaxt='n',ylim=Y.lim,lty='dotted',
        yaxt='n',xlab="",ylab="",lwd=3,xlim = range(time),
-       main = paste("Impact of each expert on prediction"))
+       main = paste("Contribution of each expert to prediction"))
   y.summed <- Agg
   for(i in rev(c(1:ncol(mat))))
   {
