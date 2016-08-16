@@ -3,7 +3,7 @@
 #'
 #' Electricity forecasting data set provided by EDF R&D.
 #' It contains weekly measurements of the total electricity consumption in France from 1996 to 2009,
-#' together with several covariates, including temperature, industrial production indices.
+#' together with several covariates, including temperature, industrial production indices (source: INSEE) and calendar information.
 #'
 #' @docType data
 #'
