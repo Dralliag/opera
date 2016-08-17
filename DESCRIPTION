@@ -1,7 +1,7 @@
 Package: opera
 Type: Package
-Title: Online Prediction by ExpeRts Aggregation
-Version: 1.00
+Title: Online Prediction by Expert Aggregation
+Version: 1.0
 Date: 2016-08-11
 Author: Pierre Gaillard [cre, aut],
   Yannig Goude [aut]
@@ -23,7 +23,8 @@ Suggests:
     caret,
     mgcv,
     survival,
-    knitr
+    knitr,
+    gbm
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
