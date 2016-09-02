@@ -7,7 +7,8 @@ Author: Pierre Gaillard [cre, aut],
   Yannig Goude [aut]
 Maintainer: Pierre Gaillard <pierre@gaillard.me>
 Copyright: EDF R&D 2012-2015
-Description: Misc methods to form online predictions, for regression-oriented time-series, by combining a finite set of forecasts provided by the user.
+Description: Misc methods to form online predictions, for regression-oriented 
+    time-series, by combining a finite set of forecasts provided by the user.
 License: LGPL
 URL: http://pierre.gaillard.me/opera.html
 BugReports: https://github.com/dralliag/opera/issues
@@ -24,7 +25,8 @@ Suggests:
     mgcv,
     survival,
     knitr,
-    gbm
+    gbm,
+    htmltools
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1

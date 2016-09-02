@@ -6,7 +6,8 @@ opera.Rproj
 .Rapp.history
 inst/doc
 *.html
-examples/
+tests/examples/
 .Rd2pdf*
 R/nBOA.r
 opera.html
+vignettes/.build.timestamp

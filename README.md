@@ -28,15 +28,20 @@ The package `opera` provides three important functions: `mixture` to build the a
 Installation
 ------------
 
-To install the package, you need to install first the R-packages `devtools` and `roxygen2`. Then, you can enter the following commands in R
+opera is now available on CRAN, so you can install it with:
 
 ``` r
-library(devtools)
-library(roxygen2)
-install_github("dralliag/opera")
+install.packages("opera")
 ```
 
-You may be asked to install additional necessary packages for the compilation. You can install package vignette with option: build\_vignettes = TRUE.
+You can also install the development version of opera with the package devtools:
+
+``` r
+install.packages("devtools")
+devtools::install_github("dralliag/opera")
+```
+
+You may be asked to install additional necessary packages. You can install the package vignette by setting the option: build\_vignettes = TRUE.
 
 Example: predict the weekly electricity consumption.
 ----------------------------------------------------
@@ -87,7 +92,7 @@ Here, we build three base forecasting methods to be combined later.
 ``` r
 library(mgcv)
 gam.fit <- gam(Load ~ s(IPI) + s(Temp) + s(Time, k=3) + 
-                s(Load1) + as.factor(NumWeek), data = data_train)
+                 s(Load1) + as.factor(NumWeek), data = data_train)
 gam.forecast <- predict(gam.fit, newdata = data_test)
 ```
 
@@ -112,7 +117,7 @@ for (i in seq(idx_data_test)) {
 ``` r
 library(caret)
 gbm.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek, 
-                  data = data_train, method = "gbm")
+                 data = data_train, method = "gbm")
 gbm.forecast <- predict(gbm.fit, newdata = data_test)
 ```
 

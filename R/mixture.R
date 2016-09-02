@@ -25,7 +25,7 @@
 #'    \item{'EWA'}{Exponentially weighted average aggregation rule. A positive learning rate \strong{eta} 
 #' can be chosen by the user. The
 #' bigger it is the faster the aggregation rule will learn from observations
-#' and experts performances. However, too hight values lead to unstable weight
+#' and experts performances. However, too high values lead to unstable weight
 #' vectors and thus unstable predictions. If it is not specified, the learning rate is calibrated online. 
 #' A finite grid of potential learning rates to be optimized online can be specified with \strong{grid.eta}.}
 #'    \item{'FS'}{Fixed-share aggregation rule. As for \code{ewa}, a learning rate \strong{eta} 
