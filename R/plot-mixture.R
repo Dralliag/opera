@@ -38,10 +38,6 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
     col[w.order] <- c(my.colors, rep(my.colors[length(my.colors)],K-length(my.colors)))
   }
   
-  if (is.null(names(x$experts))) {
-    names(x$experts) <- colnames(x$experts)
-  }
-  
   if (!pause) {
     layout(matrix(c(1,2,3,4,5,6),nrow = 3,ncol =  2, byrow = TRUE))  
   }
@@ -53,13 +49,13 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
   T <- x$T
   d <- x$d
   
-  if (is.null(names(x$experts))) {
-    names(x$experts) <- colnames(x$experts)
+  if (!is.null(x$names.experts)) {
+    names(x$weights) <- names(x$experts) <- x$names.experts
+  } else {
+    if (is.null(names(x$experts))) {
+      names(x$weights) <- names(x$experts) <- x$names.experts <- paste("X", 1:K,sep="")
+    }
   }
-  if (is.null(names(x$experts))) {
-    names(x$experts) <- paste("X", 1:K,sep="")
-  }
-  names(x$weights) <- names(x$experts)
   l.names <- max(nchar(names(x$experts))) / 3 + 1.7
   
   if (x$model == "Ridge") {

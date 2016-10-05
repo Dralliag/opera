@@ -6,8 +6,12 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
   # Number of instant and number of experts
   if (!is.null(newY)) {
     T <- length(newY)
-    if (is.null(object$names.experts) && T == 1) {
-      object$names.experts <- names(newexperts)
+    if (is.null(object$names.experts)) {
+      if (T == 1) {
+        object$names.experts <- names(newexperts)
+      } else {
+        object$names.experts <- colnames(newexperts)
+      }
     }
     newexperts <- matrix(newexperts, nrow = T)
     N <- ncol(newexperts)

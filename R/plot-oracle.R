@@ -21,9 +21,12 @@ plot.oracle <- function(x, sort = TRUE, col = NULL, ...) {
     col <- col.palette
   }
   
-  
-  if (is.null(names(x$experts))) {
-    names(x$experts) <- colnames(x$experts)
+  if (!is.null(x$names.experts)) {
+     names(x$experts) <- x$names.experts
+  } else {
+    if (is.null(names(x$experts))) {
+      names(x$experts) <- x$names.experts <- paste("X", 1:K,sep="")
+    }
   }
   
   if (x$model == "expert") {

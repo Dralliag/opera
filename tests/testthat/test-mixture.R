@@ -6,6 +6,7 @@ context("Testing mixture function")
 set.seed(3)
 n <- 50
 X <- cbind(rep(0, n), rep(1, n))
+colnames(X) <- c("Exp1","Exp2")
 Y <- rep(0.4, n)
 X[n, ] <- c(1, 1)
 Y[n] <- 1
@@ -277,7 +278,7 @@ test_that("Regrets and Losses are coherent", {
     l1 <- m$loss*n - m$training$R
     l2 <- o$loss.experts*n
     l3 = apply(loss(X,Y,loss.type=l),2,sum)
-    expect_equal(l1,l2)
+    expect_equal(as.numeric(l1),as.numeric(l2))
     expect_equal(l2,l3)
   }
 })
