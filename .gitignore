@@ -11,3 +11,4 @@ tests/examples/
 R/nBOA.r
 opera.html
 vignettes/.build.timestamp
+tests/examples
