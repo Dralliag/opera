@@ -5,3 +5,4 @@ man-roxygen
 .gitignore
 README.Rmd
 opera.html
+tests/examples
