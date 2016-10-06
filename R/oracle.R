@@ -45,7 +45,9 @@
 #' prediction. If the expert number \code{k} at instance \code{t} does not
 #' form any prediction of observation \code{Y_t}, we can put
 #' \code{awake[t,k]=0} so that the mixture does not consider expert \code{k} in
-#' the mixture to predict \code{Y_t}.
+#' the mixture to predict \code{Y_t}. Remark that to compute the best expert oracle, 
+#' the performance of unactive (or partially active) experts is computed by using 
+#' the prediction of the uniform average of active experts.
 #' 
 #' @param ... Additional parameters
 #' that are passed to \code{\link{optim}} function is order to perform convex optimization 
@@ -131,9 +133,13 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
     niter <- 3
   
   if ((!is.null(awake) || sum(is.na(experts) > 0)) && model != "convex" && model != 
-    "shifting") {
+    "shifting" && model != "expert") {
     stop(paste("Sleeping or missing values not allowed for best", model, "oracle."))
+    if (model == "expert") {
+      warning("When experts are unactive (or sleeping), their prediction are replaced with the uniform average of active experts")
+    }
   }
+  
   
   if (!(model %in% c("convex", "linear", "shifting", "expert"))) {
     stop("Wrong model specification")
@@ -159,7 +165,15 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
     res <- bestShifts(Y, experts, awake = awake, loss.type = loss.type)
   }
   
-  loss.experts <- apply(apply(experts, 2, function(x) {
+  if (!is.null(awake)) {
+    pond <- apply(awake,1,mean)
+    pred.unif <- apply(experts * awake, 1,mean) /pond
+    experts.pred <- experts * awake + pred.unif * (1-awake)
+  } else {
+    experts.pred <- experts
+  }
+  
+  loss.experts <- apply(apply(experts.pred, 2, function(x) {
     loss(x, Y, loss.type = loss.type)
   }), 2, mean)
   
@@ -167,7 +181,7 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
     best.loss <- min(loss.experts)
     coefficients <- (loss.experts == best.loss)/sum(loss.experts == best.loss)
     best.expert <- which(coefficients > 0)[1]
-    res <- list(loss = best.loss, coefficients = coefficients, prediction = experts[, 
+    res <- list(loss = best.loss, coefficients = coefficients, prediction = experts.pred[, 
       best.expert], loss.experts = loss.experts)
   }
   

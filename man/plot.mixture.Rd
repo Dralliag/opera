@@ -7,7 +7,8 @@
 \method{plot}{mixture}(x, pause = FALSE, col = NULL, ...)
 }
 \arguments{
-\item{x}{an object of class mixture}
+\item{x}{an object of class mixture. If awake is provided (i.e., some experts are unactive), 
+their residuals and cumulative losses are computed by using the predictions of the mixture.}
 
 \item{pause}{if set to TRUE (default) displays the plots separately, otherwise on a single page}
 

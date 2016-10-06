@@ -46,8 +46,8 @@ summary.oracle <- function(object, ...) {
   
   if (object$model == "linear" || object$model == "convex") {
     
-    x <- summary(oracle(object$Y, object$experts, model = "expert", loss.type = object$loss.type), 
-                 awake = object$awake)
+    x <- summary(oracle(object$Y, object$experts, model = "expert", loss.type = object$loss.type, 
+                 awake = object$awake))
     
     rmse.algo <- sqrt(mean(loss(object$prediction, object$Y)))
     mape.algo <- mean(loss(object$prediction, object$Y, loss.type = "percentage"))

@@ -44,7 +44,9 @@ Possible if some experts are specialists and do not always form and suggest
 prediction. If the expert number \code{k} at instance \code{t} does not
 form any prediction of observation \code{Y_t}, we can put
 \code{awake[t,k]=0} so that the mixture does not consider expert \code{k} in
-the mixture to predict \code{Y_t}.}
+the mixture to predict \code{Y_t}. Remark that to compute the best expert oracle, 
+the performance of unactive (or partially active) experts is computed by using 
+the prediction of the uniform average of active experts.}
 
 \item{lambda}{A positive number used by the 'linear' oracle only. 
 A possible $L_2$ regularization parameter for computing the linear oracle 
