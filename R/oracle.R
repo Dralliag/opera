@@ -133,9 +133,11 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
     niter <- 3
   
   if ((!is.null(awake) || sum(is.na(experts) > 0)) && model != "convex" && model != 
-    "shifting" && model != "expert") {
-    stop(paste("Sleeping or missing values not allowed for best", model, "oracle."))
-    if (model == "expert") {
+    "shifting") {
+    if (model != "expert") {
+      stop(paste("Sleeping or missing values not allowed for best", model, "oracle."))
+    }
+    else {
       warning("When experts are unactive (or sleeping), their prediction are replaced with the uniform average of active experts")
     }
   }

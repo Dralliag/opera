@@ -104,9 +104,9 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
   
   # Box plot
   if (!is.null(x$awake)) {
-    pond <- apply(x$awake,1,sum)
-    normalized.weights <- x$weights * pond / (K*x$awake)
-    normalized.weights[x$awake == pond] <- NaN
+    pond <- apply(x$awake[d*(1:T),],1,sum)
+    normalized.weights <- x$weights * pond / (K*x$awake[d*(1:T),])
+    normalized.weights[x$awake[d*(1:T),] == pond] <- NaN
   } else {
     normalized.weights <- x$weights 
   }
