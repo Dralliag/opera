@@ -47,7 +47,7 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
     lexp <- lossPred(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
     
     # Instantaneous regret
-    r <-  awake[t, ] * (lpred - lexp)
+    r <-  awake[t, ] * c(c(lpred) - lexp)
     
     # Update the learning rates
     B <- pmax(B, abs(r))

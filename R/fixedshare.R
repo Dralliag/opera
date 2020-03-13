@@ -38,7 +38,7 @@ fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square
     lexp <- lossPred(experts[t, ], y[t], pred[t], loss.type, loss.gradient)
     
     # Regret and weight update
-    R <- R + awake[t, ] * (lpred - lexp)
+    R <- R + awake[t, ] * (c(c(lpred) - lexp))
     v <- truncate1(exp(eta * R))/sum(truncate1(exp(eta * R)))
     R <- log(alpha/N + (1 - alpha) * v)/eta
   }

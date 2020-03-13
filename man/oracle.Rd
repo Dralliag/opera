@@ -5,8 +5,16 @@
 \alias{plot.oracle}
 \title{Compute oracle predictions}
 \usage{
-oracle(Y, experts, model = "convex", loss.type = "square", awake = NULL,
-  lambda = NULL, niter = NULL, ...)
+oracle(
+  Y,
+  experts,
+  model = "convex",
+  loss.type = "square",
+  awake = NULL,
+  lambda = NULL,
+  niter = NULL,
+  ...
+)
 
 \method{plot}{oracle}(x, sort = TRUE, col = NULL, ...)
 }
@@ -90,14 +98,12 @@ data set \code{Y} and the expert advice to be well defined.
 Examples of oracles are the best fixed expert, the best fixed convex
 combination rule, the best linear combination rule, or the best expert
 that can shift a few times.
-
-Plot an aggregation procedure
 }
 \section{Methods (by class)}{
 \itemize{
 \item \code{oracle}: \code{plot}. It has one optional arguments.
 }}
+
 \author{
 Pierre Gaillard <pierre@gaillard.me>
 }
-

@@ -5,7 +5,7 @@ library("htmltools")
 knitr::opts_chunk$set(
   comment = "#>",
   collapse = TRUE,
-  warning = FALSE,
+  warning = TRUE,
   message = FALSE,
   fig.width = 4.5,
   fig.height = 3,
@@ -30,7 +30,6 @@ knitr::knit_hooks$set(imgcenter = function(before, options, envir){
 
 ## ---- echo=FALSE---------------------------------------------------------
 library(opera)
-library(RColorBrewer)
 set.seed(1)
 
 ## ------------------------------------------------------------------------
@@ -125,7 +124,7 @@ summary(MLpol)
 #  plot(MLpol, pause = TRUE, col = brewer.pal(3,name = "Set1"))
 
 ## ----MLpol, echo = FALSE, imgcenter = TRUE-------------------------------
-plot(MLpol, pause = TRUE, col = brewer.pal(3,name = "Set1"))
+plot(MLpol, pause = TRUE)
 
 ## ----MLpolPredict, eval = FALSE------------------------------------------
 #  MLpol <- predict(MLpol0, newexpert = X, newY = Y, online = TRUE)

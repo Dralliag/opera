@@ -20,7 +20,13 @@ bestConvex <- function(y, experts, awake = NULL, loss.type = list(name = "square
     b <- c(1, rep(0, nrow(Q)))
     m <- 1
     res <- tryCatch({
-      quadprog::solve.QP(Dmat = Q, dvec = c, Amat = A, bvec = b, meq = m)
+      if (!requireNamespace("quadprog", quietly = TRUE)) {
+        warning("The quadprog package must be installed to use this functionality")
+        #Either exit or do something without quadprog
+        return(NULL)
+      } else {
+        quadprog::solve.QP(Dmat = Q, dvec = c, Amat = A, bvec = b, meq = m)
+      }
     }, error = function(e) {
       NULL
     })

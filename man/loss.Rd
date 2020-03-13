@@ -34,4 +34,3 @@ by the predictions in \code{x} to predict the observation in \code{y}.
 \author{
 Pierre Gaillard <pierre@gaillard.me>
 }
-

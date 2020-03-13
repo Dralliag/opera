@@ -4,9 +4,15 @@
 \alias{predict.mixture}
 \title{Predict method for Mixture models}
 \usage{
-\method{predict}{mixture}(object, newexperts = NULL, newY = NULL,
-  awake = NULL, online = TRUE, type = c("model", "response", "weights",
-  "all"), ...)
+\method{predict}{mixture}(
+  object,
+  newexperts = NULL,
+  newY = NULL,
+  awake = NULL,
+  online = TRUE,
+  type = c("model", "response", "weights", "all"),
+  ...
+)
 }
 \arguments{
 \item{object}{Object of class inheriting from 'mixture'}
@@ -55,4 +61,3 @@ Performs sequential predictions and updates
 of a mixture object based on new observations 
 and expert advice.
 }
-

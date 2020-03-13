@@ -46,13 +46,13 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
     lpred <- lossPred(pred, y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
     lexp <- lossPred(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
     
-    r <- awake[t, ] * (lpred - lexp)
+    r <- awake[t, ] * (c(c(lpred) - lexp))
     L <- L + r^2
     maxloss <- pmax(maxloss, abs(r))
     neweta <- pmin(1/(2 * maxloss), sqrt(log(N)/L))
     
     # Update regret and learning parameter
-    R <- neweta/eta[t, ] * R + log(1 + awake[t, ] * neweta * (lpred - lexp))
+    R <- neweta/eta[t, ] * R + log(1 + awake[t, ] * neweta * (c(c(lpred) - lexp)))
     eta[t + 1, ] <- neweta
     
     if (is.na(sum(R))) {

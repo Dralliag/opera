@@ -48,7 +48,7 @@ MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     lexp <- lossPred(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
     
     # update regret and weights
-    r <- awake[t, ] * (lpred - lexp)
+    r <- awake[t, ] * (c(c(lpred) - lexp))
     R <- R + r
     eta[t + 1, ] <- sqrt(log(N)/(log(N)/eta[t, ]^2 + r^2))
     w <- truncate1(exp(log(w0) + eta[t + 1, ] * R))

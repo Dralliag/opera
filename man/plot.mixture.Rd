@@ -25,12 +25,11 @@ expert's forecast in function of time, average loss suffered by the experts and 
 \description{
 provides different diagnostic plots for an aggregation procedure.
 }
+\seealso{
+See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.
+}
 \author{
 Pierre Gaillard <pierre@gaillard.me>
 
 Yannig  Goude <yannig.goude@edf.fr>
 }
-\seealso{
-See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.
-}
-

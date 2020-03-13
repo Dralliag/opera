@@ -109,12 +109,14 @@ test_that("Best shifting oracle is ok", {
 }) 
 
 # test multi-dimensional data
+
 test_that("Dimension d>1 is ok",{
+  set.seed(1)
   # load some basic data to perform tests
   n <- 10
   d <- 3
   for (model in c("expert", "convex", "linear")) {
-    l <- sample(c("square", "pinball", "percentage", "absolute"), 1)
+    for (l in c("square", "pinball", "percentage", "absolute")) {
     
     # Une petite fonction pour creer les prévisions de la base canonique
     base_predictions = function(d,n) {
@@ -131,6 +133,7 @@ test_that("Dimension d>1 is ok",{
     }
     Y <- rep(theta.star, n)
     
+    cat(model, l, "\n")
     m <- oracle(Y = Y,experts = X, model = model, loss.type = l)
     m$d <- d
     m$prediction <- seriesToBlock(m$prediction,d)
@@ -144,6 +147,8 @@ test_that("Dimension d>1 is ok",{
     Y <- seriesToBlock(Y, d = d)
     m1 <- oracle(Y = Y, experts= X, model = model, loss.type = l)
     expect_equal(m$experts,m1$experts)
-    expect_true(mean(abs(m$prediction - m1$prediction)) < mean(abs(Y))/10)  
+    expect_true(mean(abs(m$prediction - m1$prediction)) < mean(abs(Y))/10)
+    }
   }
 })
+

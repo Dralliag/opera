@@ -16,8 +16,14 @@ plot.oracle <- function(x, sort = TRUE, col = NULL, ...) {
   
   T <- nrow(x$experts)
   K <- ncol(x$experts)
-  col.palette <-RColorBrewer::brewer.pal(n = 3,name = "Set1")
+
   if (is.null(col)) {
+    if(!requireNamespace("RColorBrewer", quietly = TRUE)) {
+      print("The RColorBrewer package must be installed to get better colors\n")
+      col.palette <- 2:min((K+1),7)
+    } else{
+      col.palette <- RColorBrewer::brewer.pal(n = 3,name = "Set1")    
+    }
     col <- col.palette
   }
   

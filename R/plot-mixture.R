@@ -29,7 +29,16 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
   K <- length(x$experts)
   w.order <- order(apply(x$weights,2,mean),decreasing = TRUE)
   
-  if (is.null(col)) col <- rev(RColorBrewer::brewer.pal(n = max(min(K,11),4),name = "Spectral"))[1:min(K,11)]
+  if (is.null(col)) {
+    if(!requireNamespace("RColorBrewer", quietly = TRUE)) {
+      print("The RColorBrewer package must be installed to get better colors\n")
+      col <- 2:min((K+1),7)
+    } else{
+      col <- rev(RColorBrewer::brewer.pal(n = max(min(K,11),4),name = "Spectral"))[1:min(K,11)]
+    }
+  }
+
+    
   my.colors <- col
   
   col <- numeric(K)

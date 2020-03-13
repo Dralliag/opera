@@ -49,7 +49,7 @@ MLpol <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     lexp <- lossPred(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
     
     # Update the regret and the weight
-    r <- awake[t, ] * (lpred - lexp)
+    r <- awake[t, ] * c(c(lpred) - lexp)
     R <- R + r
     
     # Update the learning rate

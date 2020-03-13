@@ -2,8 +2,8 @@
 % Please edit documentation in R/opera-package.R
 \docType{package}
 \name{opera-package}
-\alias{opera}
 \alias{opera-package}
+\alias{opera}
 \title{Online Prediction by ExpeRt Aggregation}
 \description{
 The package \code{opera} performs, for regression-oriented time-series,
@@ -99,9 +99,6 @@ identical(m1.BOA, m3.BOA)  # TRUE
 summary(m3.BOA)
 plot(m1.BOA)
 }
-\author{
-Pierre Gaillard <pierre@gaillard.me>
-}
 \references{
 Prediction, Learning, and Games. N. Cesa-Bianchi and G. Lugosi.
 \cr
@@ -117,5 +114,7 @@ Contributions to online robust aggregation: work on the approximation error and 
 probabilistic forecasting. Pierre Gaillard. PhD Thesis, University Paris-Sud, 2015.
 \cr
 }
+\author{
+Pierre Gaillard <pierre@gaillard.me>
+}
 \keyword{package}
-

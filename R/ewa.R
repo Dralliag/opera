@@ -39,7 +39,7 @@ ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradie
     lexp <- lossPred(experts[t, ], y[t], pred[t], loss.type, loss.gradient)
     
     # Regret update
-    R.w0 <- R.w0 + awake[t, ] * (lpred - lexp)
+    R.w0 <- R.w0 + awake[t, ] * (c(c(lpred) - lexp))
   }
   w <- t(truncate1(exp(eta * R.w0)))/sum(t(truncate1(exp(eta * R.w0))))
   

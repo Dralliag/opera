@@ -4,7 +4,9 @@
 \name{electric_load}
 \alias{electric_load}
 \title{Electricity forecasting data set}
-\format{An object of class \code{data.frame} with 731 rows and 11 columns.}
+\format{
+An object of class \code{data.frame} with 731 rows and 11 columns.
+}
 \usage{
 data(electric_load)
 }
@@ -25,4 +27,3 @@ together with several covariates, including temperature, industrial production i
  detach(electric_load)
 }
 \keyword{datasets}
-

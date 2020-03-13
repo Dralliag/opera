@@ -43,8 +43,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
   awake[idx.na] <- 0
   newexperts[idx.na] <- 0
   
-  # test possible warnings and errors
-  if (is.null(object$training) && (object$coefficients != "Uniform") && (object$model == 
+  if (is.null(object$training) && (object$coefficients[1] != "Uniform") && (object$model == 
                                                                          "MLpol")) {
     stop(paste(object$model, "cannot handle non-uniform prior weight vector"))
   }

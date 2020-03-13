@@ -124,7 +124,7 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
     warning("Unused lambda parameter (model != 'linear')")
   }
   if (is.null(lambda) && model == "linear") 
-    lambda <- 0
+    lambda <- 0 
   
   if (!is.null(niter) && model != "convex" && model != "linear") {
     warning("Unused niter parameter (model should be 'convex' or 'linear')")
@@ -160,7 +160,11 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
   }
   
   if (model == "linear") {
-    res <- bestLinear(Y, experts, lambda = lambda, loss.type = loss.type)
+    res <- tryCatch(
+        bestLinear(Y, experts, lambda = lambda, loss.type = loss.type),
+        error = function(err) {
+          bestLinear(Y, experts, lambda = 1e-14, loss.type = loss.type) 
+        })
   }
   
   if (model == "shifting") {
