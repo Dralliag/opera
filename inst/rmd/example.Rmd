@@ -42,7 +42,6 @@ First, we load the data and we cut it into two subsets: a training set used to b
 
 ```{r, echo=FALSE}
 library(opera)
-library(RColorBrewer)
 set.seed(1)
 ```
 
@@ -174,7 +173,7 @@ The results can be displayed with method `summary` and `plot`.
 summary(MLpol)
 ```
 ```{r MLpol, echo = TRUE, eval = FALSE}
-plot(MLpol, pause = TRUE, col = brewer.pal(3,name = "Set1"))
+plot(MLpol, pause = TRUE)
 ```
 ```{r MLpol, echo = FALSE, imgcenter = TRUE}
 ```
