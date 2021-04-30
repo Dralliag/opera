@@ -63,12 +63,15 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
     pred <- experts[t, ] %*% t(t(weta * awake[t, ])/apply(weta * awake[t, ], 
       2, sum))
     cumulativeLoss <- cumulativeLoss + loss(pred, y[t], loss.type)  # cumulative loss without gradient trick
-    lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient))  # gradient loss suffered by each eta on the grid
+    if (neta == 1){
+      lpred <- lossPred(pred, y[t], pred, loss.type, loss.gradient)
+    } else {
+      lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient))  # gradient loss suffered by each eta on the grid
+    }
     lexp <- lossPred(experts[t, ], y[t], pred, loss.type, loss.gradient)  # gradient loss suffered by each expert
     
-    
     # Regret update
-    R.w0 <- R.w0 + awake[t, ] * t(lpred - t(lexp))
+    R.w0 <- R.w0 + awake[t, ] * t(c(lpred) - t(lexp))
     
     # Update of the best parameter
     besteta <- order(cumulativeLoss)[1]

@@ -64,11 +64,15 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
       pred <- experts[t, ] %*% waux
       
       cumulativeLoss[, k] <- cumulativeLoss[, k] + loss(pred, y[t], loss.type)  # Non gradient cumulative losses
-      lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient))
+      if (neta == 1){
+        lpred <- lossPred(pred, y[t], pred, loss.type, loss.gradient)
+      } else {
+        lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient))  # gradient loss suffered by each eta on the grid
+      }
       lexp <- lossPred(experts[t, ], y[t], pred, loss.type, loss.gradient)
       
       # Regret update
-      R <- t(t(log(wpar[, , k]))/grid.eta) + awake[t, ] * t(lpred - t(lexp))
+      R <- t(t(log(wpar[, , k]))/grid.eta) + awake[t, ] * t(c(lpred) - t(lexp))
       
       # Weight update
       v <- truncate1(exp(t(t(matrix(R, ncol = neta)) * grid.eta)))
