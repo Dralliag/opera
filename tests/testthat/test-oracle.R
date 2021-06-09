@@ -134,7 +134,7 @@ test_that("Dimension d>1 is ok",{
     Y <- rep(theta.star, n)
     
     cat(model, l, "\n")
-    m <- oracle(Y = Y,experts = X, model = model, loss.type = l)
+    m <- suppressWarnings({oracle(Y = Y,experts = X, model = model, loss.type = l)})
     m$d <- d
     m$prediction <- seriesToBlock(m$prediction,d)
     m$Y <- seriesToBlock(m$Y,d)
@@ -145,7 +145,7 @@ test_that("Dimension d>1 is ok",{
     
     X <- seriesToBlock(X, d = d)
     Y <- seriesToBlock(Y, d = d)
-    m1 <- oracle(Y = Y, experts= X, model = model, loss.type = l)
+    m1 <- suppressWarnings({oracle(Y = Y, experts= X, model = model, loss.type = l)})
     expect_equal(m$experts,m1$experts)
     expect_true(mean(abs(m$prediction - m1$prediction)) < mean(abs(Y))/10)
     }
