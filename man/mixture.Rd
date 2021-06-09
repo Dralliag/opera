@@ -61,7 +61,7 @@ A finite grid of coefficient to be optimized can be specified with a parameter \
    \item{'MLpol'}{Polynomial Potential aggregation rule
 with different learning rates for each expert.  The learning rates are
 calibrated using theoretical values. There are similar aggregation rules 
-like 'BOA' (Bernstein online Aggregation see [Wintenberger, 2014], 'MLewa', and 'MLprod' 
+like 'BOA' (Bernstein online Aggregation see [Wintenberger, 2014] <doi:10.1007/s10994-016-5592-6>, 'MLewa', and 'MLprod' 
 (see [Gaillard, Erven, and Stoltz, 2014])} 
  \item{'OGD'}{Online Gradient descent (see Zinkevich, 2003). The optimization is performed with a time-varying learning rate. 
  At time step \eqn{t \geq 1}, the learning rate is chosen to be \eqn{t^{-\alpha}}, where \eqn{\alpha} is provided by alpha in the parameters argument.
