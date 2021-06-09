@@ -6,3 +6,7 @@ man-roxygen
 README.Rmd
 opera.html
 tests/examples
+^appveyor\.yml$
+^\.travis\.yml$
+^_pkgdown\.yml$
+^codecov\.yml$
