@@ -140,8 +140,8 @@ test_that("Dimension d>1 is ok",{
     m$Y <- seriesToBlock(m$Y,d)
     m$residuals <- seriesToBlock(m$residuals,d)
     m$experts <- seriesToBlock(m$experts,d)
-    summary(m)
-    plot(m)
+    # summary(m)
+    # plot(m)
     
     X <- seriesToBlock(X, d = d)
     Y <- seriesToBlock(Y, d = d)

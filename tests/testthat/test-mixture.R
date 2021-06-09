@@ -330,8 +330,8 @@ test_that("Dimension d>1 is ok",{
     m$Y <- t(matrix(m$Y,nrow = d))
     m$weights <- m$weights[seq(1,n*d,by=d),]
 
-    summary(m)
-    plot(m)
+    # summary(m)
+    # plot(m)
     X1 <- seriesToBlock(X, d = d)
     Y1 <- seriesToBlock(Y, d = d)
     m1 <- mixture(Y = Y1, experts= X1, model = algo, loss.type = l)
