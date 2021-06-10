@@ -26,7 +26,7 @@ expert forecasts according to their past performance. That is, \[
   \widehat y_t = \sum_{k=1}^K p_{k,t} x_{k,t} \,.
 \] These algorithms come with finite time worst-case guarantees. The
 monograph of [Cesa-Bianchi and Lugisi
-(2006)](http://www.ii.uni.wroc.pl/~lukstafi/pmwiki/uploads/AGT/Prediction_Learning_and_Games.pdf)
+(2006)](https://ii.uni.wroc.pl/~lukstafi/pmwiki/uploads/AGT/Prediction_Learning_and_Games.pdf)
 gives a complete introduction to the setting of prediction of arbitrary
 sequences with the help of expert advice.
 
