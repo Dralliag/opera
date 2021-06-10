@@ -22,11 +22,24 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL) {
     At <- lambda * diag(1, N)
     bt <- matrix(lambda * w0, nrow = N)
   }
+  #start C++ insertion
+  if (!exists("use_cpp")){
+    use_cpp<-TRUE
+  }
   
+  
+  if (use_cpp){
+    error_code<-computeRidgeCPP(experts,w,At,bt,y)
+    if (error_code != 0){
+      stop("matrix is not invertible")
+    }
+  } #end C++ insertion
+  else{
   for (t in 1:T) {
     w[t, ] <- solve(At, bt)
     At <- At + experts[t, ] %*% t(experts[t, ])
     bt <- bt + y[t] * experts[t, ]
+  }
   }
   # w[1,] = w0
   

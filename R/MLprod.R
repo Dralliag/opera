@@ -31,6 +31,29 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
     maxloss <- training$maxloss
   }
   
+  #start C++ modification
+  if (!is.list(loss.type)) {
+    loss.type <- list(name = loss.type)
+  }
+  if (is.null(loss.type$tau) && loss.type$name == "pinball") {
+    loss.type$tau <- 0.5
+  }
+  
+  loss_name <- loss.type$name
+  loss_tau <- 0
+  if (!is.null(loss.type$tau)){
+    loss_tau <- loss.type$tau
+  }
+  
+  if (!exists("use_cpp")){use_cpp<-TRUE}
+  
+  if (use_cpp){
+    B <- computeMLProdEigen(awake,eta,experts,weights,y,prediction,
+                            R,L,maxloss,loss_name,loss_tau,loss.gradient);
+  }
+  else{
+    
+  
   for (t in 1:T) {
     
     # Update weights
@@ -58,6 +81,7 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
     if (is.na(sum(R))) {
       browser("Nan in R")
     }
+  }
   }
   
   w <- truncate1(exp(R))

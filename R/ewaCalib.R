@@ -47,11 +47,38 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
   }  # We initialize the regrets so that w0 is the initial weight vector
   
   
+  #start c++ modif
+  if (!is.list(loss.type)) {
+    loss.type <- list(name = loss.type)
+  }
+  if (is.null(loss.type$tau) && loss.type$name == "pinball") {
+    loss.type$tau <- 0.5
+  }
+  
+  loss_name <- loss.type$name
+  loss_tau <- 0
+  if (!is.null(loss.type$tau)){
+    loss_tau <- loss.type$tau
+  }
+  #end C++ modif
+  
+  if (!exists("use_cpp")){
+    use_cpp<-TRUE
+  }
+  
+  
+  
   for (t in 1:T) {
     # Display the state of progress of the algorithm
     if (!(t%%floor(T/10)) && trace) 
       cat(floor(10 * t/T) * 10, "% -- ")
     
+    
+    if (use_cpp){
+      besteta<-computeEWACalib(t,besteta,awake,experts,weights,weta,
+                               R.w0,grid.eta,y,eta,cumulativeLoss,prediction,loss_name,loss_tau,loss.gradient);
+    }
+    else{
     # Weights, prediction formed by EWA(eta[t]) where eta[t] is the learning rate
     # calibrated online
     weights[t, ] <- weta[, besteta] * awake[t, ]/sum(weta[, besteta] * awake[t, 
@@ -75,7 +102,7 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
     
     # Update of the best parameter
     besteta <- order(cumulativeLoss)[1]
-    
+    }
     # We increase the size of the grid if the best parameter lies in an extremity
     if (besteta == neta) {
       if (trace) 
@@ -92,6 +119,7 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
         cumulativeLoss <- c(cumulativeLoss, perfneweta$training$cumulativeLoss)
         R.w0[, besteta + k] <- perfneweta$training$R + log(w0) / neweta[k]
       }
+      weta <- truncate1(exp(t(t(matrix(R.w0, ncol = neta)) * grid.eta)))
     }
     
     if (besteta == 1) {
@@ -110,9 +138,14 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
         cumulativeLoss <- c(perfneweta$training$cumulativeLoss, cumulativeLoss)
         R.w0[, besteta - k] <- perfneweta$training$R + log(w0) / neweta[k]
       }
+      weta <- truncate1(exp(t(t(matrix(R.w0, ncol = neta)) * grid.eta)))
     }
-    weta <- truncate1(exp(t(t(matrix(R.w0, ncol = neta)) * grid.eta)))
-  }
+    
+    if (!use_cpp){
+      weta <- truncate1(exp(t(t(matrix(R.w0, ncol = neta)) * grid.eta)))
+    }
+  }#end of time loop
+  
   
   # Next weights
   w <- weta[, besteta]/sum(weta[, besteta])

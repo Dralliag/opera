@@ -42,6 +42,10 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
     T0 <- 0
   }
   
+  if (!exists("use_cpp")){
+    use_cpp<-TRUE
+  }
+  
   lambda <- rep(grid.lambda[bestlambda], T)
   for (t in 1:T) {
     # Display the state of progress of the algorithm
@@ -50,6 +54,16 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
     
     # Weights, prediction forme by Ridge(lambda[t]) where lambda[t] is the learning
     # rate calibrated online
+    if (use_cpp){
+      bestlambda<-RidgeCalibStep1(t,bestlambda,
+                                  experts, weights,
+                                  wlambda, w0,
+                                  At, bt, 
+                                  grid.lambda, pred.lambda, 
+                                  y, lambda,
+                                  cumulativeLoss, prediction)
+    }
+    else{
     weights[t, ] <- wlambda[, bestlambda]
     prediction[t] <- experts[t, ] %*% weights[t, ]
     lambda[t] <- grid.lambda[bestlambda]
@@ -65,7 +79,7 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
     
     # Grid update **************
     bestlambda <- order(cumulativeLoss)[1]  # find the best smoothing rate lambda in the grid
-    
+    }
     # Expand the grid if the best parameter lies on an extremity
     if (bestlambda == nlambda) {
       if (trace) 
@@ -104,12 +118,19 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
           pred.lambda)
       }
     }
-    wlambda <- matrix(0, nrow = N, ncol = nlambda)
+    if (nlambda!=ncol(wlambda)){
+      wlambda <- matrix(0, nrow = N, ncol = nlambda)
+    }
+    if (use_cpp){
+      RidgeCalibStep2(wlambda,w0,At,bt,grid.lambda);
+    }
+    else{
     for (k in 1:nlambda) {
       wlambda[, k] <- tryCatch(solve(grid.lambda[k] * diag(1, N) + At, matrix(grid.lambda[k] * 
         w0, nrow = N) + bt), error = function(e) {
         NA
       })
+    }
     }
     # the smoothing parameter has to big large enough in order to have invertible
     # design matrix

@@ -26,6 +26,33 @@ ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradie
     R.w0 <- training$R + log(w0)/eta
     cumulativeLoss <- training$cumulativeLoss
   }
+  #start C++ insertion
+  if (!is.list(loss.type)) {
+    loss.type <- list(name = loss.type)
+  }
+  if (is.null(loss.type$tau) && loss.type$name == "pinball") {
+    loss.type$tau <- 0.5
+  }
+  
+  loss_name <- loss.type$name
+  loss_tau <- 0
+  if (!is.null(loss.type$tau)){
+    loss_tau <- loss.type$tau
+  }
+  #end LP
+  if (!exists("use_cpp")){
+    use_cpp<-TRUE
+  }
+  
+  if (use_cpp){
+    cumulativeLoss<-computeEWAEigen(
+      awake, experts,weights,y,pred, 
+      R.w0,eta,cumulativeLoss,
+      loss_name,loss_tau,loss.gradient);
+  }
+  else{
+  
+  
   
   for (t in 1:T) {
     # Weight update
@@ -40,6 +67,7 @@ ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradie
     
     # Regret update
     R.w0 <- R.w0 + awake[t, ] * (c(c(lpred) - lexp))
+  }
   }
   w <- t(truncate1(exp(eta * R.w0)))/sum(t(truncate1(exp(eta * R.w0))))
   

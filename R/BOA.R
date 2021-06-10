@@ -17,13 +17,22 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
   experts[idx.na] <- 0
   
   R <- rep(0, N)
-  R.reg <- R
+  #LP pb with the Copy On Write R policy
+  #R.reg <- R
+  R.reg <- rep(0, N)
   weights <- matrix(0, ncol = N, nrow = T)
   prediction <- rep(0, T)
-  w <- w0
+  #LP pb with the Copy On Write R policy
+  #w <- w0
+  w <- rep(1, N)
+  for (k in 1:N) {
+    w[k] = w0[k]
+  }
   eta <- matrix(exp(350), ncol = N, nrow = T + 1)
-  V <- 0
-  B <- 0
+  # V <- 0
+  # B <- 0
+  V <- rep(0, N)
+  B <- rep(0, N)
   
   if (!is.null(training)) {
     w0 <- training$w0
@@ -34,7 +43,26 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
     B <- training$B
     V <- training$V
   }
+  #start C++ insertion
+  if (!is.list(loss.type)) {
+    loss.type <- list(name = loss.type)
+  }
+  if (is.null(loss.type$tau) && loss.type$name == "pinball") {
+    loss.type$tau <- 0.5
+  }
   
+  loss_name <- loss.type$name
+  loss_tau <- 0
+  if (!is.null(loss.type$tau)){
+    loss_tau <- loss.type$tau
+  }
+  
+  if (!exists("use_cpp")){use_cpp<-TRUE}
+  if (use_cpp){
+    computeBOAEigen(awake,eta,experts,weights,y,prediction,
+                    w,w0,R,R.reg,B,V,loss_name,loss_tau,loss.gradient);
+  }
+  else{
   for (t in 1:T) {
     p <- awake[t, ] * w/sum(awake[t, ] * w)
     pred <- experts[t, ] %*% p
@@ -67,6 +95,7 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
     
     w <- truncate1(exp(log(w0) + eta[t + 1, ] * R.reg))
     
+  }
   }
   
   object <- list(model = "BOA", loss.type = loss.type, loss.gradient = loss.gradient, 

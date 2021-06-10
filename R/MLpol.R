@@ -28,6 +28,29 @@ MLpol <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     training <- list(eta = eta[1, ])
   }
   
+  #start C++ modification
+  if (!is.list(loss.type)) {
+    loss.type <- list(name = loss.type)
+  }
+  if (is.null(loss.type$tau) && loss.type$name == "pinball") {
+    loss.type$tau <- 0.5
+  }
+  
+  loss_name <- loss.type$name
+  loss_tau <- 0
+  if (!is.null(loss.type$tau)){
+    loss_tau <- loss.type$tau
+  }
+  
+  w <- rep(0, N)
+  if (!exists("use_cpp")){use_cpp<-TRUE}
+  
+  if (use_cpp){
+      B <- computeMLPolEigen(awake,eta,experts,weights,y,prediction,
+                             R,w,B,loss_name,loss_tau,loss.gradient)
+  }
+  else{
+  #end of C++ modification
   for (t in 1:T) {
     # We check if there is at least one expert with positive weight
     if (max(awake[t, ] * R) > 0) {
@@ -62,6 +85,7 @@ MLpol <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     w <- eta[T + 1, ] * pmax(R, 0)/sum(eta[T + 1, ] * pmax(R, 0))
   } else {
     w <- rep(1/N, N)
+  }
   }
   object <- list(model = "MLpol", loss.type = loss.type, loss.gradient = loss.gradient, 
     coefficients = w)
