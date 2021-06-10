@@ -1,8 +1,7 @@
 Package: opera
 Type: Package
 Title: Online Prediction by Expert Aggregation
-Version: 1.1
-Date: 2020-03-11
+Version: 1.1.1
 Author: Pierre Gaillard [cre, aut],
   Yannig Goude [aut]
 Maintainer: Pierre Gaillard <pierre@gaillard.me>
@@ -30,4 +29,4 @@ Suggests:
     htmltools
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1

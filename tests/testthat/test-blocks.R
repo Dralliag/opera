@@ -4,7 +4,7 @@ context("Testing seriesToBlock and blockToSeries")
 n <- 10
 d <- 3
 K <- 23
-X <- matrix(runif(K*n*d), ncol = K, nrow = K*d)
+X <- matrix(runif(K*n*d), ncol = K, nrow = n*d)
 Y <- rnorm(d*n)
 
 test_that("block functions are OK", {
