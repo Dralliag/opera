@@ -198,5 +198,5 @@ MLpol <- mixture(Y = Y, experts = X, model = "MLpol", loss.type = "square")
 * License: LGPL
 
 
-[Cesa-BianchiLugosi2006]: http://www.ii.uni.wroc.pl/~lukstafi/pmwiki/uploads/AGT/Prediction_Learning_and_Games.pdf
+[Cesa-BianchiLugosi2006]: https://ii.uni.wroc.pl/~lukstafi/pmwiki/uploads/AGT/Prediction_Learning_and_Games.pdf
 [Insee]: http://www.insee.fr
