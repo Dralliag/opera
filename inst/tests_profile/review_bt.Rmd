@@ -1,0 +1,263 @@
+---
+title: "Review opera"
+author: "B.Thieurmel"
+date: "08/06/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# gestion des dépendances 
+
+- besoin de ``quantreg`` & ``quadprog`` pour la fonction ``oracle`` et pour certains tests
+
+**quantreg**
+
+```{r, eval = FALSE}
+bestLinear <- function(y, experts, lambda = 0, loss.type = list(name = "square"), 
+                       niter = 1, ...) {
+  experts <- as.matrix(experts)
+  N <- ncol(experts)
+  
+  coefficients <- NULL
+  if (loss.type$name == "square") {
+    coefficients <- 
+      tryCatch(
+        solve(lambda * diag(1, ncol(experts)) + t(experts) %*% experts, t(experts) %*% y),
+        error = function(err){
+          lambda = 1e-14
+          solve(lambda * diag(1, ncol(experts)) + t(experts) %*% experts, t(experts) %*% y)
+          warning("Ill conditioned problem. Regularized with lambda = 1e-14.")
+        })
+    
+  } else if (loss.type$name == "pinball") {
+    if (is.null(loss.type$tau)) {
+      loss.type$tau <- 0.5
+    }
+    if (!requireNamespace("quantreg", quietly = TRUE)) {
+      warning("The quantreg package must be installed to use this functionality")
+      #Either exit or do something without quantreg
+      return(NULL)
+    } else {
+      coefficients <- tryCatch({
+        quantreg::rq(y ~ experts - 1, tau = loss.type$tau)$coefficients
+      }, error = function(e) {
+        NULL
+      })
+    }
+  }
+  if (is.null(coefficients)) {
+    warning("The best linear oracle is only approximated (using optim).")
+    lossu <- function(u) {
+      return(mean(loss(x = experts %*% matrix(u, nrow = ncol(experts)), y = y, 
+                       loss.type = loss.type)))
+    }
+    
+    best_u <- rep(0, N)
+    bestLoss <- exp(700)
+    
+    for (i in 1:niter) {
+      # Random initialization
+      u <- rnorm(N, 0, 1)
+      
+      # Convex initialization
+      w <- optim(u, lossu, gr = NULL, ...)$par
+      l <- lossu(w)
+      if (bestLoss > l) {
+        bestLoss <- l
+        best_u <- w
+      }
+    }
+    coefficients <- matrix(best_u, nrow = N)
+  }
+  
+  prev <- experts %*% coefficients
+  return(list(coefficients = c(coefficients), prediction = prev))
+} 
+```
+
+**quadprog**
+
+```{r, eval = FALSE}
+bestConvex <- function(y, experts, awake = NULL, loss.type = list(name = "square"), 
+                       niter = 1, ...) {
+  experts <- matrix(as.numeric(as.matrix(experts)), nrow = length(y))
+  N <- ncol(experts)
+  
+  # if there are no NA and if awake is null we can perform an exact resolution for
+  # the square loss
+  idx.na <- which(is.na(experts))
+  if (length(idx.na) == 0 && is.null(awake) && loss.type$name == "square") {
+    y.na <- is.na(y)
+    y <- y[!y.na]
+    x <- experts[!y.na, ]
+    eq <- paste("y ~ x-1")
+    
+    Q <- crossprod(x)
+    c <- crossprod(x, y)
+    A <- cbind(1, diag(nrow(Q)))
+    b <- c(1, rep(0, nrow(Q)))
+    m <- 1
+    res <- tryCatch({
+      if (!requireNamespace("quadprog", quietly = TRUE)) {
+        warning("The quadprog package must be installed to use this functionality")
+        #Either exit or do something without quadprog
+        return(NULL)
+      } else {
+        quadprog::solve.QP(Dmat = Q, dvec = c, Amat = A, bvec = b, meq = m)
+      }
+    }, error = function(e) {
+      NULL
+    })
+    if (!is.null(res)) {
+      coefficients <- matrix(res$solution, ncol = N)
+      prediction <- experts %*% t(coefficients)
+      bestLoss <- mean(loss(x = prediction, y))
+    }
+  } else {
+    res <- NULL
+  }
+  if (is.null(res)) {
+    warning("The best convex oracle is only approximated (using optim).")
+    if (is.null(awake)) {
+      awake <- as.matrix(array(1, dim(experts)))
+    }
+    awake[idx.na] <- 0
+    experts[idx.na] <- 0
+    
+    lossp <- function(p) {
+      return(lossConv(p, y, experts, awake, loss.type))
+    }
+    
+    best_p <- rep(0, N)
+    bestLoss <- exp(700)
+    
+    for (i in 1:niter) {
+      # Random initialization
+      p <- runif(N, 0, 1)
+      p <- p/sum(p)
+      
+      # Convex optimization
+      w <- optim(p, lossp, gr = NULL, lower = 1e-20, method = "L-BFGS-B", ...)
+      
+      # Projection on the simplex
+      w <- pmax(w$par, 0)
+      l <- lossp(w)
+      if (bestLoss > l) {
+        bestLoss <- l
+        best_p <- w
+      }
+    }
+    coefficients <- matrix(best_p, ncol = N)
+    coefficients <- coefficients/apply(coefficients, 1, sum)
+    pond <- awake %*% t(coefficients)
+    prediction <- ((as.numeric(experts) * awake) %*% t(coefficients))/pond
+  }
+  res <- list(coefficients = coefficients, prediction = prediction)
+  return(res)
+} 
+```
+
++ **quantreg** pas d'alternatives proposées. ``return(NULL)``
++ pourquoi en suggests donc ?
++ utilisation de la fonction oracle
+
+- besoin de ``caret``, ``mgcv`` & ``gbm`` pour le build de la vignette
+
+
+# Tests / CI
+
+- warnings sur les tests actuels : 
+
+```{r, eval = FALSE}
+Warning (test-oracle.R:148:5): Dimension d>1 is ok
+The best linear oracle is only approximated (using optim).
+Backtrace:
+  1. opera::oracle(Y = Y, experts = X, model = model, loss.type = l) test-oracle.R:148:4
+2. opera::oracle.default(Y = Y, experts = X, model = model, loss.type = l) C:/Users/bthie/Desktop/opera_cpp/opera_cpp/opera/R/oracle.R:74:10
+7. opera::bestLinear(Y, experts, lambda = lambda, loss.type = loss.type) C:/Users/bthie/Desktop/opera_cpp/opera_cpp/opera/R/oracle.R:163:4
+-----------------------------------------------------------------------------------------------------------
+  
+  == Results ================================================================================================
+  Duration: 5.0 s
+
+[ FAIL 0 | WARN 16 | SKIP 0 | PASS 201 ]
+```
+
+- erreurs sur certains tests pour le ``r-devel`` : incohérence entre la taille du vecteur et les dimensions de la matrice. A corriger rapidement.
+
+https://cran.r-project.org/web/checks/check_results_opera.html
+
+```{r, eval = FALSE}
+# load some basic data to perform tests
+n <- 10
+d <- 3
+K <- 23
+X <- matrix(runif(K*n*d), ncol = K, nrow = K*d)
+```
+
+## Couverture de code
+
+- Avec le package ``covr`` : 
+
+```{r, eval = FALSE}
+pkgbuild::with_build_tools(covr::report(
+  file = file.path(getwd(), "opera-report.html")
+  )
+)
+```
+
+https://covr.r-lib.org/
+
+## Integration continue
+
+- Branchement sur github à des tests automatiques sur linux / windows + lancement des tests et couvertures de code.
+
+*exemple :*
+
+https://github.com/dreamRs/shinyWidgets
+
+
+# Performance / profiling
+
+Avec le package ``profvis`` : https://rstudio.github.io/profvis/
+
+## oracle
+
+```{r, eval = FALSE}
+profvis({
+  oracle.convex <- oracle(Y = Y, experts = res, loss.type = "square", model = "convex")
+}, interval = 0.005)
+```
+
+**Axes d'améliorations ?**
+
+- meilleur gestion de passage en matrice
+
+## mixture
+
+- mutualisation de certains calculs
+
+```{r, eval = FALSE}
+# MLpol.R, line 57, calcul pmax (plus dans la version C++)
+w <- eta[t, ] * pmax(R, 0)/sum(eta[t, ] * pmax(R, 0))
+```
+ 
+```{r, eval = FALSE}
+
+# contrôle des experts dans les différentes fonctions
+  experts <- as.matrix(experts)
+  N <- ncol(experts)
+  T <- nrow(experts)
+  
+  awake <- as.matrix(awake)
+  idx.na <- which(is.na(experts))
+  awake[idx.na] <- 0
+  experts[idx.na] <- 0
+```
+
+# truncate 1
+
+Encore nécessaire ? Cas exemple ?
