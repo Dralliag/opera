@@ -3,7 +3,7 @@
 `opera` is a R package that provides several algorithms to perform robust online prediction of time series with the help of expert advice. In this vignette, we provide an example of how to use the package. 
 
 ## Setting: when is the package `opera` useful?
-Consider a sequence of real bounded observations \(y_1,\dots,y_n\) to be predicted step by step. Suppose that you have at your disposal a finite set of methods \(k =1,\dots,K\) (henceforth referred to as experts) that provide you before each time step \(t=1,\dots,n\) predictions \(x_{k,t}\) of the next observation \(y_t\). You can form your prediction \(\widehat y_t\) by using only the knowledge of the past observations \(y_1,\dots,y_{t-1}\) and past and current expert forecasts \(x_{k,1},\dots,x_{k,t}\) for \(k=1,\dots,K\). The package <a href=#>opera</a> implements several algorithms of the online learning literature that form predictions \(\widehat y_t\) by combining the expert forecasts according to their past performance. 
+Consider a sequence of real bounded observations $y_1,\dots,y_n$ to be predicted step by step. Suppose that you have at your disposal a finite set of methods $k =1,\dots,K$ (henceforth referred to as experts) that provide you before each time step $t=1,\dots,n$ predictions $x_{k,t}$ of the next observation $y_t$. You can form your prediction $\widehat y_t$ by using only the knowledge of the past observations $y_1,\dots,y_{t-1}$ and past and current expert forecasts $x_{k,1},\dots,x_{k,t}$ for $k=1,\dots,K$. The package <a href=#>opera</a> implements several algorithms of the online learning literature that form predictions $\widehat y_t$ by combining the expert forecasts according to their past performance. 
 That is, 
 \[
   \widehat y_t = \sum_{k=1}^K p_{k,t} x_{k,t} \,.
@@ -233,13 +233,13 @@ print(pred)
 
 ### Block by block predictions
 
-In some situations, the aggregation model cannot be updated at each step due to an operational constraint. One must predict the time-series \(y_1,\dots,y_n\) block by block. For example, a weather website might want to make a daily forecast of the next day's temperature at hourly intervals. This corresponds to block by block predictions of 24 observations. 
+In some situations, the aggregation model cannot be updated at each step due to an operational constraint. One must predict the time-series $y_1,\dots,y_n$ block by block. For example, a weather website might want to make a daily forecast of the next day's temperature at hourly intervals. This corresponds to block by block predictions of 24 observations. 
 
 Let's say that in the above example, instead of making a weekly prediction, we need to predict every four weeks, the consumption of the next four weeks. Below we show two different ways to use the `opera` package to do this. 
 
 #### Using d-dimensional time-series
 
-Note that the outputs \(y_1,\dots,y_n\) to be predicted step by step can be \(d\)-dimensional in `opera`. In this case, the argument `Y` provided to the function `mixture` should be a matrix, where each line corresponds to the output observed at time \(t\); the argument `experts` must be an array of dimension \(T \times d \times K\) such that `experts[t,:,k]` is the prediction made by expert \(k\) at iteration \(t\). These predictions of dimension \(d\) can be used in various situations. For example, we might want to simultaneously predict the electricity consumption of several countries in the example above. 
+Note that the outputs $y_1,\dots,y_n$ to be predicted step by step can be $d$-dimensional in `opera`. In this case, the argument `Y` provided to the function `mixture` should be a matrix, where each line corresponds to the output observed at time $t$; the argument `experts` must be an array of dimension $T \times d \times K$ such that `experts[t,:,k]` is the prediction made by expert $k$ at iteration $t$. These predictions of dimension $d$ can be used in various situations. For example, we might want to simultaneously predict the electricity consumption of several countries in the example above. 
 
 Another useful application of this feature is block by block prediction. Consider the above exemple of electricity consumption to be predicted every four weeks. This can be easily done by transforming the original time series into a 4 dimensional time series, where each row corresponds to the four weeks to predict after each update. 
 

@@ -27,19 +27,37 @@ In this vignette, we provide an example of how to use the package.
 
 ## Setting: when is the package `opera` useful?
 
-Consider a sequence of real bounded observations \(y_1,\dots,y_n\) to be
-predicted step by step. Suppose that you have at your disposal a finite
-set of methods \(k =1,\dots,K\) (henceforth referred to as experts) that
-provide you before each time step \(t=1,\dots,n\) predictions
-\(x_{k,t}\) of the next observation \(y_t\). You can form your
-prediction \(\widehat y_t\) by using only the knowledge of the past
-observations \(y_1,\dots,y_{t-1}\) and past and current expert forecasts
-\(x_{k,1},\dots,x_{k,t}\) for \(k=1,\dots,K\). The package
-<a href=#>opera</a> implements several algorithms of the online learning
-literature that form predictions \(\widehat y_t\) by combining the
-expert forecasts according to their past performance. That is, \[
-  \widehat y_t = \sum_{k=1}^K p_{k,t} x_{k,t} \,.
-\] These algorithms come with finite time worst-case guarantees. The
+Consider a sequence of real bounded observations
+![y\_1,\\dots,y\_n](https://latex.codecogs.com/png.latex?y_1%2C%5Cdots%2Cy_n
+"y_1,\\dots,y_n") to be predicted step by step. Suppose that you have at
+your disposal a finite set of methods ![k
+=1,\\dots,K](https://latex.codecogs.com/png.latex?k%20%3D1%2C%5Cdots%2CK
+"k =1,\\dots,K") (henceforth referred to as experts) that provide you
+before each time step
+![t=1,\\dots,n](https://latex.codecogs.com/png.latex?t%3D1%2C%5Cdots%2Cn
+"t=1,\\dots,n") predictions
+![x\_{k,t}](https://latex.codecogs.com/png.latex?x_%7Bk%2Ct%7D
+"x_{k,t}") of the next observation
+![y\_t](https://latex.codecogs.com/png.latex?y_t "y_t"). You can form
+your prediction ![\\widehat
+y\_t](https://latex.codecogs.com/png.latex?%5Cwidehat%20y_t
+"\\widehat y_t") by using only the knowledge of the past observations
+![y\_1,\\dots,y\_{t-1}](https://latex.codecogs.com/png.latex?y_1%2C%5Cdots%2Cy_%7Bt-1%7D
+"y_1,\\dots,y_{t-1}") and past and current expert forecasts
+![x\_{k,1},\\dots,x\_{k,t}](https://latex.codecogs.com/png.latex?x_%7Bk%2C1%7D%2C%5Cdots%2Cx_%7Bk%2Ct%7D
+"x_{k,1},\\dots,x_{k,t}") for
+![k=1,\\dots,K](https://latex.codecogs.com/png.latex?k%3D1%2C%5Cdots%2CK
+"k=1,\\dots,K"). The package <a href=#>opera</a> implements several
+algorithms of the online learning literature that form predictions
+![\\widehat y\_t](https://latex.codecogs.com/png.latex?%5Cwidehat%20y_t
+"\\widehat y_t") by combining the expert forecasts according to their
+past performance. That is,   
+![&#10; \\widehat y\_t = \\sum\_{k=1}^K p\_{k,t} x\_{k,t}
+\\,.&#10;](https://latex.codecogs.com/png.latex?%0A%20%20%5Cwidehat%20y_t%20%3D%20%5Csum_%7Bk%3D1%7D%5EK%20p_%7Bk%2Ct%7D%20x_%7Bk%2Ct%7D%20%5C%2C.%0A
+"
+  \\widehat y_t = \\sum_{k=1}^K p_{k,t} x_{k,t} \\,.
+")  
+These algorithms come with finite time worst-case guarantees. The
 monograph of [Cesa-Bianchi and Lugisi
 (2006)](https://ii.uni.wroc.pl/~lukstafi/pmwiki/uploads/AGT/Prediction_Learning_and_Games.pdf)
 gives a complete introduction to the setting of prediction of arbitrary
@@ -344,7 +362,8 @@ pred = newexperts %*% MLpol$coefficients
 
 In some situations, the aggregation model cannot be updated at each step
 due to an operational constraint. One must predict the time-series
-\(y_1,\dots,y_n\) block by block. For example, a weather website might
+![y\_1,\\dots,y\_n](https://latex.codecogs.com/png.latex?y_1%2C%5Cdots%2Cy_n
+"y_1,\\dots,y_n") block by block. For example, a weather website might
 want to make a daily forecast of the next day’s temperature at hourly
 intervals. This corresponds to block by block predictions of 24
 observations.
@@ -356,15 +375,22 @@ package to do this.
 
 #### Using d-dimensional time-series
 
-Note that the outputs \(y_1,\dots,y_n\) to be predicted step by step can
-be \(d\)-dimensional in `opera`. In this case, the argument `Y` provided
-to the function `mixture` should be a matrix, where each line
-corresponds to the output observed at time \(t\); the argument `experts`
-must be an array of dimension \(T \times d \times K\) such that
-`experts[t,:,k]` is the prediction made by expert \(k\) at iteration
-\(t\). These predictions of dimension \(d\) can be used in various
-situations. For example, we might want to simultaneously predict the
-electricity consumption of several countries in the example above.
+Note that the outputs
+![y\_1,\\dots,y\_n](https://latex.codecogs.com/png.latex?y_1%2C%5Cdots%2Cy_n
+"y_1,\\dots,y_n") to be predicted step by step can be
+![d](https://latex.codecogs.com/png.latex?d "d")-dimensional in `opera`.
+In this case, the argument `Y` provided to the function `mixture` should
+be a matrix, where each line corresponds to the output observed at time
+![t](https://latex.codecogs.com/png.latex?t "t"); the argument `experts`
+must be an array of dimension ![T \\times d \\times
+K](https://latex.codecogs.com/png.latex?T%20%5Ctimes%20d%20%5Ctimes%20K
+"T \\times d \\times K") such that `experts[t,:,k]` is the prediction
+made by expert ![k](https://latex.codecogs.com/png.latex?k "k") at
+iteration ![t](https://latex.codecogs.com/png.latex?t "t"). These
+predictions of dimension ![d](https://latex.codecogs.com/png.latex?d
+"d") can be used in various situations. For example, we might want to
+simultaneously predict the electricity consumption of several countries
+in the example above.
 
 Another useful application of this feature is block by block prediction.
 Consider the above exemple of electricity consumption to be predicted

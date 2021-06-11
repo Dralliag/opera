@@ -5,6 +5,7 @@ output:
   github_document:
     toc: true
     toc_depth: 2
+    pandoc_args: --webtex
 header-includes:
     <img src="inst/img/opera-logo.jpg" align="right" width="200">
 ---
