@@ -84,7 +84,7 @@ observations of the French electric load together with several
 covariates: the temperature, calendar information, and industrial
 production indexes. The data set is provided by the French [National
 Institute of Statistics and Economic Studies
-(Insee)](http://www.insee.fr).
+(Insee)](https://www.insee.fr/fr/accueil).
 
 ### The data set
 
