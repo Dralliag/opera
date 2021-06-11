@@ -13,8 +13,8 @@ Pierre Gaillard, Yannig Goude
 
 <!-- badges: start -->
 
-[![version](http://www.r-pkg.org/badges/version/opera)](https://CRAN.R-project.org/package=opera)
-[![cranlogs](http://cranlogs.r-pkg.org/badges/opera)](https://CRAN.R-project.org/package=opera)
+[![version](https://www.r-pkg.org/badges/version/opera)](https://CRAN.R-project.org/package=opera)
+[![cranlogs](https://cranlogs.r-pkg.org/badges/opera)](https://CRAN.R-project.org/package=opera)
 [![cran
 checks](https://cranchecks.info/badges/worst/opera)](https://cranchecks.info/pkgs/opera)
 <!-- badges: end -->
