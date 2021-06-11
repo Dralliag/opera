@@ -9,8 +9,6 @@ Pierre Gaillard, Yannig Goude
   - [Installation](#installation)
   - [Example: predict the weekly electricity
     consumption.](#example-predict-the-weekly-electricity-consumption.)
-  - [About the predictions](#about-the-predictions)
-  - [Block by block predictions](#block-by-block-predictions)
   - [Meta](#meta)
 
 <!-- badges: start -->
@@ -171,8 +169,7 @@ for (i in seq(idx_data_test)) {
 
 ``` r
 library(caret)
-gbm.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek, 
-                 data = data_train, method = "gbm")
+gbm.fit <- train(Load ~ IPI + IPI_CVS + Temp + Temp1 + Time + Load1 + NumWeek, data = data_train, method = "gbm")
 gbm.forecast <- predict(gbm.fit, newdata = data_test)
 ```
 
@@ -201,29 +198,27 @@ only for analysis and cannot be design online).
 
 ``` r
 oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "convex")
+print(oracle.convex)
 plot(oracle.convex)
 ```
 
 <p align="center">
 
+    #> Call:
+    #> oracle.default(Y = Y, experts = X, model = "convex", loss.type = "square")
+    #> 
+    #> Coefficients:
+    #>    gam    ar    gbm
+    #>  0.719 0.201 0.0799
+    #> 
+    #>                       rmse   mape
+    #> Best expert oracle:   1480 0.0202
+    #> Uniform combination:  1560 0.0198
+    #> Best convex oracle:   1440 0.0193
+
 <img src="inst/img/oracle-1.png" style="display: block; margin: auto;" />
 
 </p>
-
-``` r
-print(oracle.convex)
-#> Call:
-#> oracle.default(Y = Y, experts = X, model = "convex", loss.type = "square")
-#> 
-#> Coefficients:
-#>    gam    ar    gbm
-#>  0.719 0.201 0.0799
-#> 
-#>                       rmse   mape
-#> Best expert oracle:   1480 0.0202
-#> Uniform combination:  1560 0.0198
-#> Best convex oracle:   1440 0.0193
-```
 
 The parameter `loss.type` defines the evaluation criterion. It can be
 either the square loss, the percentage loss, the absolute loss, or the
@@ -307,7 +302,7 @@ MLpol <- predict(MLpol0, newexpert = X, newY = Y, online = TRUE)
 MLpol <- mixture(Y = Y, experts = X, model = "MLpol", loss.type = "square")
 ```
 
-## About the predictions
+### About the predictions
 
 The vector of predictions formed by the mixture can be obtained through
 the output prediction.
@@ -345,7 +340,7 @@ pred = newexperts %*% MLpol$coefficients
 
     #> [1] 64397.10 61317.41 63571.59
 
-## Block by block predictions
+### Block by block predictions
 
 In some situations, the aggregation model cannot be updated at each step
 due to an operational constraint. One must predict the time-series
@@ -359,7 +354,7 @@ prediction, we need to predict every four weeks, the consumption of the
 next four weeks. Below we show two different ways to use the `opera`
 package to do this.
 
-### Using d-dimensional time-series
+#### Using d-dimensional time-series
 
 Note that the outputs \(y_1,\dots,y_n\) to be predicted step by step can
 be \(d\)-dimensional in `opera`. In this case, the argument `Y` provided
@@ -396,7 +391,7 @@ dimensional time-series by using the function `blockToSeries`.
 prediction <- blockToSeries(MLpolBlock$prediction)
 ```
 
-### Using the `online = FALSE` option
+#### Using the `online = FALSE` option
 
 Another equivalent solution is to use the `online = FALSE` option in the
 predict function. The latter ensures that the model coefficients are not
@@ -414,13 +409,13 @@ for (i in 0:(n-1)) {
 
 As we see below, the coefficients are updated every four lines only.
 
-    #>            gam         ar       gbm
-    #> [1,] 0.3333333 0.33333333 0.3333333
-    #> [2,] 0.0000000 0.19648764 0.8035124
-    #> [3,] 0.3773681 0.00000000 0.6226319
-    #> [4,] 0.1631607 0.00000000 0.8368393
-    #> [5,] 0.1437215 0.00000000 0.8562785
-    #> [6,] 0.5203173 0.05667268 0.4230100
+    #>           [,1]      [,2]      [,3]
+    #> [1,] 0.3333333 0.3333333 0.3333333
+    #> [2,] 0.3333333 0.3333333 0.3333333
+    #> [3,] 0.3333333 0.3333333 0.3333333
+    #> [4,] 0.3333333 0.3333333 0.3333333
+    #> [5,] 0.1437215 0.0000000 0.8562785
+    #> [6,] 0.1437215 0.0000000 0.8562785
 
 # Meta
 
