@@ -25,8 +25,7 @@
 plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
   def.par <- par(no.readonly = TRUE) # save default, for resetting...
   if (pause) par(ask=TRUE)
-  x$experts <- data.frame(x$experts)
-  K <- length(x$experts)
+  K <- ncol(x$experts)
   w.order <- order(apply(x$weights,2,mean),decreasing = TRUE)
   
   if (is.null(col)) {
@@ -37,7 +36,6 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
       col <- rev(RColorBrewer::brewer.pal(n = max(min(K,11),4),name = "Spectral"))[1:min(K,11)]
     }
   }
-
     
   my.colors <- col
   
@@ -52,7 +50,7 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
     layout(matrix(c(1,2,3,4,5,6),nrow = 3,ncol =  2, byrow = TRUE))  
   }
   par(mar = c(3, 3, 1.6, 0.1), mgp = c(2, 0.5, 0))
-  x$experts <- data.frame(x$experts)
+  # x$experts <- data.frame(x$experts)
   x$Y <- c(t(x$Y))
   x$prediction <- c(t(x$prediction))
   x$weights <- data.frame(x$weights)
@@ -60,13 +58,13 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
   d <- x$d
   
   if (!is.null(x$names.experts)) {
-    names(x$weights) <- names(x$experts) <- x$names.experts
+    names(x$weights) <- colnames(x$experts) <- x$names.experts
   } else {
-    if (is.null(names(x$experts))) {
-      names(x$weights) <- names(x$experts) <- x$names.experts <- paste("X", 1:K,sep="")
+    if (is.null(colnames(x$experts))) {
+      names(x$weights) <- colnames(x$experts) <- x$names.experts <- paste("X", 1:K,sep="")
     }
   }
-  l.names <- max(nchar(names(x$experts))) / 3 + 1.7
+  l.names <- max(nchar(colnames(x$experts))) / 3 + 1.7
   
   if (x$model == "Ridge") {
     # Linear aggregation rule
@@ -75,7 +73,7 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
     matplot(x$weights, type = "l", xlab = "", ylab = "", lty = 1:5, main = "Weights associated with the experts", col = col,...)
     mtext(side = 2, text = "Weights", line = 1.8, cex = 1)
     # mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)
-    mtext(side = 4, text = names(x$experts), at = x$weights[T,], las = 2, col = col, cex= 0.5, line = 0.3)
+    mtext(side = 4, text = colnames(x$experts), at = x$weights[T,], las = 2, col = col, cex= 0.5, line = 0.3)
   } else {
     # Convex aggregation rule
     par(mar = c(3, 3, 2, l.names/2), mgp = c(1, 0.5, 0))
@@ -99,12 +97,12 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
       w.summed.old <- w.summed
       w.summed <- w.summed - x$weights[,j]
       i.remaining[j] <- FALSE
-      writeLegend(f = w.summed.old,w.summed,name = names(x$experts)[j])
+      writeLegend(f = w.summed.old,w.summed,name = colnames(x$experts)[j])
     }
     axis(1)
     axis(2)
     box()
-    names.toWrite <- names(x$experts)
+    names.toWrite <- colnames(x$experts)
     names.toWrite[w.order[-(1:min(K,15))]] <- ""
     mtext(side = 4, text = names.toWrite[i.order], 
           at = (1-cumsum(c(x$weights[T,i.order])))  + x$weights[T,i.order]/2, las = 2, col = col[i.order], cex= 0.5, line = 0.3)
@@ -172,7 +170,7 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
   legend(place, c("Experts", x$model), bty = "n", lty = 1, col = c("gray", 1), lwd = c(1,2))
   
   #losses
-  l.names <- max(max(nchar(names(x$experts))) / 3 + 1.7,4)
+  l.names <- max(max(nchar(colnames(x$experts))) / 3 + 1.7,4)
   x$loss.experts <- apply(loss(x = pred.experts,y = x$Y,loss.type = x$loss.type),2,mean)
   err.unif <- lossConv(rep(1/K, K), x$Y, x$experts, awake = x$awake, loss.type = x$loss.type)
   err.mixt <- x$loss
@@ -185,7 +183,7 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
        col = my.col, lwd = 2,type='b')
   mtext(side = 2, text = paste(x$loss.type$name,"loss"), line = 1.8, cex = 1)
   axis(1, at = 1:(K + 2), labels = FALSE)
-  mtext(at = 1:(K + 2), text = c(names(x$experts), "Uniform", x$model)[idx.sorted], 
+  mtext(at = 1:(K + 2), text = c(colnames(x$experts), "Uniform", x$model)[idx.sorted], 
         side = 1, las = 2, col = my.col, line = 0.8,cex = .7)
   axis(2)
   box()

@@ -12,7 +12,6 @@ plot.oracle <- function(x, sort = TRUE, col = NULL, ...) {
     x$experts <- blockToSeries(x$experts)
     x$Y <- blockToSeries(x$Y)
   }
-  x$experts <- data.frame(x$experts)
   
   T <- nrow(x$experts)
   K <- ncol(x$experts)
