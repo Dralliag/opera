@@ -23,7 +23,6 @@ bestShifts <- function(y, experts, awake = NULL, loss.type = list(name = "square
   L[1, , ] <- 0
   instanceLoss <- array(0, dim = c(N, 3))
   
-  # browser()
   for (t in 1:T) {
     if (!(t%%100) && trace) {
       cat(floor(t^2/T^2 * 10000)/100, "% -- ")
