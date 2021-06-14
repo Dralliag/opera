@@ -84,8 +84,6 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     stop("newY cannot be null to perform online prediction. Provide newY or set online = FALSE")
   }
   
-  newexperts <- matrix(as.numeric(as.matrix(newexperts)), nrow = T)
-  
   # Batch prediction and weights
   if (!online) {
     w <- matrix(object$coefficients, ncol = 1)
@@ -191,7 +189,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
         newobject$names.experts <- colnames(newexperts)
       } else {
         if (!is.null(names(newexperts))) {
-          newobject$names.experts <- names(newexperts)
+          newobject$names.experts <- colnames(newexperts)
         } else {
           newobject$names.experts <- paste("X",1:N,sep="")
         }

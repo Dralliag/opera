@@ -79,12 +79,35 @@ oracle <- function(Y, experts, model = "convex", loss.type = "square", awake = N
 oracle.default <- function(Y, experts, model = "convex", loss.type = "square", awake = NULL, 
   lambda = NULL, niter = NULL, ...) {
   
+  # check class of experts
+  if (! is.null(experts) && ! "array" %in% class(experts)) { 
+    experts <- tryCatch({
+      as.array(experts)
+    }, error = function(e) {
+      cat("Error when casting experts to array : \n", 
+          e[[1]])
+    })
+  }
+  # check type of experts
+  if (! is.null(experts) && typeof(experts) != "double") { 
+    storage.mode(experts) <- "numeric" 
+  }
+  
+  # check class of awake
+  if (! is.null(awake) && ! "array" %in% class(awake)) {
+    awake <- tryCatch({
+      as.array(awake)
+    }, error = function(e) {
+      cat("Error when casting awake to array : \n", 
+          e[[1]])
+    })
+  }
+  
   # Test that Y and experts have correct dimensions
   if (is.null(Y) || is.null(experts)) {
     stop("Y and experts should not be null")
   }
   if (length(Y) == 1) {
-    experts <- as.matrix(experts)
     if (nrow(experts) == 1 || ncol(experts) == 1) {
       experts <- matrix(experts, nrow = 1)
     } else {
@@ -106,6 +129,10 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
   
   if (!(length(Y) == nrow(experts))) {
     stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
+  }
+  
+  if (typeof(experts) != "numeric") {
+    storage.mode(experts)  <- "numeric"
   }
   
   if (is.null(loss.type)) {
@@ -150,7 +177,6 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
     stop("Y should be non-negative for percentage loss function")
   }
   names.experts <- colnames(experts)
-  experts <- matrix(as.numeric(as.matrix(experts)), nrow = length(Y))
   colnames(experts) <- names.experts
   
   # if we are looking for the best convex combination of experts

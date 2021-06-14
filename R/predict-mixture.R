@@ -48,6 +48,30 @@
 predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL, 
                             online = TRUE, type = c("model", "response", "weights", "all"), ...) {
   
+  # check class of newexperts
+  if (! is.null(newexperts) && "array" %in% class(newexperts)) { 
+    newexperts <- tryCatch({
+      as.array(newexperts)
+    }, error = function(e) {
+      cat("Error when casting newexperts to array : \n", 
+          e[[1]])
+    })
+  }
+  # check type of newexperts
+  if (! is.null(newexperts) && typeof(newexperts) != "numeric") {
+    storage.mode(newexperts) <- "numeric" 
+  }
+  
+  # check class of awake
+  if (! is.null(awake) && ! "array" %in% class(awake)) {
+    awake <- tryCatch({
+      as.array(awake)
+    }, error = function(e) {
+      cat("Error when casting awake to array : \n", 
+          e[[1]])
+    })
+  }
+  
   result <- object
   d <- object$d
   if ((d == 1) || (d == "unknown" && is.null(dim(newY)))) {
@@ -84,9 +108,9 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
         stop("Batch prediction are currently not supported for dimension > 1")
       }
       if (!is.null(awake)){
-        awakei <- as.matrix(awake[i,,])
+        awakei <- awake[i,,]
       }
-      result <- predictReal(result, newexperts = as.matrix(newexperts[i,,]), newY = c(newY[i,]), awake = awakei, 
+      result <- predictReal(result, newexperts = newexperts[i,,], newY = c(newY[i,]), awake = awakei,
                             online = FALSE, type, ...)
     }
   }

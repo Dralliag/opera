@@ -8,8 +8,7 @@ print.oracle <- function(x, ...) {
   }
   if (x$model != "shifting") {
     cat("\nCoefficients:\n")
-    x$coefficients <- data.frame(matrix(as.numeric(as.matrix(x$coefficients)), 
-                                        nrow = 1))
+    x$coefficients <- data.frame(as.list(x$coefficients))
     names(x$coefficients) <- colnames(x$experts)
     rownames(x$coefficients) <- ""
     print(signif(x$coefficients, digits = 3))

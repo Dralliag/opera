@@ -2,7 +2,6 @@
 #' @importFrom stats runif optim 
 bestConvex <- function(y, experts, awake = NULL, loss.type = list(name = "square"), 
   niter = 1, ...) {
-  experts <- matrix(as.numeric(as.matrix(experts)), nrow = length(y))
   N <- ncol(experts)
   
   # if there are no NA and if awake is null we can perform an exact resolution for

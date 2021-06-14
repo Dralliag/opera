@@ -142,6 +142,29 @@ mixture <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "squa
 mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square", 
   loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list()) {
   
+  # check class of experts
+  if (! is.null(experts) && ! "array" %in% class(experts)) {
+    experts <- tryCatch({
+      as.array(experts)
+    }, error = function(e) {
+      cat("Error when casting experts to array : \n", 
+             e[[1]])
+    })
+  }
+  # check type of experts
+  if (! is.null(experts) && typeof(experts) != "numeric") { 
+    storage.mode(experts) <- "numeric" 
+  }
+  
+  # check class of awake
+  if (! is.null(awake) && ! "array" %in% class(awake)) { 
+    awake <- tryCatch({
+      as.array(awake)
+    }, error = function(e) {
+      cat("Error when casting awake to array : \n", 
+          e[[1]])
+    })
+  }
   
   if (!is.list(loss.type)) {
     loss.type <- list(name = loss.type)
@@ -190,9 +213,7 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
     
     if (T == 1 && d == 1) {
       experts <- as.matrix(experts)
-      if (nrow(experts) == 1 || ncol(experts) == 1) {
-        experts <- matrix(as.numeric(experts), nrow = 1)
-      } else {
+      if (! (nrow(experts) == 1 || ncol(experts) == 1)) {
         stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
       }
     }
