@@ -5,5 +5,17 @@
 # @author Pierre Gaillard <pierre@@gaillard.me> @keywords ~kwd1 ~kwd2
 
 truncate1 <- function(x) {
-  pmin(pmax(x, exp(-700)), exp(700))
+  is_sup <- max(x) > exp(700)
+  is_inf <- min(x) <= exp(-700)
+  
+  res <- x
+  
+  if (is_sup) {
+    res <- pmin(res, exp(700))
+  }
+  if (is_inf) {
+    res <- pmax(res, exp(-700))
+  }
+  
+  return(res)
 } 
