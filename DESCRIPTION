@@ -26,7 +26,8 @@ Suggests:
     survival,
     knitr,
     gbm,
-    htmltools
+    htmltools,
+    rmarkdown
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
