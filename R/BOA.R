@@ -1,6 +1,6 @@
 
 BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-  w0 = NULL, training = NULL) {
+  w0 = NULL, training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE)) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -57,7 +57,6 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
     loss_tau <- loss.type$tau
   }
   
-  if (!exists("use_cpp")){use_cpp<-TRUE}
   if (use_cpp){
     computeBOAEigen(awake,eta,experts,weights,y,prediction,
                     w,w0,R,R.reg,B,V,loss_name,loss_tau,loss.gradient);

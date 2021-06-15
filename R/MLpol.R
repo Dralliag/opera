@@ -1,5 +1,5 @@
 MLpol <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-  training = NULL) {
+  training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE)) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -43,7 +43,6 @@ MLpol <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
   }
   
   w <- rep(0, N)
-  if (!exists("use_cpp")){use_cpp<-TRUE}
   
   if (use_cpp){
       B <- computeMLPolEigen(awake,eta,experts,weights,y,prediction,

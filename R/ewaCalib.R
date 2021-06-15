@@ -1,6 +1,7 @@
 
 ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square", 
-  loss.gradient = TRUE, w0 = NULL, trace = F, gamma = 2, training = NULL) {
+  loss.gradient = TRUE, w0 = NULL, trace = F, gamma = 2, training = NULL,
+  use_cpp = getOption("opera_use_cpp", default = TRUE)) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -61,11 +62,6 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
     loss_tau <- loss.type$tau
   }
   #end C++ modif
-  
-  if (!exists("use_cpp")){
-    use_cpp<-TRUE
-  }
-  
   
   
   for (t in 1:T) {

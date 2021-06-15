@@ -1,5 +1,5 @@
 ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-  w0 = NULL, training = NULL) {
+  w0 = NULL, training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE)) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -40,9 +40,6 @@ ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradie
     loss_tau <- loss.type$tau
   }
   #end LP
-  if (!exists("use_cpp")){
-    use_cpp<-TRUE
-  }
   
   if (use_cpp){
     cumulativeLoss<-computeEWAEigen(

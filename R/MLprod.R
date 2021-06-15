@@ -1,5 +1,5 @@
 MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-  w0 = NULL, training = NULL) {
+  w0 = NULL, training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE)) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -44,8 +44,6 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
   if (!is.null(loss.type$tau)){
     loss_tau <- loss.type$tau
   }
-  
-  if (!exists("use_cpp")){use_cpp<-TRUE}
   
   if (use_cpp){
     B <- computeMLProdEigen(awake,eta,experts,weights,y,prediction,

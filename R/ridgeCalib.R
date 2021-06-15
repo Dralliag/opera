@@ -1,6 +1,6 @@
 # Ridge aggregation rule with automatic calibration of smoothing parameters
 ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, gamma = 2, 
-  training = NULL) {
+  training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE)) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -42,9 +42,6 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
     T0 <- 0
   }
   
-  if (!exists("use_cpp")){
-    use_cpp<-TRUE
-  }
   
   lambda <- rep(grid.lambda[bestlambda], T)
   for (t in 1:T) {

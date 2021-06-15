@@ -1,5 +1,6 @@
 
-ridge <- function(y, experts, lambda, w0 = NULL, training = NULL) {
+ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
+                  use_cpp = getOption("opera_use_cpp", default = TRUE)) {
   experts <- as.matrix(experts)
   N <- ncol(experts)
   T <- nrow(experts)
@@ -23,9 +24,6 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL) {
     bt <- matrix(lambda * w0, nrow = N)
   }
   #start C++ insertion
-  if (!exists("use_cpp")){
-    use_cpp<-TRUE
-  }
   
   
   if (use_cpp){
