@@ -22,15 +22,12 @@
 #' sequence of experts with at most $m$ shifts that would have performed the
 #' best to predict the sequence of observations in \code{Y}.}
 #' }
-#' @param loss.type A string or a list with a component 'name' specifying
-#' the loss function considered to evaluate the performance. It can be
-#' 'square', 'absolute', 'percentage', or 'pinball'. In the case of the pinball loss, the quantile 
-#' can be provided by assigning to loss.type a list of two elements: 
+#' @param loss.type \code{character, list or function}. 
 #' \describe{
-#'      \item{name}{A string defining the name of the loss function (i.e., 'pinball')}
-#'      \item{tau}{ A number in \code{[0,1]} defining the quantile to be predicted. The default value is 0.5 to predict the median.}
-#' } 
-#' 
+#'      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
+#'      \item{list}{ When using pinball loss: list with field name equal to 'pinball' and field tau equal to the required quantile in [0,1];}
+#'      \item{function}{ A custom loss as a function of two parameters.}
+#' }
 #' @param lambda A positive number used by the 'linear' oracle only. 
 #' A possible $L_2$ regularization parameter for computing the linear oracle 
 #' (if the design matrix is not identifiable)
@@ -79,29 +76,9 @@ oracle <- function(Y, experts, model = "convex", loss.type = "square", awake = N
 oracle.default <- function(Y, experts, model = "convex", loss.type = "square", awake = NULL, 
   lambda = NULL, niter = NULL, ...) {
   
-  # check class of experts
-  if (! is.null(experts) && ! "array" %in% class(experts)) { 
-    experts <- tryCatch({
-      as.array(experts)
-    }, error = function(e) {
-      cat("Error when casting experts to array : \n", 
-          e[[1]])
-    })
-  }
-  # check type of experts
-  if (! is.null(experts) && typeof(experts) != "double") { 
-    storage.mode(experts) <- "numeric" 
-  }
-  
-  # check class of awake
-  if (! is.null(awake) && ! "array" %in% class(awake)) {
-    awake <- tryCatch({
-      as.array(awake)
-    }, error = function(e) {
-      cat("Error when casting awake to array : \n", 
-          e[[1]])
-    })
-  }
+  # checks
+  experts <- check_matrix(experts, "experts")
+  awake <- opera:::check_matrix(awake, "awake")
   
   # Test that Y and experts have correct dimensions
   if (is.null(Y) || is.null(experts)) {
@@ -131,21 +108,22 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
     stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
   }
   
-  if (typeof(experts) != "numeric") {
-    storage.mode(experts)  <- "numeric"
-  }
-  
   if (is.null(loss.type)) {
     loss.type <- list(name = "square")
   }
-  if (!is.list(loss.type)) {
-    loss.type <- list(name = loss.type)
-  }
-  if (!(loss.type$name %in% c("pinball", "square", "percentage", "absolute"))) {
-    stop("loss.type should be one of these: 'absolute', 'percentage', 'square', 'pinball'")
-  }
-  if (!is.null(loss.type$tau) && loss.type$name != "pinball") {
-    warning("Unused parameter tau (loss.type != 'pinball')")
+  if (! class(loss.type) == "function") {
+    if (!is.list(loss.type)) {
+      loss.type <- list(name = loss.type)
+    }
+    if (!(loss.type$name %in% c("pinball", "square", "percentage", "absolute"))) {
+      stop("loss.type should be one of these: 'absolute', 'percentage', 'square', 'pinball'")
+    }
+    if (!is.null(loss.type$tau) && loss.type$name != "pinball") {
+      warning("Unused parameter tau (loss.type != 'pinball')")
+    }
+    if (min(Y) <= 0 && loss.type$name == "percentage") {
+      stop("Y should be non-negative for percentage loss function")
+    }
   }
   if (!is.null(lambda) && model != "linear") {
     warning("Unused lambda parameter (model != 'linear')")
@@ -172,9 +150,6 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
   
   if (!(model %in% c("convex", "linear", "shifting", "expert"))) {
     stop("Wrong model specification")
-  }
-  if (min(Y) <= 0 && loss.type$name == "percentage") {
-    stop("Y should be non-negative for percentage loss function")
   }
   names.experts <- colnames(experts)
   colnames(experts) <- names.experts

@@ -37,6 +37,9 @@
 #'    be obtained from the last rows of object$weights.}
 #'    \item{all}{return a list containing 'model', 'response', and 'weights'.}
 #'    }
+#'    
+#' @param \code{use_cpp}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
+#' with the use of custom loss function.
 #' 
 #' @param ...  further arguments are ignored
 #' 
@@ -46,30 +49,17 @@
 #' 
 #' @export 
 predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL, 
-                            online = TRUE, type = c("model", "response", "weights", "all"), ...) {
+                            online = TRUE, type = c("model", "response", "weights", "all"),
+                            use_cpp = getOption("opera_use_cpp", default = TRUE), ...) {
   
-  # check class of newexperts
-  if (! is.null(newexperts) && "array" %in% class(newexperts)) { 
-    newexperts <- tryCatch({
-      as.array(newexperts)
-    }, error = function(e) {
-      cat("Error when casting newexperts to array : \n", 
-          e[[1]])
-    })
-  }
-  # check type of newexperts
-  if (! is.null(newexperts) && typeof(newexperts) != "numeric") {
-    storage.mode(newexperts) <- "numeric" 
-  }
+  # checks
+  newexperts <- check_matrix(newexperts, "newexperts")
+  awake <- check_matrix(awake, "awake")
   
-  # check class of awake
-  if (! is.null(awake) && ! "array" %in% class(awake)) {
-    awake <- tryCatch({
-      as.array(awake)
-    }, error = function(e) {
-      cat("Error when casting awake to array : \n", 
-          e[[1]])
-    })
+  if (class(object$loss.type) == "function" || class(object$loss.type[[1]]) == "function") {
+    if (use_cpp == TRUE) {
+      stop("Custom loss functions are not yet available when use_cpp == TRUE (check $loss.type).") 
+    }
   }
   
   result <- object
@@ -77,7 +67,7 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
   if ((d == 1) || (d == "unknown" && is.null(dim(newY)))) {
     object$d <- 1
     return(predictReal(object, newexperts, newY, awake, 
-                online, type, ...))
+                online, type, use_cpp = use_cpp, ...))
   } else {
     if (d == "unknown") {
       d = dim(newY)[2]
@@ -111,7 +101,7 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
         awakei <- awake[i,,]
       }
       result <- predictReal(result, newexperts = newexperts[i,,], newY = c(newY[i,]), awake = awakei,
-                            online = FALSE, type, ...)
+                            online = FALSE, type, use_cpp = use_cpp, ...)
     }
   }
   result$weights <- matrix(result$weights, nrow = result$T)

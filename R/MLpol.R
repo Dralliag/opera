@@ -29,17 +29,19 @@ MLpol <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
   }
   
   #start C++ modification
-  if (!is.list(loss.type)) {
-    loss.type <- list(name = loss.type)
-  }
-  if (is.null(loss.type$tau) && loss.type$name == "pinball") {
-    loss.type$tau <- 0.5
-  }
-  
-  loss_name <- loss.type$name
-  loss_tau <- 0
-  if (!is.null(loss.type$tau)){
-    loss_tau <- loss.type$tau
+  if (! class(loss.type) == "function") {
+    if (!is.list(loss.type)) {
+      loss.type <- list(name = loss.type)
+    }
+    if (is.null(loss.type$tau) && loss.type$name == "pinball") {
+      loss.type$tau <- 0.5
+    }
+    
+    loss_name <- loss.type$name
+    loss_tau <- 0
+    if (!is.null(loss.type$tau)){
+      loss_tau <- loss.type$tau
+    } 
   }
   
   w <- rep(0, N)

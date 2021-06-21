@@ -1,5 +1,6 @@
 predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL, 
-                            online = TRUE, type = c("model", "response", "weights", "all"), ...) {
+                        online = TRUE, type = c("model", "response", "weights", "all"),
+                        use_cpp = getOption("opera_use_cpp", default = TRUE), ...) {
   
   type <- match.arg(type)
   
@@ -7,11 +8,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
   if (!is.null(newY)) {
     T <- length(newY)
     if (is.null(object$names.experts)) {
-      if (T == 1) {
-        object$names.experts <- names(newexperts)
-      } else {
-        object$names.experts <- colnames(newexperts)
-      }
+      object$names.experts <- colnames(newexperts)
     }
     newexperts <- matrix(newexperts, nrow = T)
     N <- ncol(newexperts)
@@ -44,7 +41,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
   newexperts[idx.na] <- 0
   
   if (is.null(object$training) && (object$coefficients[1] != "Uniform") && (object$model == 
-                                                                         "MLpol")) {
+                                                                            "MLpol")) {
     stop(paste(object$model, "cannot handle non-uniform prior weight vector"))
   }
   
@@ -56,12 +53,14 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     stop("Bad number of experts: (length(object$coefficients) != nrow(newexperts))")
   }
   
-  if (!is.null(object$loss.type$tau) && object$loss.type$name != "pinball") {
-    warning("Unused parameter tau (loss.type$name != 'pinball)")
-  }
-  
-  if (object$loss.type$name != "square" && object$model == "Ridge") {
-    stop(paste("Square loss is require for", object$model, "model."))
+  if (! (class(object$loss.type) == "function" || class(object$loss.type[[1]]) == "function")) {
+    if (!is.null(object$loss.type$tau) && object$loss.type$name != "pinball") {
+      warning("Unused parameter tau (loss.type$name != 'pinball)")
+    }
+    
+    if (object$loss.type$name != "square" && object$model == "Ridge") {
+      stop(paste("Square loss is require for", object$model, "model."))
+    }
   }
   
   if (!is.null(awake) && !identical(awake, matrix(1, nrow = T, ncol = N)) && (object$model == 
@@ -109,17 +108,17 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
       if (is.null(object$parameters$lambda) || !is.null(object$parameters$grid.lambda)) {
         newobject <- ridgeCalib(y = newY, experts = newexperts, w0 = object$coefficients, 
                                 gamma = object$parameters$gamma, grid.lambda = object$parameters$grid.lambda, 
-                                training = object$training)
+                                training = object$training, use_cpp = use_cpp)
         newobject$parameters$lambda <- c(object$parameters$lambda, newobject$parameters$lambda)
       } else {
         newobject <- ridge(y = newY, experts = newexperts, lambda = object$parameters$lambda, 
-                           w0 = object$coefficients, training = object$training)
+                           w0 = object$coefficients, training = object$training, use_cpp = use_cpp)
       }
     }
     
     if (object$model == "MLpol") {
       newobject <- MLpol(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
-                         loss.gradient = object$loss.gradient, training = object$training)
+                         loss.gradient = object$loss.gradient, training = object$training, use_cpp = use_cpp)
       newobject$parameters <- list(eta = rbind(object$parameters$eta, newobject$parameters$eta))
     }
     
@@ -135,7 +134,8 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
                                                                  "MLprod")) {
       algo <- eval(parse(text = object$model))
       newobject <- algo(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
-                        loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training)
+                        loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training,
+                        use_cpp = use_cpp)
       newobject$parameters <- list(eta = rbind(object$parameters$eta, newobject$parameters$eta))
     }
     
@@ -148,12 +148,12 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
         newobject <- ewaCalib(y = newY, experts = newexperts, awake = awake, 
                               loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
                               w0 = object$coefficients, gamma = object$parameters$gamma, grid.eta = sort(object$parameters$grid.eta), 
-                              training = object$training)
+                              training = object$training, use_cpp = use_cpp)
         newobject$parameters$eta <- c(object$parameters$eta, newobject$parameters$eta)
       } else {
         newobject <- ewa(y = newY, experts = newexperts, eta = object$parameters$eta, 
                          awake = awake, loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
-                         w0 = object$coefficients, training = object$training)
+                         w0 = object$coefficients, training = object$training, use_cpp = use_cpp)
       }
     }
     
@@ -232,11 +232,15 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
         newpred <- newobject$prediction
       }
     }
-  
+    
     newobject$prediction <- rbind(object$prediction, matrix(newpred, ncol = object$d))
     newobject$weights <- rbind(object$weights, newweights)
     rownames(newobject$weights) <- NULL
-    newobject$loss <- mean(loss(c(newobject$prediction), c(newobject$Y), loss.type = newobject$loss.type))
+    if (! (class(object$loss.type) == "function" && object$loss.gradient == T)) {
+      newobject$loss <- mean(loss(c(newobject$prediction), c(newobject$Y), loss.type = newobject$loss.type)) 
+    } else {
+      newobject$loss <- "unused when the loss is provided and loss.gradient == T"
+    }
     newobject$T <- object$T + T/object$d
     newobject$d <- object$d
   } else {

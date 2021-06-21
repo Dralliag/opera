@@ -109,6 +109,9 @@
 #'    more regularity assumption on the underlying process genearting the data (i.i.d. for instance). }
 #' }
 #' 
+#' @param \code{use_cpp}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
+#' with the use of custom loss function.
+#' 
 #' 
 #' @return An object of class mixture that can be used to perform new predictions. 
 #' It contains the parameters \code{model}, \code{loss.type}, \code{loss.gradient},
@@ -135,42 +138,30 @@
 #' @export mixture
 
 mixture <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square", 
-  loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list()) UseMethod("mixture")
+                    loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list(),
+                    use_cpp = getOption("opera_use_cpp", default = TRUE)) UseMethod("mixture")
 
 
 #' @export 
 mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square", 
-  loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list()) {
+                            loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list(),
+                            use_cpp = getOption("opera_use_cpp", default = TRUE)) {
   
-  # check class of experts
-  if (! is.null(experts) && ! "array" %in% class(experts)) {
-    experts <- tryCatch({
-      as.array(experts)
-    }, error = function(e) {
-      cat("Error when casting experts to array : \n", 
-             e[[1]])
-    })
-  }
-  # check type of experts
-  if (! is.null(experts) && typeof(experts) != "numeric") { 
-    storage.mode(experts) <- "numeric" 
-  }
-  
-  # check class of awake
-  if (! is.null(awake) && ! "array" %in% class(awake)) { 
-    awake <- tryCatch({
-      as.array(awake)
-    }, error = function(e) {
-      cat("Error when casting awake to array : \n", 
-          e[[1]])
-    })
-  }
-  
-  if (!is.list(loss.type)) {
-    loss.type <- list(name = loss.type)
-  }
-  if (!(loss.type$name %in% c("pinball", "square", "percentage", "absolute"))) {
-    stop("loss.type should be one of these: 'absolute', 'percentage', 'square', 'pinball'")
+  # checks
+  experts <- check_matrix(experts, "experts")
+  awake <- check_matrix(awake, "awake")
+
+  if (class(loss.type) == "function") {
+    if (use_cpp == TRUE) {
+      stop("Custom loss functions are not yet available when use_cpp == TRUE.") 
+    }
+  } else {
+    if (!is.list(loss.type)) {
+      loss.type <- list(name = loss.type)
+    }
+    if (!(loss.type$name %in% c("pinball", "square", "percentage", "absolute"))) {
+      stop("loss.type should be one of these: 'absolute', 'percentage', 'square', 'pinball'")
+    } 
   }
   
   
@@ -223,7 +214,7 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
     }
     object$d <- d
     object <- predict(object, newY = Y, newexperts = experts, awake = awake, 
-      type = "model")
+      type = "model", use_cpp = use_cpp)
     
   }
   return(object)
