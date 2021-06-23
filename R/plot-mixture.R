@@ -11,7 +11,7 @@
 #' @param type \code{char}.
 #' \itemize{
 #'      \item{'all'}{ Display all the graphs ;}
-#'      \item{'plot_weight', 'boxplot_weight', 'cumul_sq_loss', 'cumul_res', 'avg_loss', 'contrib'}{ Display the selected graph alone.}
+#'      \item{'plot_weight', 'boxplot_weight', 'dyn_avg_loss', 'cumul_res', 'avg_loss', 'contrib'}{ Display the selected graph alone.}
 #' }
 #' @param max_experts \code{integer}. Maximum number of experts to be displayed (only the more influencial).
 #' @param ... additional plotting parameters
@@ -42,7 +42,7 @@ plot.mixture <- function(x,
                          alpha = 0.01,
                          dynamic = T, 
                          type = c('all', 'plot_weight', 'boxplot_weight', 
-                                  'cumul_sq_loss', 'cumul_res', 
+                                  'dyn_avg_loss', 'cumul_res', 
                                   'avg_loss', 'contrib'
                          ), 
                          max_experts = 50,
@@ -99,7 +99,7 @@ plot.mixture <- function(x,
   }
   
   if (ncol(x$weights) > max_experts + 2) {
-    l.names <- max(nchar(c(colnames(x$experts), "sup_lower"))) / 3 + 1.7
+    l.names <- max(nchar(c(colnames(x$experts), "worst_others"))) / 3 + 1.7
     col[1:ncol(x$weight) <= ncol(x$weights) - max_experts] <- "grey"
     
   } else {
@@ -124,7 +124,7 @@ plot.mixture <- function(x,
       
       if (ncol(x$weights) > max_experts + 2) {
         tmp_weights <- x$weights[, c(1, max_experts, (ncol(x$weights) - max_experts + 1):ncol(x$weights))]
-        names(tmp_weights)[1:2] <- c("inf_lower", "sup_lower")
+        names(tmp_weights)[1:2] <- c("worst_others", "best_others")
       } else {
         tmp_weights <- x$weights[, max(1, ncol(x$weights) - max_experts):ncol(x$weights)]
       }
@@ -157,7 +157,7 @@ plot.mixture <- function(x,
         tmp_weights <- x$weights[]
         tmp_weights <- cbind(apply(tmp_weights[1:(ncol(tmp_weights) - max_experts)], 1, sum), 
                              tmp_weights[, (ncol(tmp_weights) - max_experts + 1):ncol(tmp_weights)])
-        names(tmp_weights)[1] <- "lower_weigths"
+        names(tmp_weights)[1] <- "others"
         tmp_K <- min(K, max_experts + 1)
         tmp_cols <- c(rev(col)[1:(tmp_K-1)], "grey")
         
@@ -227,12 +227,12 @@ plot.mixture <- function(x,
       if (ncol(x$weights) > max_experts + 2) {
         if (ncol(x$weights) <= 15) {
           i.order <- c(i.order, max_experts + 1, ncol(x$weights))
-          names(normalized.weights)[c(1, ncol(x$weights) - min(14, max_experts + 1) + 1)] <- c("inf_lower", "sup_lower")
+          names(normalized.weights)[c(1, ncol(x$weights) - min(14, max_experts + 1) + 1)] <- c("worst_others", "best_others")
           tmp_col <- rev(col) ; tmp_col[1:ncol(x$weight) > 13] <- "grey"
           
         } else {
           i.order <- c(i.order[1:min(13, max_experts)], min(14, max_experts + 1), ncol(x$weights))
-          names(normalized.weights)[c(1, ncol(x$weights) - min(14, max_experts + 1) + 1)] <- c("inf_lower", "sup_lower")
+          names(normalized.weights)[c(1, ncol(x$weights) - min(14, max_experts + 1) + 1)] <- c("worst_others", "best_others")
           tmp_col <- rev(col) ; tmp_col[1:ncol(x$weight) > 13] <- "grey"
         }
       } else {
@@ -272,16 +272,16 @@ plot.mixture <- function(x,
     }
   }
   
-  # cumulative loss
-  if (type == "all" || type == "cumul_sq_loss") {
+  # dynamic average loss
+  if (type == "all" || type == "dyn_avg_loss") {
     if (! dynamic) {
       pred.experts <- data.frame(x$experts * x$awake + x$prediction * (1-x$awake))
-      cumul.losses <- apply(loss(pred.experts, x$Y, x$loss.type), 2, cumsum)[seq(d,T*d,by=d),]
-      cumul.exploss <- cumsum(loss(x$prediction, x$Y, x$loss.type))[seq(d,T*d,by=d)]
+      cumul.losses <- apply(loss(pred.experts, x$Y, x$loss.type), 2, cumsum)[seq(d,T*d,by=d),] / 1:T
+      cumul.exploss <- cumsum(loss(x$prediction, x$Y, x$loss.type))[seq(d,T*d,by=d)] / 1:T
       
       if (ncol(x$weights) > max_experts + 2) {
         cumul.losses <- cumul.losses[, -c(2:(ncol(x$weights) - max_experts - 1))]
-        colnames(cumul.losses)[1:2] <- c("inf_lower", "sup_lower")
+        colnames(cumul.losses)[1:2] <- c("worst_others", "best_others")
         tmp_col <- col[-c(2:(ncol(x$weights) - max_experts - 1))]
       } else {
         cumul.losses <- cumul.losses[, max(1, ncol(cumul.losses) - max_experts + 1):ncol(cumul.losses)]
@@ -292,7 +292,7 @@ plot.mixture <- function(x,
         par(mar = c(1.5, 3, 2.5, l.names/2), mgp = c(1, 0.5, 0))
       }
       
-      matplot(cumul.losses, type = "l", lty = 1, xlab = "", ylab = "",main = paste("Cumulative", x$loss.type$name, "loss"), 
+      matplot(cumul.losses, type = "l", lty = 1, xlab = "", ylab = "",main = "Dynamic average loss", 
               col = makeTransparent(tmp_col), ylim = range(c(cumul.losses,cumul.exploss)))
       lines(cumul.exploss, col = 1, lwd = 2)
       mtext(side = 2, text = "Cumulative loss", line = 1.8, cex = 1)
@@ -305,8 +305,8 @@ plot.mixture <- function(x,
       list_plt[[length(list_plt) + 1]] <- 
         {
           html_p <- rAmCharts::controlShinyPlot(
-            plot_cumul_sq_loss(data = x, colors = col, 
-                               max_experts = max_experts, round = 3
+            plot_dyn_avg_loss(data = x, colors = col, 
+                              max_experts = max_experts, round = 3
             )
           )
           html_p$height <- 322 + 22 * (min(K, max_experts) - 3)
@@ -325,7 +325,7 @@ plot.mixture <- function(x,
       
       if (ncol(x$weights) > max_experts + 2) {
         cumul.residuals <- cumul.residuals[, -c(2:(ncol(x$weights) - max_experts - 1))]
-        colnames(cumul.residuals)[1:2] <- c("inf_lower", "sup_lower")
+        colnames(cumul.residuals)[1:2] <- c("worst_others", "best_others")
         tmp_col <- col[-c(2:(ncol(x$weights) - max_experts - 1))]
       } else {
         cumul.residuals <- cumul.residuals[, max(1, ncol(cumul.residuals) - max_experts + 1):ncol(cumul.residuals)]
@@ -375,7 +375,7 @@ plot.mixture <- function(x,
       
       if (ncol(x$weights) > max_experts + 2) {
         x$loss.experts <- c(x$loss.experts[-c(2:(ncol(x$weight) - max_experts - 1))], "uniform" = err.unif, "mixt" = err.mixt)
-        names(x$loss.experts)[1:2] <- c("inf_lower", "sup_lower")
+        names(x$loss.experts)[1:2] <- c("worst_others", "best_others")
         idx.sorted <- order(x$loss.experts)
         tmp_cols <- c("grey", "grey", col[-c(1:(ncol(x$weight) - max_experts))], "black", "black")[idx.sorted]
         my.pch <- c(rep(20, length(x$loss.experts)-2),8,8)[idx.sorted]
@@ -523,7 +523,7 @@ cumulativePlot<-function(W,X,Y,col.pal=NULL, smooth = FALSE, plot.Y = FALSE, alp
   }
   
   if (ncol(mat) > max_experts) {
-    colnames(mat)[1] <- "lower_weights"
+    colnames(mat)[1] <- "others"
   }
   
   plot(x = NULL,y = NULL,col=col.pal[1], type='l', xaxt='n',ylim=Y.lim,lty='dotted',
@@ -590,7 +590,7 @@ plot_ridge_weights <- function(data,
   if (ncol(data) > max_experts + 2) {
     colors <- colors[-c(1:(ncol(data) - max_experts - 2))]
     data <- data[, c(1, (ncol(data) - max_experts):ncol(data))]
-    names(data)[1:2] <- c("inf_lower", "sup_lower")
+    names(data)[1:2] <- c("worst_others", "best_others")
   } else {
     colors <- colors[-c(1:(ncol(data) - max_experts))]
     data <- data[, max(1, ncol(data) - max_experts + 1):ncol(data)]
@@ -640,7 +640,7 @@ plot_weights <- function(data,
   
   if (ncol(data_weight) > max_experts + 2) {
     data_weight <- cbind(apply(data_weight[1:(ncol(data_weight) - max_experts)], 1, sum), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight)])
-    names(data_weight)[1] <- "lower_weigths"
+    names(data_weight)[1] <- "others"
     colors <- colors[-c(2:(ncol(data$weights) - max_experts))]
   }
   
@@ -701,7 +701,7 @@ boxplot_weights <- function(data,
   
   if (ncol(data_weight) > max_experts + 2) {
     data_weight <- data_weight[, -c(2:(ncol(data$weights) - max_experts - 1))]
-    names(data_weight)[1:2] <- c("inf_lower", "sup_lower")
+    names(data_weight)[1:2] <- c("worst_others", "best_others")
     colors <- colors[-c(2:(ncol(data$weights) - max_experts - 1))]
   } else {
     data_weight <- data_weight[, max(1, ncol(data_weight) - max_experts):ncol(data_weight)]
@@ -719,18 +719,18 @@ boxplot_weights <- function(data,
 
 
 #' @rdname plot-opera-rAmCharts
-plot_cumul_sq_loss <- function(data,
-                               colors = NULL,
-                               max_experts = 50,
-                               round = 3) {
+plot_dyn_avg_loss <- function(data,
+                              colors = NULL,
+                              max_experts = 50,
+                              round = 3) {
   
   if (is.null(colors)) {
     colors <- RColorBrewer::brewer.pal(n = min(ncol(data$experts), 9), name = "Spectral")
   }
   
   pred.experts <- data.frame(data$experts * data$awake + data$prediction * (1-data$awake))
-  cumul.losses <- apply(loss(pred.experts, data$Y, data$loss.type), 2, cumsum)[seq(data$d, data$T*data$d, by = data$d), ]
-  cumul.exploss <- cumsum(loss(data$prediction, data$Y, data$loss.type))[seq(data$d, data$T*data$d, by = data$d)]
+  cumul.losses <- apply(loss(pred.experts, data$Y, data$loss.type), 2, cumsum)[seq(data$d, data$T*data$d, by = data$d), ] / 1:nrow(data$experts)
+  cumul.exploss <- cumsum(loss(data$prediction, data$Y, data$loss.type))[seq(data$d, data$T*data$d, by = data$d)] / 1:nrow(data$experts)
   
   data_loss <- data.frame(cbind(cumul.losses, cumul.exploss))
   data_loss$timestamp <- 1:nrow(data_loss)
@@ -738,7 +738,7 @@ plot_cumul_sq_loss <- function(data,
   
   if (ncol(data$weight) > max_experts + 2) {
     data_loss <- data_loss[, -c(2:(ncol(data$weights) - max_experts - 1))]
-    names(data_loss)[1:2] <- c("inf_lower", "sup_lower")
+    names(data_loss)[1:2] <- c("worst_others", "best_others")
     colors <- colors[-c(2:(ncol(data$weights) - max_experts - 1))]
   } else {
     data_loss <- data_loss[, max(1, ncol(data$weights) - max_experts + 1):ncol(data_loss)]
@@ -770,7 +770,7 @@ plot_cumul_sq_loss <- function(data,
                         balloonText = paste0("<b> cumul.exploss : </b>", "[[cumul.exploss]]"))
   
   plt <- plt %>>%
-    rAmCharts::addTitle(text = "Cumulative square loss") %>>%
+    rAmCharts::addTitle(text = "Dynamic average loss") %>>%
     rAmCharts::setExport(position = "bottom-right") %>>% 
     rAmCharts::setChartCursor() %>>% 
     # rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
@@ -802,7 +802,7 @@ plot_cumul_res <- function(data,
   
   if (ncol(data$weight) > max_experts + 2) {
     data_res <- data_res[, -c(2:(ncol(data$weights) - max_experts - 1))]
-    names(data_res)[1:2] <- c("inf_lower", "sup_lower")
+    names(data_res)[1:2] <- c("worst_others", "best_others")
     colors <- colors[-c(2:(ncol(data$weights) - max_experts - 1))]
   } else {
     data_res <- data_res[, max(1, ncol(data$weights) - max_experts + 1):ncol(data_res)]
@@ -874,7 +874,7 @@ plot_avg_loss <- function(data,
   
   if (ncol(data$weights) > max_experts + 2) {
     data_plot <- data_plot[-c(2:(ncol(data$weight) - max_experts - 1)), ]
-    data_plot[1:2, ]$names <- c("inf_lower", "sup_lower")
+    data_plot[1:2, ]$names <- c("worst_others", "best_others")
     data_plot <- data_plot[order(data_plot$values), ]
   } else {
     data_plot <- data_plot[max(1, ncol(data$weight) - max_experts + 1):nrow(data_plot), ]
@@ -936,14 +936,14 @@ plot_contrib <- function(data,
   
   o<-order(colSums(W),decreasing = F)
   mat<-W[,o]*X[,o]
-  Agg<-apply(mat,1,sum)
+  mat <- sapply(mat, function(x) lowess(x = 1:nrow(mat), y = x, f = alpha)$y)
   colnames(mat)<-colnames(X)[o]
   
   data_weight <- as.data.frame(mat)
   
   if (ncol(data_weight) > max_experts + 2) {
     data_weight <- cbind(apply(data_weight[1:(ncol(data_weight) - max_experts)], 1, sum), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight)])
-    names(data_weight)[1] <- "lower_weigths"
+    names(data_weight)[1] <- "others"
     colors <- colors[-c(2:(ncol(mat) - max_experts))]
   }
   
