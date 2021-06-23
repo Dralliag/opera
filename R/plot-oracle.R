@@ -8,6 +8,8 @@
 plot.oracle <- function(x, sort = TRUE, col = NULL, dynamic = T,  ...) {
   def.par <- par(no.readonly = TRUE)
   
+  ############# add checks on x$loss
+  
   if (x$d > 1) {
     x$experts <- blockToSeries(x$experts)
     x$Y <- blockToSeries(x$Y)
