@@ -205,7 +205,7 @@ plt_oracle_shift <- function(data,
     rAmCharts::addTitle(text = "Error suffered by the shifting oracle") %>>%
     rAmCharts::setExport(position = "top-right") %>>% 
     rAmCharts::setChartCursor() %>>%
-    rAmCharts::setCategoryAxis(title = "Number of shifts", labelRotation = 90, labelColorField = "cols", labelOffset = 5)
+    rAmCharts::setCategoryAxis(title = "Number of shifts", labelColorField = "cols", labelOffset = 5)
   
   return(plt)
 }
