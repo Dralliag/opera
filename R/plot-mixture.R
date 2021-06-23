@@ -615,7 +615,7 @@ plot_ridge_weights <- function(data,
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Weights associated with the experts") %>>%
-    rAmCharts::setExport(position = "bottom-right") %>>% 
+    rAmCharts::setExport(position = "top-right") %>>% 
     rAmCharts::setChartCursor() %>>% 
     # rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
     rAmCharts::setLegend(useGraphSettings = F, valueText = "", position = "right", reversedOrder = T)
@@ -677,7 +677,7 @@ plot_weights <- function(data,
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Weights associated with the experts") %>>%
-    rAmCharts::setExport(position = "bottom-right") %>>% 
+    rAmCharts::setExport(position = "top-right") %>>% 
     rAmCharts::setChartCursor() %>>% 
     # rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
     rAmCharts::setLegend(useGraphSettings = F, valueText = "", position = "right", reversedOrder = T)
@@ -708,11 +708,13 @@ boxplot_weights <- function(data,
   }
   
   plt <- rAmCharts::amBoxplot(data_weight[, rev(names(data_weight))], col = rev(colors),
-                              ylab = "weights", creditsPosition = "bottom-right") %>>%
+                              ylab = "weights", creditsPosition = "bottom-right", zoom = TRUE) %>>%
     rAmCharts::addTitle(text = "Weights associated with the experts") %>>%
     rAmCharts::setCategoryAxis(autoGridCount = FALSE, gridCount = ncol(data_weight), labelRotation = 90, labelOffset = 5) %>>%
-    rAmCharts::setExport(position = "bottom-right") # %>>% 
+    rAmCharts::setExport(position = "top-right") # %>>% 
   # rAmCharts::setLegend(useGraphSettings = TRUE, valueText = "", position = "right")
+  
+  plt@otherProperties$zoomOutButtonImageSize <- 0
   
   plt
 }
@@ -771,7 +773,7 @@ plot_cumul_sq_loss <- function(data,
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Cumulative square loss") %>>%
-    rAmCharts::setExport(position = "bottom-right") %>>% 
+    rAmCharts::setExport(position = "top-right") %>>% 
     rAmCharts::setChartCursor() %>>% 
     # rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
     rAmCharts::setLegend(useGraphSettings = F, valueText = "", position = "right", reversedOrder = T)
@@ -835,7 +837,7 @@ plot_cumul_res <- function(data,
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Cumulative residuals") %>>%
-    rAmCharts::setExport(position = "bottom-right") %>>% 
+    rAmCharts::setExport(position = "top-right") %>>% 
     rAmCharts::setChartCursor() %>>% 
     # rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
     rAmCharts::setLegend(useGraphSettings = F, valueText = "", position = "right", reversedOrder = T)
@@ -896,7 +898,7 @@ plot_avg_loss <- function(data,
                         type = "line", lineAlpha = 0, 
                         bulletField = "bullet", bulletSizeField = "size", colorField = "cols") %>>%
     rAmCharts::addTitle(text = "Average loss suffered by the experts") %>>%
-    rAmCharts::setExport(position = "bottom-right") %>>% 
+    rAmCharts::setExport(position = "top-right") %>>% 
     rAmCharts::setChartCursor() %>>%
     rAmCharts::setCategoryAxis(autoGridCount = FALSE, gridCount = nrow(data_plot), labelRotation = 90, labelColorField = "cols", labelOffset = 5)
   
@@ -986,7 +988,7 @@ plot_contrib <- function(data,
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Contribution of each expert to the prediction") %>>%
-    rAmCharts::setExport(position = "bottom-right") %>>% 
+    rAmCharts::setExport(position = "top-right") %>>% 
     rAmCharts::setChartCursor() %>>% 
     # rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
     rAmCharts::setLegend(useGraphSettings = F, valueText = "", position = "right", reversedOrder = T)

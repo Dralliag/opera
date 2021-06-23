@@ -24,29 +24,18 @@ their residuals and cumulative losses are computed by using the predictions of t
 
 \item{col}{the color to use to represent each experts, if set to NULL (default) use R\code{RColorBrewer::brewer.pal(...,"Spectral"}}
 
-<<<<<<< HEAD
-\item{alpha}{\code{numeric}. Smoothing parameter for contribution plot (parameter 'f' of function \code{\link{stats::lowess}}).}
-
-\item{dynamic}{\code{boolean}. If TRUE, graphs are generated with rAmCharts, else with basic R.}
-
-\item{select_graph}{\code{char}.
-=======
 \item{alpha}{\code{numeric}. Smoothing parameter for contribution plot (parameter 'f' of function \code{\link[stats]{lowess}}).}
 
 \item{dynamic}{\code{boolean}. If TRUE, graphs are generated with \code{rAmCharts}, else with base R.}
 
 \item{type}{\code{char}.
->>>>>>> 15eb92f95e790e60c3df63cd911e42ad15469df1
 \itemize{
      \item{'all'}{ Display all the graphs ;}
      \item{'plot_weight', 'boxplot_weight', 'cumul_sq_loss', 'cumul_res', 'avg_loss', 'contrib'}{ Display the selected graph alone.}
 }}
 
-<<<<<<< HEAD
-=======
 \item{max_experts}{\code{integer}. Maximum number of experts to be displayed (only the more influencial).}
 
->>>>>>> 15eb92f95e790e60c3df63cd911e42ad15469df1
 \item{...}{additional plotting parameters}
 }
 \value{

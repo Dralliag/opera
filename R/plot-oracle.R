@@ -180,7 +180,7 @@ plt_oracle_convex <- function(data,
                         bulletField = "bullet", bulletSizeField = "size", colorField = "cols",
                         precision = round) %>>%
     rAmCharts::addTitle(text = "Average loss suffered by the experts") %>>%
-    rAmCharts::setExport(position = "bottom-right") %>>% 
+    rAmCharts::setExport(position = "top-right") %>>% 
     rAmCharts::setChartCursor() %>>%
     rAmCharts::setCategoryAxis(labelRotation = 90, labelColorField = "cols", labelOffset = 5)
   
@@ -203,7 +203,7 @@ plt_oracle_shift <- function(data,
                         type = "line", lineColor = "black",
                         precision = round) %>>%
     rAmCharts::addTitle(text = "Error suffered by the shifting oracle") %>>%
-    rAmCharts::setExport(position = "bottom-right") %>>% 
+    rAmCharts::setExport(position = "top-right") %>>% 
     rAmCharts::setChartCursor() %>>%
     rAmCharts::setCategoryAxis(title = "Number of shifts", labelRotation = 90, labelColorField = "cols", labelOffset = 5)
   
