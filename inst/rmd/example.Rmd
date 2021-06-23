@@ -36,15 +36,16 @@ with several covariates: the temperature, calendar information,
 and industrial production indexes. The data set is provided by 
 the French [National Institute of Statistics and Economic Studies (Insee)][Insee].
 
+```{r, echo=TRUE}
+library(opera)
+set.seed(1)
+```
+
 ### The data set
 
 First, we load the data and we cut it into two subsets: a training set used to build the experts (base forecasting methods) and a testing set (here the last two years) used to evaluate the performance and to run the combining algorithms. 
 
 ```{r, echo=FALSE}
-library(opera)
-library(rAmCharts)
-set.seed(1)
-
 dynamic <- TRUE
 if(exists("readme") && readme){
   dynamic <- FALSE
