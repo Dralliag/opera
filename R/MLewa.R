@@ -30,7 +30,10 @@ MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     eta[1, ] <- training$eta
     R <- training$R
     # Update weights
-    w <- truncate1(exp(log(w0) + eta[1, ] * R))
+    
+    R.aux <- log(w0) + eta[t, ] * R
+    R.max <- max(R.aux)
+    w <- exp(R.aux - R.max)
     w <- w/sum(w)
   }
   
@@ -51,7 +54,10 @@ MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     r <- awake[t, ] * (c(c(lpred) - lexp))
     R <- R + r
     eta[t + 1, ] <- sqrt(log(N)/(log(N)/eta[t, ]^2 + r^2))
-    w <- truncate1(exp(log(w0) + eta[t + 1, ] * R))
+    idx <- awake[t,] > 0
+    R.aux <- log(w0) + eta[t + 1, ] * R
+    R.max <- max(R.aux[idx])
+    w[idx] <- exp(R.aux[idx] - R.max)
   }
   w <- w/sum(w)
   

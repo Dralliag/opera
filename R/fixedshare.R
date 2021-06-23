@@ -28,8 +28,11 @@ fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square
   
   for (t in 1:T) {
     # Weight update
-    weights[t, ] <- t(truncate1(exp(eta * R)) * t(awake[t, ]))
-    weights[t, ] <- weights[t, ]/sum(weights[t, ])
+    idx <- awake[t,] > 0
+    R.aux<- eta * R
+    R.max <- max(R.aux[idx])
+    weights[t, idx] <- t(exp(R.aux[idx]-R.max)) * t(awake[t, idx])
+    weights[t, idx] <- weights[t, idx]/sum(weights[t, idx])
     
     # Prediction and loss
     pred[t] <- experts[t, ] %*% weights[t, ]
@@ -39,10 +42,14 @@ fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square
     
     # Regret and weight update
     R <- R + awake[t, ] * (c(c(lpred) - lexp))
-    v <- truncate1(exp(eta * R))/sum(truncate1(exp(eta * R)))
+    R.aux <- eta * R
+    R.max <- max(R.aux)
+    v <- exp(R.aux - R.max)/sum(exp(R.aux - R.max))
     R <- log(alpha/N + (1 - alpha) * v)/eta
   }
-  w <- t(truncate1(exp(eta * R)))
+  R.aux <- eta * R
+  R.max <- max(R.aux)
+  w <- t(exp(R.aux - R.max))
   w <- w/sum(w)
   
   object <- list(model = "FS", loss.type = loss.type, loss.gradient = loss.gradient, 

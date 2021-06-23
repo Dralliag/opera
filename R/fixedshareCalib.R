@@ -75,7 +75,9 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
       R <- t(t(log(wpar[, , k]))/grid.eta) + awake[t, ] * t(c(lpred) - t(lexp))
       
       # Weight update
-      v <- truncate1(exp(t(t(matrix(R, ncol = neta)) * grid.eta)))
+      R.aux <- t(t(matrix(R, ncol = neta)) * grid.eta)
+      R.max <- max(R.aux)
+      v <- exp(R.aux - R.max)
       v <- t(t(v)/apply(v, 2, sum))  # Renormalization of each column
       wpar[, , k] <- grid.alpha[k]/N + (1 - grid.alpha[k]) * v
     }

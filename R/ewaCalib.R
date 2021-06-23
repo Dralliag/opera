@@ -117,7 +117,10 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
         cumulativeLoss <- c(cumulativeLoss, perfneweta$training$cumulativeLoss)
         R.w0[, besteta + k] <- perfneweta$training$R + log(w0) / neweta[k]
       }
-      weta <- truncate1(exp(t(t(matrix(R.w0, ncol = neta)) * grid.eta)))
+      
+      R.aux <- t(t(matrix(R.w0, ncol = neta)) * grid.eta)
+      R.max = max(R.aux)
+      weta <- exp(R.aux - R.max)
     }
     
     if (besteta == 1) {
@@ -136,11 +139,16 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
         cumulativeLoss <- c(perfneweta$training$cumulativeLoss, cumulativeLoss)
         R.w0[, besteta - k] <- perfneweta$training$R + log(w0) / neweta[k]
       }
-      weta <- truncate1(exp(t(t(matrix(R.w0, ncol = neta)) * grid.eta)))
+      
+      R.aux <- t(t(matrix(R.w0, ncol = neta)) * grid.eta)
+      R.max = max(R.aux)
+      weta <- exp(R.aux - R.max)
     }
     
     if (!use_cpp){
-      weta <- truncate1(exp(t(t(matrix(R.w0, ncol = neta)) * grid.eta)))
+      R.aux <- t(t(matrix(R.w0, ncol = neta)) * grid.eta)
+      R.max = max(R.aux)
+      weta <- exp(R.aux - R.max)
     }
   }#end of time loop
   
