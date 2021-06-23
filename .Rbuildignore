@@ -10,3 +10,5 @@ tests/examples
 ^\.travis\.yml$
 ^_pkgdown\.yml$
 ^codecov\.yml$
+^doc$
+^Meta$
