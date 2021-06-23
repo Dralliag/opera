@@ -133,10 +133,13 @@
 #' @keywords ~models ~ts
 #' @seealso See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.
 #'  
-#' @template example
 #' @importFrom stats predict
 #' @export mixture
-
+#' 
+#' @rdname mixture-opera
+#' 
+#' @example examples/example.R
+#' 
 mixture <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square", 
                     loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list(),
                     use_cpp = getOption("opera_use_cpp", default = TRUE)) UseMethod("mixture")

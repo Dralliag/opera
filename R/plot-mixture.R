@@ -1,13 +1,14 @@
 #' Plot an object of class mixture
 #' 
 #' provides different diagnostic plots for an aggregation procedure.
+#' 
 #' @param x an object of class mixture. If awake is provided (i.e., some experts are unactive), 
 #' their residuals and cumulative losses are computed by using the predictions of the mixture.
 #' @param pause if set to TRUE (default) displays the plots separately, otherwise on a single page
 #' @param col the color to use to represent each experts, if set to NULL (default) use R\code{RColorBrewer::brewer.pal(...,"Spectral"}
-#' @param alpha \code{numeric}. Smoothing parameter for contribution plot (parameter 'f' of function \code{\link{stats::lowess}}).
-#' @param dynamic \code{boolean}. If TRUE, graphs are generated with rAmCharts, else with basic R.
-#' @param select_graph \code{char}.
+#' @param alpha \code{numeric}. Smoothing parameter for contribution plot (parameter 'f' of function \code{\link[stats]{lowess}}).
+#' @param dynamic \code{boolean}. If TRUE, graphs are generated with \code{rAmCharts}, else with base R.
+#' @param type \code{char}.
 #' \itemize{
 #'      \item{'all'}{ Display all the graphs ;}
 #'      \item{'plot_weight', 'boxplot_weight', 'cumul_sq_loss', 'cumul_res', 'avg_loss', 'contrib'}{ Display the selected graph alone.}
@@ -23,11 +24,15 @@
 #' 
 #' @author Pierre Gaillard <pierre@@gaillard.me>
 #' @author Yannig  Goude <yannig.goude@edf.fr>
+#' 
 #' @seealso See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.
+#' 
 #' @importFrom grDevices col2rgb rgb
 #' @importFrom graphics axis box boxplot layout legend lines matplot mtext par plot polygon text
 #' @importFrom stats lowess var
 #' @importFrom htmltools browsable tagList
+#' 
+#' 
 #' @export 
 #' 
 #'
@@ -36,11 +41,21 @@ plot.mixture <- function(x,
                          col = NULL, 
                          alpha = 0.01,
                          dynamic = T, 
-                         select_graph = "all", 
+                         type = c('all', 'plot_weight', 'boxplot_weight', 
+                                  'cumul_sq_loss', 'cumul_res', 
+                                  'avg_loss', 'contrib'
+                         ), 
                          max_experts = 50,
                          ...) {
   
+  type <- tryCatch({
+    match.arg(type)
+  }, error = function(e){
+    warning("Invalid 'type' argument. Set to 'all'")
+    'all'
+  })
   ############# add checks on x$loss
+
   
   def.par <- par(no.readonly = TRUE) # save default, for resetting...
   if (pause) par(ask=TRUE)
@@ -56,12 +71,6 @@ plot.mixture <- function(x,
     }
   }
   
-  if (is.null(select_graph) || ! select_graph %in% c('all', 'plot_weight', 'boxplot_weight', 'cumul_sq_loss', 
-                                                     'cumul_res', 'avg_loss', 'contrib')) {
-    warning("could not find select_graph ('", select_graph, "').")
-    select_graph <- "all"
-  }
-    
   my.colors <- col
   
   col <- numeric(K)
@@ -71,10 +80,10 @@ plot.mixture <- function(x,
     col[w.order] <- c(my.colors, rep(my.colors[length(my.colors)],K-length(my.colors)))
   }
   
-  if (!pause && select_graph == "all") {
+  if (!pause && type == "all") {
     layout(matrix(c(1,2,3,4,5,6),nrow = 3,ncol =  2, byrow = TRUE))  
   }
-
+  
   x$Y <- c(t(x$Y))
   x$prediction <- c(t(x$prediction))
   x$weights <- data.frame(x$weights)
@@ -106,10 +115,10 @@ plot.mixture <- function(x,
     par(mar = c(3, 3, 1.6, 0.1), mgp = c(2, 0.5, 0))
   }
   
-  if (x$model == "Ridge" && (select_graph == "all" || select_graph == "plot_weight")) {
+  if (x$model == "Ridge" && (type == "all" || type == "plot_weight")) {
     # Linear aggregation rule
     if (! dynamic) {
-      if (select_graph == "all") {
+      if (type == "all") {
         par(mar = c(3, 3, 2, l.names/2), mgp = c(1, 0.5, 0)) 
       }
       
@@ -126,14 +135,22 @@ plot.mixture <- function(x,
       mtext(side = 4, text = colnames(tmp_weights), at = tmp_weights[T,], las = 2, col = col, cex= 0.5, line = 0.3)
       
     } else {
-      list_plt[[1]] <- rAmCharts::plot(plot_ridge_weights(data = x, colors = col, max_experts = max_experts, round = 3), 
-                                       height = 280 + 10 * min(K, max_experts))
+      list_plt[[length(list_plt) + 1]] <- 
+        {
+          html_p <- rAmCharts::controlShinyPlot(
+            plot_ridge_weights(data = x, colors = col, 
+                               max_experts = max_experts, 
+                               round = 3)
+          )
+          html_p$height <- 280 + 10 * min(K, max_experts)
+          html_p
+        }
     }
     
-  } else if (select_graph == "all" || select_graph == "plot_weight") {
+  } else if (type == "all" || type == "plot_weight") {
     # Convex aggregation rule
     if (! dynamic) {
-      if (select_graph == "all") {
+      if (type == "all") {
         par(mar = c(3, 3, 2, l.names/2), mgp = c(1, 0.5, 0)) 
       } 
       if (ncol(x$weights) > max_experts) {
@@ -175,8 +192,18 @@ plot.mixture <- function(x,
               tmp_weights[, rev(names(tmp_weights))][T,]/2, las = 2, col = tmp_cols, cex= 0.5, line = 0.3)
       
     } else {
-      list_plt[[1]] <- rAmCharts::plot(plot_weights(data = x, colors = col, max_experts = max_experts, round = 3), 
-                                       height = 325 + 25 * (min(K, max_experts) - 3))
+      list_plt[[length(list_plt) + 1]] <- 
+        {
+          html_p <- rAmCharts::controlShinyPlot(
+            plot_weights(data = x, 
+                         colors = col, 
+                         max_experts = max_experts, 
+                         round = 3
+            )
+          )
+          html_p$height <- 325 + 25 * (min(K, max_experts) - 3)
+          html_p
+        }
     }
   }
   
@@ -190,10 +217,10 @@ plot.mixture <- function(x,
     normalized.weights <- x$weights 
   }
   
-  if (select_graph == "all" || select_graph == "boxplot_weight") {
+  if (type == "all" || type == "boxplot_weight") {
     if (! dynamic) {
       i.order <- 1:min(c(K, 15, max_experts))
-      if (select_graph == "all") {
+      if (type == "all") {
         par(mar = c(l.names+2, 3, 1.6, 0.1))
       }
       
@@ -221,10 +248,18 @@ plot.mixture <- function(x,
       axis(2)
       box()
       
-     } else {
-      list_plt[[2]] <- rAmCharts::plot(boxplot_weights(data = x, colors = col, max_experts = max_experts),
-                                       height = 300 + 10 * max(c(nchar(names(max_experts)), 17*(ncol(x$weights) > max_experts))))
-     } 
+    } else {
+      list_plt[[length(list_plt) + 1]] <- 
+        {
+          html_p <- rAmCharts::controlShinyPlot(
+            boxplot_weights(data = x, colors = col, 
+                            max_experts = max_experts
+            )
+          )
+          html_p$height <- 300 + 10 * max(c(nchar(names(max_experts)), 17*(ncol(x$weights) > max_experts)))
+          html_p
+        }
+    } 
   }
   
   # note: always pass alpha on the 0-255 scale
@@ -238,7 +273,7 @@ plot.mixture <- function(x,
   }
   
   # cumulative loss
-  if (select_graph == "all" || select_graph == "cumul_sq_loss") {
+  if (type == "all" || type == "cumul_sq_loss") {
     if (! dynamic) {
       pred.experts <- data.frame(x$experts * x$awake + x$prediction * (1-x$awake))
       cumul.losses <- apply(loss(pred.experts, x$Y, x$loss.type), 2, cumsum)[seq(d,T*d,by=d),]
@@ -253,7 +288,7 @@ plot.mixture <- function(x,
         tmp_col <- col
       }
       
-      if (select_graph == "all") {
+      if (type == "all") {
         par(mar = c(1.5, 3, 2.5, l.names/2), mgp = c(1, 0.5, 0))
       }
       
@@ -267,14 +302,22 @@ plot.mixture <- function(x,
       legend("topleft", c("Experts", x$model), bty = "n", lty = 1, col = c("gray", 1), lwd = c(1,2))
       
     } else {
-      list_plt[[3]] <- rAmCharts::plot(plot_cumul_sq_loss(data = x, colors = col, max_experts = max_experts, round = 3), 
-                                       height = 322 + 22 * (min(K, max_experts) - 3))
+      list_plt[[length(list_plt) + 1]] <- 
+        {
+          html_p <- rAmCharts::controlShinyPlot(
+            plot_cumul_sq_loss(data = x, colors = col, 
+                               max_experts = max_experts, round = 3
+            )
+          )
+          html_p$height <- 322 + 22 * (min(K, max_experts) - 3)
+          html_p
+        }
     } 
   }
   
   
   # cumulative residuals
-  if (select_graph == "all" || select_graph == "cumul_res") {
+  if (type == "all" || type == "cumul_res") {
     if (! dynamic) {
       pred.experts <- data.frame(x$experts * x$awake + x$prediction * (1-x$awake))
       cumul.residuals <- apply(x$Y - pred.experts, 2, cumsum)[seq(d,T*d,by=d),]
@@ -289,7 +332,7 @@ plot.mixture <- function(x,
         tmp_col <- col
       }
       
-      if (select_graph == "all") {
+      if (type == "all") {
         par(mar = c(1.5, 3, 2.5,l.names/2), mgp = c(1, 0.5, 0))
       }
       
@@ -308,14 +351,22 @@ plot.mixture <- function(x,
       legend(place, c("Experts", x$model), bty = "n", lty = 1, col = c("gray", 1), lwd = c(1,2))
       
     } else {
-      list_plt[[4]] <- rAmCharts::plot(plot_cumul_res(data = x, colors = col, max_experts = max_experts, round = 3), 
-                                       height = 322 + 22 * (min(K, max_experts) - 3))
+      list_plt[[length(list_plt) + 1]] <- {
+        html_p <- rAmCharts::controlShinyPlot(
+          plot_cumul_res(
+            data = x, colors = col, 
+            max_experts = max_experts, round = 3
+          )
+        )
+        html_p$height <- 322 + 22 * (min(K, max_experts) - 3)
+        html_p
+      }
     } 
   }
   
   
   # losses
-  if (select_graph == "all" || select_graph == "avg_loss") {
+  if (type == "all" || type == "avg_loss") {
     if (! dynamic) {
       pred.experts <- data.frame(x$experts * x$awake + x$prediction * (1-x$awake))
       x$loss.experts <- apply(loss(x = pred.experts,y = x$Y,loss.type = x$loss.type),2,mean)
@@ -338,7 +389,7 @@ plot.mixture <- function(x,
       
       l.names <- max(max(nchar(names(x$loss.experts))) / 3 + 1.7,4)
       
-      if (select_graph == "all") {
+      if (type == "all") {
         par(mar = c(l.names, 3, 2.5,l.names/2), mgp = c(1, 0.5, 0))
       }
       
@@ -353,53 +404,71 @@ plot.mixture <- function(x,
       box()
       
     } else {
-      list_plt[[5]] <- rAmCharts::plot(plot_avg_loss(data = x, colors = col, max_experts = max_experts, round = 3), 
-                                       height = 300)
+      list_plt[[length(list_plt) + 1]] <- 
+        {
+          html_p <- rAmCharts::controlShinyPlot(
+            plot_avg_loss(
+              data = x, colors = col, 
+              max_experts = max_experts, round = 3
+            )
+          )
+          html_p$height <- 300
+          html_p
+        }
     }
   }
   
   
   # cumulative plot of the series
-  if (select_graph == "all" || select_graph == "contrib") {
+  if (type == "all" || type == "contrib") {
     if (! dynamic) {
       if (x$d ==1) {
-        if (select_graph == "all") {
+        if (type == "all") {
           par(mar = c(2, 3, 2.5,l.names/2), mgp = c(1, 0.5, 0))
         }
         
-        cumulativePlot(W = x$weights,X = x$experts, Y = x$Y,smooth = TRUE,alpha = alpha,plot.Y = TRUE, 
-                       col.pal = col, max_experts = max_experts)
+        cumulativePlot(W = x$weights,X = x$experts, Y = x$Y,smooth = TRUE, alpha = alpha, 
+                       plot.Y = TRUE, col.pal = col, max_experts = max_experts)
         
       } else {
         X <- apply(seriesToBlock(X = x$experts,d = x$d),c(1,3),mean)
         Y <- apply(seriesToBlock(x$Y,d = x$d),1,mean)
         colnames(X) <- names(x$weights)
         
-        if (select_graph == "all") {
+        if (type == "all") {
           par(mar = c(2, 3, 2.5,l.names/2), mgp = c(1, 0.5, 0))
         }
         
-        cumulativePlot(W = x$weights,X = X, Y = Y,smooth = TRUE,alpha = alpha,plot.Y = TRUE, col.pal = rev(col), max_experts = max_experts)
+        cumulativePlot(W = x$weights,X = X, Y = Y,smooth = TRUE,
+                       alpha = alpha,plot.Y = TRUE, col.pal = rev(col),
+                       max_experts = max_experts)
       }
     } else {
-      list_plt[[6]] <- rAmCharts::plot(plot_contrib(data = x, colors = col, alpha = alpha, max_experts = max_experts, round = 3), 
-                                       height = 325 + 25 * (min(K, max_experts) - 3))
+      list_plt[[length(list_plt) + 1]] <- 
+        {
+          html_p <- rAmCharts::controlShinyPlot(
+            plot_contrib(
+              data = x, colors = col, alpha = alpha, 
+              max_experts = max_experts, round = 3
+            )
+          )
+          html_p$height <- 325 + 25 * (min(K, max_experts) - 3)
+          html_p
+        }
     }
   }
   
   if (! dynamic) {
-    res <- NULL
     par(def.par) 
-    
+    return(invisible(NULL))
   } else {
     res <- htmltools::browsable(
       htmltools::tagList(
         list_plt
       )
     )
+    return(res)
   }
-  
-  return(res)
 } 
 
 
@@ -434,7 +503,7 @@ cumulativePlot<-function(W,X,Y,col.pal=NULL, smooth = FALSE, plot.Y = FALSE, alp
   X<-X[, names(W)][,active.experts]
   
   K <- ncol(X)
-
+  
   if(is.null(col.pal)) col.pal <- RColorBrewer::brewer.pal(n = min(K,9),name = "Spectral")
   if (length(col.pal) < K) col.pal <- c(rep(col.pal[1],K-length(col.pal)),col.pal)
   
@@ -497,11 +566,15 @@ addPoly<-function(x,y,col)
 #' @param colors \code{character}. Colors of the lines and bullets.
 #' @param max_experts \code{integer}. Maximum number of experts to be displayed (only the more influencial).
 #' @param round \code{integer}. Precision of the displayed values.
-#' @param alpha \code{numeric}. Smoothing parameter for contribution plot (parameter 'f' of function \code{\link{stats::lowess}}).
+#' @param alpha \code{numeric}. Smoothing parameter for contribution plot (parameter 'f' of function \code{\link[stats]{lowess}}).
 #'
-#' @return a rAmCharts plot
+#' @return a \code{rAmCharts} plot
 #' 
-#' @import rAmCharts pipeR
+#' @import pipeR
+#' @importFrom rAmCharts amSerialChart addValueAxis addGraph addTitle setExport setChartCursor setChartScrollbar setLegend 
+#' amBoxplot setCategoryAxis controlShinyPlot
+#' 
+#' @rdname plot-opera-rAmCharts
 #' 
 plot_ridge_weights <- function(data,
                                colors = NULL,
@@ -528,7 +601,7 @@ plot_ridge_weights <- function(data,
   
   plt <- amSerialChart(dataProvider = data,
                        categoryField = c("timestamp"), 
-                       creditsPosition = "top-right",
+                       creditsPosition = "bottom-right",
                        thousandsSeparator = " ",
                        precision = round) %>>%
     rAmCharts::addValueAxis(title = "Weights")
@@ -542,15 +615,18 @@ plot_ridge_weights <- function(data,
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Weights associated with the experts") %>>%
-    rAmCharts::setExport(position = "top-right") %>>% 
+    rAmCharts::setExport(position = "bottom-right") %>>% 
     rAmCharts::setChartCursor() %>>% 
-    rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
+    # rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
     rAmCharts::setLegend(useGraphSettings = F, valueText = "", position = "right", reversedOrder = T)
   
+  plt@otherProperties$zoomOutButtonImageSize <- 0
+  
+  plt
 }
 
 
-
+#' @rdname plot-opera-rAmCharts
 plot_weights <- function(data,
                          colors = NULL,
                          max_experts = 50,
@@ -575,7 +651,7 @@ plot_weights <- function(data,
   
   plt <- amSerialChart(dataProvider = data_weight,
                        categoryField = c("timestamp"), 
-                       creditsPosition = "top-right",
+                       creditsPosition = "bottom-right",
                        thousandsSeparator = " ",
                        precision = round) %>>%
     rAmCharts::addValueAxis(title = "Weights", maximum = 1)
@@ -601,16 +677,18 @@ plot_weights <- function(data,
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Weights associated with the experts") %>>%
-    rAmCharts::setExport(position = "top-right") %>>% 
+    rAmCharts::setExport(position = "bottom-right") %>>% 
     rAmCharts::setChartCursor() %>>% 
-    rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
+    # rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
     rAmCharts::setLegend(useGraphSettings = F, valueText = "", position = "right", reversedOrder = T)
   
-  return(plt)
+  plt@otherProperties$zoomOutButtonImageSize <- 0
+  
+  plt
 }
 
 
-
+#' @rdname plot-opera-rAmCharts
 boxplot_weights <- function(data,
                             colors = NULL,
                             max_experts = 50) {
@@ -630,17 +708,17 @@ boxplot_weights <- function(data,
   }
   
   plt <- rAmCharts::amBoxplot(data_weight[, rev(names(data_weight))], col = rev(colors),
-                              ylab = "weights", creditsPosition = "top-right") %>>%
+                              ylab = "weights", creditsPosition = "bottom-right") %>>%
     rAmCharts::addTitle(text = "Weights associated with the experts") %>>%
     rAmCharts::setCategoryAxis(autoGridCount = FALSE, gridCount = ncol(data_weight), labelRotation = 90, labelOffset = 5) %>>%
-    rAmCharts::setExport(position = "top-right") # %>>% 
+    rAmCharts::setExport(position = "bottom-right") # %>>% 
   # rAmCharts::setLegend(useGraphSettings = TRUE, valueText = "", position = "right")
   
   plt
 }
 
 
-
+#' @rdname plot-opera-rAmCharts
 plot_cumul_sq_loss <- function(data,
                                colors = NULL,
                                max_experts = 50,
@@ -672,7 +750,7 @@ plot_cumul_sq_loss <- function(data,
   
   plt <- amSerialChart(dataProvider = data_loss,
                        categoryField = "timestamp", 
-                       creditsPosition = "top-right",
+                       creditsPosition = "bottom-right",
                        thousandsSeparator = " ",
                        precision = round) %>>%
     rAmCharts::addValueAxis(title = "Cumulative loss")
@@ -693,16 +771,18 @@ plot_cumul_sq_loss <- function(data,
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Cumulative square loss") %>>%
-    rAmCharts::setExport(position = "top-right") %>>% 
+    rAmCharts::setExport(position = "bottom-right") %>>% 
     rAmCharts::setChartCursor() %>>% 
-    rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
+    # rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
     rAmCharts::setLegend(useGraphSettings = F, valueText = "", position = "right", reversedOrder = T)
   
-  return(plt)
+  plt@otherProperties$zoomOutButtonImageSize <- 0
+  
+  plt
 }
 
 
-
+#' @rdname plot-opera-rAmCharts
 plot_cumul_res <- function(data,
                            colors = NULL,
                            max_experts = 50,
@@ -734,7 +814,7 @@ plot_cumul_res <- function(data,
   
   plt <- amSerialChart(dataProvider = data_res,
                        categoryField = "timestamp", 
-                       creditsPosition = "top-right",
+                       creditsPosition = "bottom-right",
                        thousandsSeparator = " ",
                        precision = round) %>>%
     rAmCharts::addValueAxis(title = "Cumulative residuals")
@@ -755,16 +835,18 @@ plot_cumul_res <- function(data,
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Cumulative residuals") %>>%
-    rAmCharts::setExport(position = "top-right") %>>% 
+    rAmCharts::setExport(position = "bottom-right") %>>% 
     rAmCharts::setChartCursor() %>>% 
-    rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
+    # rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
     rAmCharts::setLegend(useGraphSettings = F, valueText = "", position = "right", reversedOrder = T)
   
-  return(plt)
+  plt@otherProperties$zoomOutButtonImageSize <- 0
+  
+  plt
 }
 
 
-
+#' @rdname plot-opera-rAmCharts
 plot_avg_loss <- function(data,
                           colors = NULL,
                           max_experts = 50,
@@ -801,7 +883,7 @@ plot_avg_loss <- function(data,
   
   plt <- amSerialChart(dataProvider = data_plot,
                        categoryField = "names", 
-                       creditsPosition = "top-right",
+                       creditsPosition = "bottom-right",
                        thousandsSeparator = "",
                        precision = round) %>>%
     rAmCharts::addValueAxis(title = "Square loss") %>>%
@@ -814,7 +896,7 @@ plot_avg_loss <- function(data,
                         type = "line", lineAlpha = 0, 
                         bulletField = "bullet", bulletSizeField = "size", colorField = "cols") %>>%
     rAmCharts::addTitle(text = "Average loss suffered by the experts") %>>%
-    rAmCharts::setExport(position = "top-right") %>>% 
+    rAmCharts::setExport(position = "bottom-right") %>>% 
     rAmCharts::setChartCursor() %>>%
     rAmCharts::setCategoryAxis(autoGridCount = FALSE, gridCount = nrow(data_plot), labelRotation = 90, labelColorField = "cols", labelOffset = 5)
   
@@ -822,7 +904,7 @@ plot_avg_loss <- function(data,
 }
 
 
-
+#' @rdname plot-opera-rAmCharts
 plot_contrib <- function(data, 
                          colors = NULL, 
                          alpha = 0.1,
@@ -872,7 +954,7 @@ plot_contrib <- function(data,
   
   plt <- amSerialChart(dataProvider = data_weight,
                        categoryField = c("timestamp"), 
-                       creditsPosition = "top-right",
+                       creditsPosition = "bottom-right",
                        thousandsSeparator = " ",
                        precision = round) %>>%
     rAmCharts::addValueAxis(maximum = max(data_weight$pred), useScientificNotation = T)
@@ -904,10 +986,12 @@ plot_contrib <- function(data,
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Contribution of each expert to the prediction") %>>%
-    rAmCharts::setExport(position = "top-right") %>>% 
+    rAmCharts::setExport(position = "bottom-right") %>>% 
     rAmCharts::setChartCursor() %>>% 
-    rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
+    # rAmCharts::setChartScrollbar(scrollbarHeight = 10, dragIconHeight = 26, offset = 8) %>>%
     rAmCharts::setLegend(useGraphSettings = F, valueText = "", position = "right", reversedOrder = T)
   
-  return(plt)
+  plt@otherProperties$zoomOutButtonImageSize <- 0
+  
+  plt
 }

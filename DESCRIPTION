@@ -33,7 +33,8 @@ Suggests:
     mgcv,
     survival,
     knitr,
-    gbm
+    gbm,
+    rmarkdown
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1

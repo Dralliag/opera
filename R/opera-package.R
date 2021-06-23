@@ -33,7 +33,7 @@
 #'
 #' 
 #' @keywords package
-#' @template example
+#' @example examples/example.R
 
 # set options
 .onLoad <- function(libname, pkgname) {

@@ -1,9 +1,12 @@
 #' Summary of an aggregation procedure
 #' 
-#' @describeIn mixture \code{summary} 
 #' @param object An object of class mixture
 #' @param ... Additional parameters
+#' 
 #' @export 
+#' 
+#' @rdname mixture-opera
+#' 
 summary.mixture <- function(object, ...) {
   if (is.null(object$Y)) {
     K <- "Unknown"

@@ -11,6 +11,7 @@
   awake = NULL,
   online = TRUE,
   type = c("model", "response", "weights", "all"),
+  use_cpp = getOption("opera_use_cpp", default = TRUE),
   ...
 )
 }
@@ -50,6 +51,9 @@ information in newY). If TRUE, newY and newexperts should not be null.}
    }}
 
 \item{...}{further arguments are ignored}
+
+\item{\code{use_cpp}.}{Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
+with the use of custom loss function.}
 }
 \value{
 \code{predict.mixture} produces a matrix of predictions 
