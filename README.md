@@ -86,6 +86,11 @@ production indexes. The data set is provided by the French [National
 Institute of Statistics and Economic Studies
 (Insee)](http://www.insee.fr).
 
+``` r
+library(opera)
+set.seed(1)
+```
+
 ### The data set
 
 First, we load the data and we cut it into two subsets: a training set
