@@ -20,9 +20,9 @@ LinkingTo:
 Imports: 
     Rcpp,
     RcppEigen,
+    htmltools,
     rAmCharts,
-    pipeR,
-    htmltools
+    pipeR
 Suggests:
     quantreg,
     quadprog,

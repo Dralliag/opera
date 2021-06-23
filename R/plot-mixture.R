@@ -54,6 +54,8 @@ plot.mixture <- function(x,
     warning("Invalid 'type' argument. Set to 'all'")
     'all'
   })
+  ############# add checks on x$loss
+
   
   def.par <- par(no.readonly = TRUE) # save default, for resetting...
   if (pause) par(ask=TRUE)
@@ -109,6 +111,8 @@ plot.mixture <- function(x,
   
   if (dynamic) {
     list_plt <- list()
+  } else {
+    par(mar = c(3, 3, 1.6, 0.1), mgp = c(2, 0.5, 0))
   }
   
   if (x$model == "Ridge" && (type == "all" || type == "plot_weight")) {
