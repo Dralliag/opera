@@ -12,3 +12,4 @@ tests/examples
 ^codecov\.yml$
 src/*
 ^\.github$
+^pkgdown$
