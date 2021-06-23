@@ -124,14 +124,17 @@ plot.oracle <- function(x, sort = TRUE, col = NULL, dynamic = T,  ...) {
     
   }
   
-  if (! dynamic) {
-    res <- NULL
-    par(def.par)  
+  if (!dynamic) {
+    par(def.par)
+    return(invisible(NULL))
   } else {
-    res <- rAmCharts::plot(plt, height = 300)
+    res <- {
+      html_p <- rAmCharts::controlShinyPlot(plt)
+      html_p$height <- 300
+      html_p
+    }
+    return(res)
   }
-  
-  return(res)
 }
 
 
@@ -143,7 +146,7 @@ plot.oracle <- function(x, sort = TRUE, col = NULL, dynamic = T,  ...) {
 #'
 #' @return a rAmCharts plot
 #' 
-#' @import rAmCharts pipeR
+#' @import pipeR
 #' 
 plt_oracle_convex <- function(data, 
                               colors,
@@ -163,7 +166,7 @@ plt_oracle_convex <- function(data,
   
   plt <- amSerialChart(dataProvider = data_plot,
                        categoryField = "names", 
-                       creditsPosition = "top-right") %>>%
+                       creditsPosition = "bottom-right") %>>%
     rAmCharts::addValueAxis(title = "Square loss") %>>%
     rAmCharts::addGraph(title = "lines", id = "lines",
                         valueField = "values", valueAxis = "names", 
@@ -175,11 +178,13 @@ plt_oracle_convex <- function(data,
                         bulletField = "bullet", bulletSizeField = "size", colorField = "cols",
                         precision = round) %>>%
     rAmCharts::addTitle(text = "Average loss suffered by the experts") %>>%
-    rAmCharts::setExport(position = "top-right") %>>% 
+    rAmCharts::setExport(position = "bottom-right") %>>% 
     rAmCharts::setChartCursor() %>>%
     rAmCharts::setCategoryAxis(labelRotation = 90, labelColorField = "cols", labelOffset = 5)
   
-  return(plt)
+  plt@otherProperties$zoomOutButtonImageSize <- 0
+
+  plt
 }
 
 
@@ -189,14 +194,14 @@ plt_oracle_shift <- function(data,
   
   plt <- amSerialChart(dataProvider = data,
                        categoryField = "x", 
-                       creditsPosition = "top-right") %>>%
+                       creditsPosition = "bottom-right") %>>%
     rAmCharts::addValueAxis(title = ylab) %>>%
     rAmCharts::addGraph(title = "shift", id = "shift",
                         valueField = "y", valueAxis = "x", 
                         type = "line", lineColor = "black",
                         precision = round) %>>%
     rAmCharts::addTitle(text = "Error suffered by the shifting oracle") %>>%
-    rAmCharts::setExport(position = "top-right") %>>% 
+    rAmCharts::setExport(position = "bottom-right") %>>% 
     rAmCharts::setChartCursor() %>>%
     rAmCharts::setCategoryAxis(title = "Number of shifts", labelRotation = 90, labelColorField = "cols", labelOffset = 5)
   

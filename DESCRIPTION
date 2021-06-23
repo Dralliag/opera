@@ -19,7 +19,10 @@ LinkingTo:
     RcppEigen
 Imports: 
     Rcpp,
-    RcppEigen
+    RcppEigen,
+    rAmCharts,
+    pipeR,
+    htmltools
 Suggests:
     quantreg,
     quadprog,
@@ -31,7 +34,7 @@ Suggests:
     survival,
     knitr,
     gbm,
-    htmltools
+    rmarkdown
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1

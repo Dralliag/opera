@@ -39,6 +39,8 @@ knitr::knit_hooks$set(imgcenter = function(before, options, envir){
     HTML("</p>")
   }
 })
+
+readme <- TRUE
 ```
 
 ```{r child = "inst/rmd/example.Rmd"}

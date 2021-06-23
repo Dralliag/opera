@@ -42,7 +42,13 @@ First, we load the data and we cut it into two subsets: a training set used to b
 
 ```{r, echo=FALSE}
 library(opera)
+library(rAmCharts)
 set.seed(1)
+
+dynamic <- TRUE
+if(exists("readme") && readme){
+  dynamic <- FALSE
+}
 ```
 
 ```{r}
@@ -51,6 +57,7 @@ attach(electric_load)
 idx_data_test <- 620:nrow(electric_load)
 data_train <- electric_load[-idx_data_test, ] 
 data_test <- electric_load[idx_data_test, ]  
+
 ```
 
 The data is displayed in the following figures.
@@ -130,9 +137,14 @@ colnames(X) <- c("gam", "ar", "gbm")
 To evaluate the performance of the experts and see if the aggregation rules may
 perform well, you can look at the oracles (rules that are used only for analysis and cannot be design online).
 
-```{r oracle, echo = TRUE, eval = FALSE}
+```{r, echo = TRUE, eval = FALSE}
 oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "convex")
 plot(oracle.convex)
+```
+
+```{r oracle, echo = FALSE, eval = FALSE}
+oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "convex")
+plot(oracle.convex, dynamic = dynamic)
 ```
 ```{r oracle, echo = FALSE, imgcenter = TRUE}
 ```
@@ -172,9 +184,15 @@ The results can be displayed with method `summary` and `plot`.
 ```{r MLpolsummary}
 summary(MLpol)
 ```
-```{r MLpol, echo = TRUE, eval = FALSE}
+
+```{r, echo = TRUE, eval = FALSE}
 plot(MLpol, pause = TRUE)
 ```
+
+```{r MLpol, echo = FALSE, eval = FALSE}
+plot(MLpol, dynamic = dynamic, pause = TRUE)
+```
+
 ```{r MLpol, echo = FALSE, imgcenter = TRUE}
 ```
 
