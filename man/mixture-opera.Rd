@@ -15,7 +15,8 @@ mixture(
   loss.gradient = TRUE,
   coefficients = "Uniform",
   awake = NULL,
-  parameters = list()
+  parameters = list(),
+  use_cpp = getOption("opera_use_cpp", default = TRUE)
 )
 
 \method{print}{mixture}(x, ...)
@@ -127,6 +128,9 @@ online. Possible parameters are:
 \item{...}{Additional parameters}
 
 \item{object}{An object of class mixture}
+
+\item{\code{use_cpp}.}{Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
+with the use of custom loss function.}
 }
 \value{
 An object of class mixture that can be used to perform new predictions. 
@@ -156,15 +160,7 @@ sequentially with the help of the expert advice in \code{experts}.
 At each time instance \eqn{t=1,2,\dots,T}, the mixture forms a prediction of \code{Y[t,]} by assigning 
 a weight to each expert and by combining the expert advice.
 }
-\section{Methods (by class)}{
-\itemize{
-\item \code{mixture}: \code{print}
-
-\item \code{mixture}: \code{summary}
-}}
-
 \examples{
-#' 
 library('opera')  # load the package
 set.seed(1)
 
@@ -183,7 +179,7 @@ data_test <- electric_load[idx_data_test, ]
 
 # 1) A generalized additive model
 gam.fit <- gam(Load ~ s(IPI) + s(Temp) + s(Time, k=3) + 
-                s(Load1) + as.factor(NumWeek), data = data_train)
+                 s(Load1) + as.factor(NumWeek), data = data_train)
 gam.forecast <- predict(gam.fit, newdata = data_test)
 
 # 2) An online autoregressive model on the residuals of a medium term model
@@ -196,8 +192,8 @@ electric_load$Load.detrend <- electric_load$Load - electric_load$Trend
 # Residual analysis
 ar.forecast <- numeric(length(idx_data_test))
 for (i in seq(idx_data_test)) {
- ar.fit <- ar(electric_load$Load.detrend[1:(idx_data_test[i] - 1)])
- ar.forecast[i] <- as.numeric(predict(ar.fit)$pred) + electric_load$Trend[idx_data_test[i]]
+  ar.fit <- ar(electric_load$Load.detrend[1:(idx_data_test[i] - 1)])
+  ar.forecast[i] <- as.numeric(predict(ar.fit)$pred) + electric_load$Trend[idx_data_test[i]]
 }
 
 # Aggregation of experts
@@ -230,7 +226,7 @@ m0.BOA <- mixture(model = 'BOA', loss.type = 'square')
 # start with an empty model and update the model sequentially
 m1.BOA <- m0.BOA
 for (i in 1:length(Y)) {
- m1.BOA <- predict(m1.BOA, newexperts = X[i, ], newY = Y[i])
+  m1.BOA <- predict(m1.BOA, newexperts = X[i, ], newY = Y[i])
 }
 
 # 2) perform online prediction directly from the empty model
