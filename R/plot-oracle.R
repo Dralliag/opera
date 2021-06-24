@@ -152,7 +152,7 @@ plot.oracle <- function(x, sort = TRUE, col = NULL, dynamic = T,  ...) {
 #' 
 plt_oracle_convex <- function(data, 
                               colors,
-                              round = 3) {
+                              round = 2) {
   
   if (is.null(colors)) {
     colors <- RColorBrewer::brewer.pal(n = min(length(data), 9), name = "Spectral")
@@ -168,12 +168,13 @@ plt_oracle_convex <- function(data,
   
   plt <- amSerialChart(dataProvider = data_plot,
                        categoryField = "names", 
-                       creditsPosition = "bottom-right") %>>%
+                       creditsPosition = "bottom-right", 
+                       thousandsSeparator = " ") %>>%
     rAmCharts::addValueAxis(title = "Square loss") %>>%
     rAmCharts::addGraph(title = "lines", id = "lines",
                         valueField = "values", valueAxis = "names", 
                         type = "line", lineColor = "black",
-                        showBalloon = F) %>>%
+                        showBalloon = F, precision = round) %>>%
     rAmCharts::addGraph(title = "bullets", id = "bullets",
                         valueField = "values", valueAxis = "names", 
                         type = "line", lineAlpha = 0, 
@@ -196,7 +197,8 @@ plt_oracle_shift <- function(data,
   
   plt <- amSerialChart(dataProvider = data,
                        categoryField = "x", 
-                       creditsPosition = "bottom-right") %>>%
+                       creditsPosition = "bottom-right", 
+                       thousandsSeparator = " ") %>>%
     rAmCharts::addValueAxis(title = ylab) %>>%
     rAmCharts::addGraph(title = "shift", id = "shift",
                         valueField = "y", valueAxis = "x", 
