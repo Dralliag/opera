@@ -64,6 +64,7 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
       pred <- experts[t, ] %*% waux
       
       cumulativeLoss[, k] <- cumulativeLoss[, k] + loss(pred, y[t], loss.type)  # Non gradient cumulative losses
+      
       if (neta == 1){
         lpred <- lossPred(pred, y[t], pred, loss.type, loss.gradient)
       } else {
@@ -76,9 +77,9 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
       
       # Weight update
       R.aux <- t(t(matrix(R, ncol = neta)) * grid.eta)
-      R.max <- max(R.aux)
-      v <- exp(R.aux - R.max)
-      v <- t(t(v)/apply(v, 2, sum))  # Renormalization of each column
+      R.max <- apply(R.aux, 2, max)
+      v.aux <- t(exp(t(R.aux) - R.max))
+      v <- t(t(v.aux) / apply(v.aux, 2, sum))  # Renormalization of each column
       wpar[, , k] <- grid.alpha[k]/N + (1 - grid.alpha[k]) * v
     }
     

@@ -101,8 +101,9 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
       }
 
       R.aux <- t(t(matrix(R.w0, ncol = neta)) * grid.eta)
-      R.max = max(R.aux)
-      weta <- exp(R.aux - R.max)
+      R.max <- apply(R.aux, 2, max)
+      weta.aux <- exp(t(t(R.aux) - R.max))
+      weta <- t(t(weta.aux) / apply(weta.aux,2,sum))
     }
     
     if (besteta == 1) {
@@ -123,14 +124,16 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
       }
 
       R.aux <- t(t(matrix(R.w0, ncol = neta)) * grid.eta)
-      R.max = max(R.aux)
-      weta <- exp(R.aux - R.max)
+      R.max <- apply(R.aux, 2, max)
+      weta.aux <- exp(t(t(R.aux) - R.max))
+      weta <- t(t(weta.aux) / apply(weta.aux,2,sum))
     }
     
     if (!use_cpp){
       R.aux <- t(t(matrix(R.w0, ncol = neta)) * grid.eta)
-      R.max = max(R.aux)
-      weta <- exp(R.aux - R.max)
+      R.max <- apply(R.aux, 2, max)
+      weta.aux <- exp(t(t(R.aux) - R.max))
+      weta <- t(t(weta.aux) / apply(weta.aux,2,sum))
     }
   }#end of time loop
   
