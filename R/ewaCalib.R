@@ -47,32 +47,14 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
     R.w0[, k] <- R[, k] + log(w0)/grid.eta[k]
   }  # We initialize the regrets so that w0 is the initial weight vector
   
-  
-  #start c++ modif
-  if (! class(loss.type) == "function") {
-    if (!is.list(loss.type)) {
-      loss.type <- list(name = loss.type)
-    }
-    if (is.null(loss.type$tau) && loss.type$name == "pinball") {
-      loss.type$tau <- 0.5
-    }
-    
-    loss_name <- loss.type$name
-    loss_tau <- 0
-    if (!is.null(loss.type$tau)){
-      loss_tau <- loss.type$tau
-    } 
-  }
-  #end C++ modif
-  
-  
   for (t in 1:T) {
     # Display the state of progress of the algorithm
     if (!(t%%floor(T/10)) && trace) 
       cat(floor(10 * t/T) * 10, "% -- ")
     
-    
     if (use_cpp){
+      loss_tau <- ifelse(! is.null(loss.type$tau), loss.type$tau, 0)
+      loss_name <- loss.type$name
       besteta<-computeEWACalib(t,besteta,awake,experts,weights,weta,
                                R.w0,grid.eta,y,eta,cumulativeLoss,prediction,loss_name,loss_tau,loss.gradient);
     }
@@ -113,11 +95,11 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
         perfneweta <- ewa(c(training$oldY, y[1:t]), rbind(training$oldexperts, 
           matrix(experts[1:t, ], ncol = N)), neweta[k], awake = rbind(training$oldawake, 
           matrix(awake[1:t, ], ncol = N)), loss.type = loss.type, loss.gradient = loss.gradient, 
-          w0 = w0)
+          w0 = w0, use_cpp = use_cpp)
         cumulativeLoss <- c(cumulativeLoss, perfneweta$training$cumulativeLoss)
         R.w0[, besteta + k] <- perfneweta$training$R + log(w0) / neweta[k]
       }
-      
+
       R.aux <- t(t(matrix(R.w0, ncol = neta)) * grid.eta)
       R.max = max(R.aux)
       weta <- exp(R.aux - R.max)
@@ -135,11 +117,11 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
         perfneweta <- ewa(y = c(training$oldY, y[1:t]), experts = rbind(training$oldexperts, 
           matrix(experts[1:t, ], ncol = N)), eta = neweta[k], awake = rbind(training$oldawake, 
           matrix(awake[1:t, ], ncol = N)), loss.type = loss.type, loss.gradient = loss.gradient, 
-          w0 = w0)
+          w0 = w0, use_cpp = use_cpp)
         cumulativeLoss <- c(perfneweta$training$cumulativeLoss, cumulativeLoss)
         R.w0[, besteta - k] <- perfneweta$training$R + log(w0) / neweta[k]
       }
-      
+
       R.aux <- t(t(matrix(R.w0, ncol = neta)) * grid.eta)
       R.max = max(R.aux)
       weta <- exp(R.aux - R.max)
@@ -152,7 +134,6 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
     }
   }#end of time loop
   
-  
   # Next weights
   w <- weta[, besteta]/sum(weta[, besteta])
   
@@ -160,7 +141,7 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
   for (k in 1:neta) {
     R[, k] <- R.w0[, k] - log(w0)/grid.eta[k]
   }  
-  
+
   object <- list(model = "EWA", loss.type = loss.type, loss.gradient = loss.gradient, 
     coefficients = w)
   

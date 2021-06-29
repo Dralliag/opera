@@ -8,8 +8,8 @@
 print.mixture <- function(x, ...) {
   cat("Aggregation rule: ")
   cat(x$model, "\n")
-  cat("Loss function: ", x$loss.type$name, "loss", "\n")
-  cat("Gradient trick: ", x$loss.gradient, "\n")
+  cat("Loss function: ", ifelse(is.function(x$loss.type), as.character(attributes(x$loss.type)[[1]]), paste0(x$loss.type$name, "loss")), "\n")
+  cat("Gradient trick: ", ifelse(is.function(x$loss.gradient), as.character(attributes(x$loss.gradient)[[1]]), x$loss.gradient), "\n")
   cat("Coefficients: ")
   if (x$coefficients[1] != "Uniform") {
     cat("\n")

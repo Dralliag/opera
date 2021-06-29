@@ -55,13 +55,8 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
   # checks
   newexperts <- check_matrix(newexperts, "newexperts")
   awake <- check_matrix(awake, "awake")
-  
-  if (class(object$loss.type) == "function" || class(object$loss.type[[1]]) == "function") {
-    if (use_cpp == TRUE) {
-      stop("Custom loss functions are not yet available when use_cpp == TRUE (check $loss.type).") 
-    }
-  }
-  
+  object$loss.type <- check_loss(loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
+                                 Y = newY, model = object$model, use_cpp = use_cpp)
   result <- object
   d <- object$d
   if ((d == 1) || (d == "unknown" && is.null(dim(newY)))) {

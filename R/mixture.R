@@ -56,15 +56,14 @@
 #'  the value of the parameter 'simplex' provided by the user.}
 #' }
 #' 
-#' @param loss.type A string or a list with a component 'name' specifying
-#' the loss function considered to evaluate the performance. It can be
-#' 'square', 'absolute', 'percentage', or 'pinball'. In the case of the pinball loss, the quantile 
-#' can be provided by assigning to loss.type a list of two elements: 
+#' @param loss.type \code{character, list or function}. 
 #' \describe{
-#'      \item{name}{A string defining the name of the loss function (i.e., 'pinball')}
-#'      \item{tau}{ A number in \code{[0,1]} defining the quantile to be predicted. 
-#' The default value is 0.5 to predict the median.}
-#' } 'Ridge' aggregation rule is restricted to square loss.
+#'      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
+#'      \item{list}{ When using pinball loss: list with field name equal to 'pinball' and field tau equal to the required quantile in [0,1];}
+#'      \item{function}{ A custom loss as a function of two parameters.}
+#'      \item{list of 2 functions}{ A custom loss as a function of two parameters and 
+#'                                  a custom gradient loss as a function of 3 parameters, the third one being called 'pred'.}
+#' }
 #' 
 #' @param loss.gradient A boolean. If
 #' TRUE (default) the aggregation rule will not be directly applied to the loss
@@ -153,19 +152,7 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
   # checks
   experts <- check_matrix(experts, "experts")
   awake <- check_matrix(awake, "awake")
-
-  if (class(loss.type) == "function") {
-    if (use_cpp == TRUE) {
-      stop("Custom loss functions are not yet available when use_cpp == TRUE.") 
-    }
-  } else {
-    if (!is.list(loss.type)) {
-      loss.type <- list(name = loss.type)
-    }
-    if (!(loss.type$name %in% c("pinball", "square", "percentage", "absolute"))) {
-      stop("loss.type should be one of these: 'absolute', 'percentage', 'square', 'pinball'")
-    } 
-  }
+  loss.type <- check_loss(loss.type = loss.type, loss.gradient = loss.gradient, use_cpp = use_cpp)
   
   
   object <- list(model = model, loss.type = loss.type, loss.gradient = loss.gradient, 

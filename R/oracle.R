@@ -79,6 +79,7 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
   # checks
   experts <- check_matrix(experts, "experts")
   awake <- opera:::check_matrix(awake, "awake")
+  loss.type <- check_loss(loss.type = loss.type, loss.gradient = FALSE)
   
   # Test that Y and experts have correct dimensions
   if (is.null(Y) || is.null(experts)) {
@@ -106,24 +107,6 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
   
   if (!(length(Y) == nrow(experts))) {
     stop("Bad dimensions: length(Y) should be equal to nrow(experts)")
-  }
-  
-  if (is.null(loss.type)) {
-    loss.type <- list(name = "square")
-  }
-  if (! class(loss.type) == "function") {
-    if (!is.list(loss.type)) {
-      loss.type <- list(name = loss.type)
-    }
-    if (!(loss.type$name %in% c("pinball", "square", "percentage", "absolute"))) {
-      stop("loss.type should be one of these: 'absolute', 'percentage', 'square', 'pinball'")
-    }
-    if (!is.null(loss.type$tau) && loss.type$name != "pinball") {
-      warning("Unused parameter tau (loss.type != 'pinball')")
-    }
-    if (min(Y) <= 0 && loss.type$name == "percentage") {
-      stop("Y should be non-negative for percentage loss function")
-    }
   }
   if (!is.null(lambda) && model != "linear") {
     warning("Unused lambda parameter (model != 'linear')")

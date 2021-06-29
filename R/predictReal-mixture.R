@@ -53,16 +53,6 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     stop("Bad number of experts: (length(object$coefficients) != nrow(newexperts))")
   }
   
-  if (! (class(object$loss.type) == "function" || class(object$loss.type[[1]]) == "function")) {
-    if (!is.null(object$loss.type$tau) && object$loss.type$name != "pinball") {
-      warning("Unused parameter tau (loss.type$name != 'pinball)")
-    }
-    
-    if (object$loss.type$name != "square" && object$model == "Ridge") {
-      stop(paste("Square loss is require for", object$model, "model."))
-    }
-  }
-  
   if (!is.null(awake) && !identical(awake, matrix(1, nrow = T, ncol = N)) && (object$model == 
                                                                               "Ridge" || object$model == "OGD")) {
     stop(paste("Sleeping or missing values not allowed for", object$model, "model."))
@@ -93,12 +83,6 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
   
   # Online prediction and weights if newY is provided
   if (!is.null(newY)) {
-    
-    if (min(newY) <= 0 && object$loss.type$name == "percentage") {
-      stop("Y should be non-negative for percentage loss function")
-    }
-    
-    
     ## If averaged is true, the models do not use coefficient as the next weight
     if (!is.null(object$parameters$averaged) && object$parameters$averaged && !is.null(object$training)) {
       object$coefficients <- object$training$next.weights
@@ -236,11 +220,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     newobject$prediction <- rbind(object$prediction, matrix(newpred, ncol = object$d))
     newobject$weights <- rbind(object$weights, newweights)
     rownames(newobject$weights) <- NULL
-    if (! (class(object$loss.type) == "function" && object$loss.gradient == T)) {
-      newobject$loss <- mean(loss(c(newobject$prediction), c(newobject$Y), loss.type = newobject$loss.type)) 
-    } else {
-      newobject$loss <- "unused when the loss is provided and loss.gradient == T"
-    }
+    newobject$loss <- mean(loss(c(newobject$prediction), c(newobject$Y), loss.type = newobject$loss.type)) 
     newobject$T <- object$T + T/object$d
     newobject$d <- object$d
   } else {

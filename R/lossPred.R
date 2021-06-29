@@ -21,35 +21,20 @@ lossPred <- function(x, y, pred = NULL, loss.type = "square", loss.gradient = FA
   
   npred <- length(pred)
   nx <- length(x)
-
+  
   if (class(loss.type) == "function") {
-    if (loss.gradient == FALSE) {
-      args_loss <- formalArgs(loss.type)
-      
-      if (! length(args_loss) == 2) {
-        stop("The provided loss.function should contain exactly 2 arguments.")
-      }
-      
-    } else {
-      args_loss <- formalArgs(loss.type)
-      if (! (length(args_loss) == 3 && "pred" %in% args_loss)) {
-        stop("The provided loss.function should contain exactly 3 arguments ",
-             "and the third one should be called 'pred', when loss.gradient == T.")
-      }
-    }
-    
     l <- tryCatch({
       if (npred > 1 && nx > 1) {
-        if (!loss.gradient) {
+        if (! is.function(loss.gradient) && loss.gradient == FALSE) {
           l <- matrix(rep(loss.type(x, y), npred), ncol = npred) 
         } else {
-          l <- matrix(rep(loss.type(x, y, pred), npred), ncol = npred) 
+          l <- t(matrix(rep(loss.gradient(pred, y), nx), ncol = nx)) * matrix(rep(x, npred), ncol = npred)
         }
       } else {
-        if (!loss.gradient) {
+        if (! is.function(loss.gradient) && loss.gradient == FALSE) {
           l <- loss.type(x, y) 
         } else {
-          l <- loss.type(x, y, pred)
+          l <- c(loss.gradient(pred, y)) * x
         }
       }
     }, 

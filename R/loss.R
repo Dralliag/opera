@@ -22,12 +22,6 @@
 loss <- function(x, y, loss.type = "square") {
   
   if (class(loss.type) == "function") {
-    args <- formalArgs(loss.type)
-    
-    if (length(args) > 2) {
-      stop("The provided loss function should contain exactly 2 arguments.")
-    }
-    
     l <- tryCatch({loss.type(x, y)}, 
                   error = function(e) {
                     stop("Error when trying to apply custom loss function : \n",

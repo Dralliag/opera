@@ -28,27 +28,13 @@ MLpol <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     training <- list(eta = eta[1, ])
   }
   
-  #start C++ modification
-  if (! class(loss.type) == "function") {
-    if (!is.list(loss.type)) {
-      loss.type <- list(name = loss.type)
-    }
-    if (is.null(loss.type$tau) && loss.type$name == "pinball") {
-      loss.type$tau <- 0.5
-    }
-    
-    loss_name <- loss.type$name
-    loss_tau <- 0
-    if (!is.null(loss.type$tau)){
-      loss_tau <- loss.type$tau
-    } 
-  }
-  
   w <- rep(0, N)
   
   if (use_cpp){
-      B <- computeMLPolEigen(awake,eta,experts,weights,y,prediction,
-                             R,w,B,loss_name,loss_tau,loss.gradient)
+    loss_tau <- ifelse(! is.null(loss.type$tau), loss.type$tau, 0)
+    loss_name <- loss.type$name
+    B <- computeMLPolEigen(awake,eta,experts,weights,y,prediction,
+                           R,w,B,loss_name,loss_tau,loss.gradient)
   }
   else{
   #end of C++ modification

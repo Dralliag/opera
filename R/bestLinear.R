@@ -19,9 +19,6 @@ bestLinear <- function(y, experts, lambda = 0, loss.type = list(name = "square")
           })
       
     } else if (loss.type$name == "pinball") {
-      if (is.null(loss.type$tau)) {
-        loss.type$tau <- 0.5
-      }
       if (!requireNamespace("quantreg", quietly = TRUE)) {
         warning("The quantreg package must be installed to use this functionality")
         #Either exit or do something without quantreg

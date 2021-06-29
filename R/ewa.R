@@ -10,7 +10,6 @@ ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradie
     w0 <- rep(1, N)
   }
   
-  
   awake <- as.matrix(awake)
   idx.na <- which(is.na(experts))
   awake[idx.na] <- 0
@@ -26,24 +25,10 @@ ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradie
     R.w0 <- training$R + log(w0)/eta
     cumulativeLoss <- training$cumulativeLoss
   }
-  #start C++ insertion
-  if (! class(loss.type) == "function") {
-    if (!is.list(loss.type)) {
-      loss.type <- list(name = loss.type)
-    }
-    if (is.null(loss.type$tau) && loss.type$name == "pinball") {
-      loss.type$tau <- 0.5
-    }
-    
-    loss_name <- loss.type$name
-    loss_tau <- 0
-    if (!is.null(loss.type$tau)){
-      loss_tau <- loss.type$tau
-    } 
-  }
-  #end LP
   
   if (use_cpp){
+    loss_tau <- ifelse(! is.null(loss.type$tau), loss.type$tau, 0)
+    loss_name <- loss.type$name
     cumulativeLoss<-computeEWAEigen(
       awake, experts,weights,y,pred, 
       R.w0,eta,cumulativeLoss,

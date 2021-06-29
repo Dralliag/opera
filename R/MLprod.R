@@ -31,29 +31,13 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
     maxloss <- training$maxloss
   }
   
-  #start C++ modification
-  if (! class(loss.type) == "function") {
-    if (!is.list(loss.type)) {
-      loss.type <- list(name = loss.type)
-    }
-    if (is.null(loss.type$tau) && loss.type$name == "pinball") {
-      loss.type$tau <- 0.5
-    }
-    
-    loss_name <- loss.type$name
-    loss_tau <- 0
-    if (!is.null(loss.type$tau)){
-      loss_tau <- loss.type$tau
-    } 
-  }
-  
   if (use_cpp){
+    loss_tau <- ifelse(! is.null(loss.type$tau), loss.type$tau, 0)
+    loss_name <- loss.type$name
     B <- computeMLProdEigen(awake,eta,experts,weights,y,prediction,
                             R,L,maxloss,loss_name,loss_tau,loss.gradient);
   }
   else{
-    
-    
     for (t in 1:T) {
       
       # Update weights

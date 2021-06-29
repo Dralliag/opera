@@ -86,7 +86,7 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
       nlambda <- nlambda + length(newlambda)
       for (k in 1:length(newlambda)) {
         perfnewlambda <- tryCatch(ridge(y = c(training$oldY, y[1:t]), experts = rbind(training$oldexperts, 
-          matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0), 
+          matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0, use_cpp = use_cpp), 
           error = function(e) {
           list(prediction = rep(0, t))
           })
@@ -105,7 +105,7 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
       for (k in 1:length(newlambda)) {
         grid.lambda <- c(newlambda[k], grid.lambda)
         perfnewlambda <- tryCatch(y = ridge(c(training$oldY, y[1:t]), experts = rbind(training$oldexperts, 
-          matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0), 
+          matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0, use_cpp = use_cpp), 
           error = function(e) {
           list(prediction = rep(NA, t))
           })
