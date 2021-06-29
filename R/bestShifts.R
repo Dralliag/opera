@@ -44,10 +44,10 @@ bestShifts <- function(y, experts, awake = NULL, loss.type = list(name = "square
       for (m in t:2) {
         for (i in Et) {
           if (idx_min[1, m - 1] == i) 
-          aux <- idx_min[2, m - 1] else aux <- idx_min[1, m - 1]
-          
-          if (L[m, i, loss.number] < L1[m - 1, aux, loss.number]) 
-          L[m, i, ] <- L[m, i, ] + instanceLoss[i, ] else L[m, i, ] <- L1[m - 1, aux, ] + instanceLoss[i, ]
+            aux <- idx_min[2, m - 1] else aux <- idx_min[1, m - 1]
+            
+            if (L[m, i, loss.number] < L1[m - 1, aux, loss.number]) 
+              L[m, i, ] <- L[m, i, ] + instanceLoss[i, ] else L[m, i, ] <- L1[m - 1, aux, ] + instanceLoss[i, ]
         }
       }
     }
@@ -55,6 +55,11 @@ bestShifts <- function(y, experts, awake = NULL, loss.type = list(name = "square
   }
   loss.experts <- L[, , loss.number]/T
   loss <- apply(loss.experts, 1, min)
+  for (i in 2:T) {
+    if (loss[i] > loss[i-1]) {
+      loss[i] <- loss[i-1]
+    }
+  }
   res <- list(loss = loss)
   if (loss.type == "square") {
     res <- list(loss = loss, rmse = sqrt(loss))
