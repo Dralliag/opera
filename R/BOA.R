@@ -18,6 +18,7 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
   
   R <- rep(0, N)
   R.reg <- rep(0, N)
+  w <- rep(1, N)
   weights <- matrix(0, ncol = N, nrow = T)
   prediction <- rep(0, T)
   eta <- matrix(exp(350), ncol = N, nrow = T + 1)
@@ -28,6 +29,8 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
     w0 <- training$w0
     R <- training$R
     R.reg <- training$R.reg
+    R.aux <- log(w0) + training$eta * R.reg
+    w <- exp(R.aux - max(R.aux))
     eta[1, ] <- training$eta
     B <- training$B
     V <- training$V
