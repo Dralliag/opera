@@ -306,7 +306,7 @@ plot.mixture <- function(x,
         {
           html_p <- rAmCharts::controlShinyPlot(
             plot_dyn_avg_loss(data = x, colors = col, 
-                              max_experts = max_experts, round = 3
+                              max_experts = max_experts, round = 2
             )
           )
           html_p$height <- 322 + 22 * (min(K, max_experts) - 3)
@@ -355,7 +355,7 @@ plot.mixture <- function(x,
         html_p <- rAmCharts::controlShinyPlot(
           plot_cumul_res(
             data = x, colors = col, 
-            max_experts = max_experts, round = 3
+            max_experts = max_experts, round = 2
           )
         )
         html_p$height <- 322 + 22 * (min(K, max_experts) - 3)
@@ -409,7 +409,7 @@ plot.mixture <- function(x,
           html_p <- rAmCharts::controlShinyPlot(
             plot_avg_loss(
               data = x, colors = col, 
-              max_experts = max_experts, round = 3
+              max_experts = max_experts, round = 2
             )
           )
           html_p$height <- 300
@@ -449,7 +449,7 @@ plot.mixture <- function(x,
           html_p <- rAmCharts::controlShinyPlot(
             plot_contrib(
               data = x, colors = col, alpha = alpha, 
-              max_experts = max_experts, round = 3
+              max_experts = max_experts, round = 2
             )
           )
           html_p$height <- 325 + 25 * (min(K, max_experts) - 3)
@@ -762,14 +762,14 @@ plot_dyn_avg_loss <- function(data,
       rAmCharts::addGraph(title = names_experts[index], id = names_experts[index],
                           valueField = names_experts[index], valueAxis = "timestamp", 
                           type = "line", lineColor = colors[index],
-                          balloonText = paste0("<b>", names_experts[index], " : </b>", "[[", names_experts[index], "]]")) 
+                          balloonText = paste0("<b>", names_experts[index], " : </b>", "[[value]]")) 
   }
   
   plt <- plt %>>%
     rAmCharts::addGraph(title = data$model, id = "cumul.exploss",
                         valueField = "cumul.exploss", valueAxis = "timestamp", 
                         type = "line", lineThickness = 2, lineColor = "black",
-                        balloonText = paste0("<b> cumul.exploss : </b>", "[[cumul.exploss]]"))
+                        balloonText = paste0("<b> cumul.exploss : </b>", "[[value]]"))
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Dynamic average loss") %>>%
@@ -826,14 +826,14 @@ plot_cumul_res <- function(data,
       rAmCharts::addGraph(title = names_experts[index], id = names_experts[index],
                           valueField = names_experts[index], valueAxis = "timestamp", 
                           type = "line", lineColor = colors[index],
-                          balloonText = paste0("<b>", names_experts[index], " : </b>", "[[", names_experts[index], "]]")) 
+                          balloonText = paste0("<b>", names_experts[index], " : </b>", "[[value]]")) 
   }
   
   plt <- plt %>>%
     rAmCharts::addGraph(title = data$model, id = "cumul.expres",
                         valueField = "cumul.expres", valueAxis = "timestamp", 
                         type = "line", lineThickness = 2, lineColor = "black",
-                        balloonText = paste0("<b> cumul.expres : </b>", "[[cumul.expres]]"))
+                        balloonText = paste0("<b> cumul.expres : </b>", "[[value]]"))
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Cumulative residuals") %>>%
@@ -886,7 +886,7 @@ plot_avg_loss <- function(data,
   plt <- amSerialChart(dataProvider = data_plot,
                        categoryField = "names", 
                        creditsPosition = "bottom-right",
-                       thousandsSeparator = "",
+                       thousandsSeparator = " ",
                        precision = round) %>>%
     rAmCharts::addValueAxis(title = "Square loss") %>>%
     rAmCharts::addGraph(title = "lines", id = "lines",
@@ -976,7 +976,7 @@ plot_contrib <- function(data,
                             valueField = names_weights[index], valueAxis = "timestamp", 
                             type = "line", lineColor = colors[index],
                             fillToGraph = names_weights[index-1], fillColors = colors[index], fillAlphas = .75,
-                            balloonText = paste0("<b>", names_weights[index], " : </b>", "[[", names_weights[index], ".1]]"))
+                            balloonText = paste0("<b>", names_weights[index], " : </b>", "[[value]]"))
     }
   }
   
@@ -984,7 +984,7 @@ plot_contrib <- function(data,
     rAmCharts::addGraph(title = "Prediction", id = "pred",
                         valueField = "pred", valueAxis = "timestamp", 
                         type = "line", dashLength = 5, lineThickness = 2, lineColor = "black",
-                        balloonText = paste0("<b> Prediction : </b>", "[[pred]]"))
+                        balloonText = paste0("<b> Prediction : </b>", "[[value]]"))
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Contribution of each expert to the prediction") %>>%
