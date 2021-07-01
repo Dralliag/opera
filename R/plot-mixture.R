@@ -193,7 +193,7 @@ plot.mixture <- function(x, pause = FALSE, col = NULL, ...) {
   # cumulative plot of the series
   par(mar = c(2, 3, 2.5,l.names/2), mgp = c(1, 0.5, 0))
   if (x$d ==1) {
-    cumulativePlot(W = x$weights,X = x$experts, Y = x$Y,smooth = TRUE,alpha = 0.01,plot.Y = TRUE, col.pal = rev(my.colors))
+    cumulativePlot(W = x$weights,X = x$experts, Y = x$Y,smooth = TRUE,alpha = 0.01,plot.Y = TRUE, col.pal = rev(col))
   } else {
     X <- apply(seriesToBlock(X = x$experts,d = x$d),c(1,3),mean)
     Y <- apply(seriesToBlock(x$Y,d = x$d),1,mean)
@@ -266,9 +266,9 @@ cumulativePlot<-function(W,X,Y,col.pal=NULL, smooth = FALSE, plot.Y = FALSE, alp
     if (!smooth) addPoly(time,y.summed,col=col.pal[i])
     if (smooth) addPoly(time,lowess(y.summed,f = alpha)$y,col=col.pal[i])
     y.summed.old <- y.summed
-    y.summed <- y.summed - mat[,i]
-    if (!smooth) writeLegend(f=y.summed.old,g= y.summed, name = colnames(mat)[i],Y.lim,col='black')
-    if (smooth) writeLegend(f=lowess(y.summed.old,f=alpha/10)$y,g=lowess(y.summed,f=alpha/10)$y, name = colnames(mat)[i],Y.lim,col='black')
+    y.summed <- y.summed - mat[, which(o == (K - i + 1))]
+    if (!smooth) writeLegend(f=y.summed.old,g= y.summed, name = colnames(mat)[which(o == (K - i + 1))],Y.lim,col='black')
+    if (smooth) writeLegend(f=lowess(y.summed.old,f=alpha/10)$y,g=lowess(y.summed,f=alpha/10)$y, name = colnames(mat)[which(o == (K - i + 1))],Y.lim,col='black')
   }
   if (plot.Y && !smooth) lines(time,Y,col=1,lwd=2,lty='dotted')
   if (plot.Y && smooth) lines(lowess(x = time,y = Y,f = alpha)$y,col=1,lwd=2,lty='dotted')
