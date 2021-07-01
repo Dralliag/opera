@@ -52,7 +52,7 @@ plot.oracle <- function(x, sort = TRUE, col = NULL, dynamic = T,  ...) {
     
     if (! dynamic) {
       par(mar = c(4.5, 4, 2, 2))
-      plot(c(x$loss.experts, err.unif)[idx.sorted], xlab = "", ylab = paste(x$loss.type$name, 
+      plot(c(x$loss.experts, err.unif)[idx.sorted], xlab = "", ylab = paste(ifelse(is.function(x$loss.type), "custom", x$loss.type$name), 
                                                                             "loss"), main = "Average loss suffered by the experts", axes = F, pch = 3, 
            col = my.col, lwd = 2,...)
       axis(1, at = 1:(K + 1), labels = FALSE)
@@ -83,7 +83,7 @@ plot.oracle <- function(x, sort = TRUE, col = NULL, dynamic = T,  ...) {
       y.max <- c(x$loss.experts, err.unif, x$loss)[idx.sorted]
       
       par(mar = c(4.5, 4, 2, 2))
-      plot(c(x$loss.experts, err.unif, x$loss)[idx.sorted], xlab = "", ylab = paste(x$loss.type$name, 
+      plot(c(x$loss.experts, err.unif, x$loss)[idx.sorted], xlab = "", ylab = paste(ifelse(is.function(x$loss.type), "custom", x$loss.type$name), 
                                                                                     "loss"), main = "Average loss suffered by the experts", axes = F, pch = 3, 
            col = my.col, lwd = 2)
       axis(1, at = 1:(K + 2), labels = FALSE)
@@ -103,13 +103,15 @@ plot.oracle <- function(x, sort = TRUE, col = NULL, dynamic = T,  ...) {
   
   if (x$model == "shifting") {
     L <- x$loss
-    if (x$loss.type == "square") {
+    if (! is.function(x$loss.type) && x$loss.type == "square") {
       L <- sqrt(x$loss)
       y.lab <- "rmse"
-    } else if (x$loss.type == "absolute") {
+    } else if (! is.function(x$loss.type) && x$loss.type == "absolute") {
       y.lab <- "mean absolute error"
-    } else if (x$loss.type == "percentage") {
+    } else if (! is.function(x$loss.type) && x$loss.type == "percentage") {
       y.lab <- "mape"
+    } else {
+      y.lab <- "custom loss"
     }
     
     if (! dynamic) {

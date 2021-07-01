@@ -63,15 +63,19 @@ summary.oracle <- function(object, ...) {
     n.shifts <- round(quantile(1:K))
     TAB <- matrix(object$loss[n.shifts], nrow = 1)
     colnames(TAB) <- paste(n.shifts - 1, "shifts")
-    rownames(TAB) <- paste("Average", object$loss.type, "loss:")
+    rownames(TAB) <- ifelse(is.function(object$loss.type), 
+                            paste0("Average loss (", attributes(object$loss.type)$srcref, "):"), 
+                            paste0("Average ", object$loss.type, "loss:"))
     
-    if (object$loss.type == "square") {
+    if (! is.function(object$loss.type) && object$loss.type == "square") {
       TAB <- sqrt(TAB)
       rownames(TAB) <- "rmse:"
-    } else if (object$loss.type == "absolute") {
+    } else if (! is.function(object$loss.type) && object$loss.type == "absolute") {
       rownames(TAB) <- "mean absolute error:"
-    } else if (object$loss.type == "percentage") {
+    } else if (! is.function(object$loss.type) && object$loss.type == "percentage") {
       rownames(TAB) <- "mape:"
+    } else {
+      rownames(TAB) <- "custom loss:"
     }
   }
   
