@@ -79,3 +79,39 @@ identical(m1.BOA, m3.BOA)  # TRUE
 # Display the results
 summary(m3.BOA)
 plot(m1.BOA)
+
+
+# Using d-dimensional time-series
+##################################
+
+# Consider the above exemple of electricity consumption 
+#  to be predicted every four weeks
+YBlock <- seriesToBlock(X = Y, d = 4)
+XBlock <- seriesToBlock(X = X, d = 4)
+
+# The four-week-by-four-week predictions can then be obtained 
+# by directly using the `mixture` function as we did earlier. 
+
+MLpolBlock <- mixture(Y = YBlock, experts = XBlock, model = "MLpol", loss.type = "square")
+
+
+# The predictions can finally be transformed back to a 
+# regular one dimensional time-series by using the function `blockToSeries`.
+
+prediction <- blockToSeries(MLpolBlock$prediction)
+
+#### Using the `online = FALSE` option
+
+# Equivalent solution is to use the `online = FALSE` option in the predict function. 
+# The latter ensures that the model coefficients are not 
+# updated between the next four weeks to forecast.
+MLpolBlock <- MLpol0
+d = 4
+n <- length(Y)/d
+for (i in 0:(n-1)) { 
+  idx <- 4*i + 1:4 # next four weeks to be predicted
+  MLpolBlock <- predict(MLpolBlock, newexperts = X[idx, ], newY = Y[idx], online = FALSE)
+}
+
+print(head(MLpolBlock$weights))
+

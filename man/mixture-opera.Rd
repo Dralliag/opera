@@ -70,15 +70,14 @@ like 'BOA' (Bernstein online Aggregation see [Wintenberger, 2014] <doi:10.1007/s
  the value of the parameter 'simplex' provided by the user.}
 }}
 
-\item{loss.type}{A string or a list with a component 'name' specifying
-the loss function considered to evaluate the performance. It can be
-'square', 'absolute', 'percentage', or 'pinball'. In the case of the pinball loss, the quantile 
-can be provided by assigning to loss.type a list of two elements: 
+\item{loss.type}{\code{character, list or function}. 
 \describe{
-     \item{name}{A string defining the name of the loss function (i.e., 'pinball')}
-     \item{tau}{ A number in \code{[0,1]} defining the quantile to be predicted. 
-The default value is 0.5 to predict the median.}
-} 'Ridge' aggregation rule is restricted to square loss.}
+     \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
+     \item{list}{ When using pinball loss: list with field name equal to 'pinball' and field tau equal to the required quantile in [0,1];}
+     \item{function}{ A custom loss as a function of two parameters.}
+     \item{list of 2 functions}{ A custom loss as a function of two parameters and 
+                                 a custom gradient loss as a function of 3 parameters, the third one being called 'pred'.}
+}}
 
 \item{loss.gradient}{A boolean. If
 TRUE (default) the aggregation rule will not be directly applied to the loss
@@ -242,6 +241,42 @@ identical(m1.BOA, m3.BOA)  # TRUE
 # Display the results
 summary(m3.BOA)
 plot(m1.BOA)
+
+
+# Using d-dimensional time-series
+##################################
+
+# Consider the above exemple of electricity consumption 
+#  to be predicted every four weeks
+YBlock <- seriesToBlock(X = Y, d = 4)
+XBlock <- seriesToBlock(X = X, d = 4)
+
+# The four-week-by-four-week predictions can then be obtained 
+# by directly using the `mixture` function as we did earlier. 
+
+MLpolBlock <- mixture(Y = YBlock, experts = XBlock, model = "MLpol", loss.type = "square")
+
+
+# The predictions can finally be transformed back to a 
+# regular one dimensional time-series by using the function `blockToSeries`.
+
+prediction <- blockToSeries(MLpolBlock$prediction)
+
+#### Using the `online = FALSE` option
+
+# Equivalent solution is to use the `online = FALSE` option in the predict function. 
+# The latter ensures that the model coefficients are not 
+# updated between the next four weeks to forecast.
+MLpolBlock <- MLpol0
+d = 4
+n <- length(Y)/d
+for (i in 0:(n-1)) { 
+  idx <- 4*i + 1:4 # next four weeks to be predicted
+  MLpolBlock <- predict(MLpolBlock, newexperts = X[idx, ], newY = Y[idx], online = FALSE)
+}
+
+print(head(MLpolBlock$weights))
+
 }
 \seealso{
 See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.

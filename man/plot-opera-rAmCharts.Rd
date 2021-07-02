@@ -4,7 +4,7 @@
 \alias{plot_ridge_weights}
 \alias{plot_weights}
 \alias{boxplot_weights}
-\alias{plot_cumul_sq_loss}
+\alias{plot_dyn_avg_loss}
 \alias{plot_cumul_res}
 \alias{plot_avg_loss}
 \alias{plot_contrib}
@@ -16,7 +16,7 @@ plot_weights(data, colors = NULL, max_experts = 50, round = 3)
 
 boxplot_weights(data, colors = NULL, max_experts = 50)
 
-plot_cumul_sq_loss(data, colors = NULL, max_experts = 50, round = 3)
+plot_dyn_avg_loss(data, colors = NULL, max_experts = 50, round = 3)
 
 plot_cumul_res(data, colors = NULL, max_experts = 50, round = 3)
 

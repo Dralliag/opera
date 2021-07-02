@@ -10,9 +10,10 @@
   col = NULL,
   alpha = 0.01,
   dynamic = T,
-  type = c("all", "plot_weight", "boxplot_weight", "cumul_sq_loss", "cumul_res",
+  type = c("all", "plot_weight", "boxplot_weight", "dyn_avg_loss", "cumul_res",
     "avg_loss", "contrib"),
   max_experts = 50,
+  col_by_weight = TRUE,
   ...
 )
 }
@@ -31,10 +32,12 @@ their residuals and cumulative losses are computed by using the predictions of t
 \item{type}{\code{char}.
 \itemize{
      \item{'all'}{ Display all the graphs ;}
-     \item{'plot_weight', 'boxplot_weight', 'cumul_sq_loss', 'cumul_res', 'avg_loss', 'contrib'}{ Display the selected graph alone.}
+     \item{'plot_weight', 'boxplot_weight', 'dyn_avg_loss', 'cumul_res', 'avg_loss', 'contrib'}{ Display the selected graph alone.}
 }}
 
 \item{max_experts}{\code{integer}. Maximum number of experts to be displayed (only the more influencial).}
+
+\item{col_by_weight}{\code{boolean}. If TRUE (default), colors are ordered by weights of each expert, else by column}
 
 \item{...}{additional plotting parameters}
 }

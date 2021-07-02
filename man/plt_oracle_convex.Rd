@@ -4,7 +4,7 @@
 \alias{plt_oracle_convex}
 \title{Functions to render dynamic oracle graphs using rAmCharts}
 \usage{
-plt_oracle_convex(data, colors, round = 3)
+plt_oracle_convex(data, colors, round = 2)
 }
 \value{
 a rAmCharts plot
