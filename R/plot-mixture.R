@@ -14,6 +14,7 @@
 #'      \item{'plot_weight', 'boxplot_weight', 'dyn_avg_loss', 'cumul_res', 'avg_loss', 'contrib'}{ Display the selected graph alone.}
 #' }
 #' @param max_experts \code{integer}. Maximum number of experts to be displayed (only the more influencial).
+#' @param col_by_weight \code{boolean}. If TRUE (default), colors are ordered by weights of each expert, else by column
 #' @param ... additional plotting parameters
 #' 
 #' 
@@ -46,6 +47,7 @@ plot.mixture <- function(x,
                                   'avg_loss', 'contrib'
                          ), 
                          max_experts = 50,
+                         col_by_weight = TRUE, 
                          ...) {
   
   type <- tryCatch({
@@ -60,7 +62,7 @@ plot.mixture <- function(x,
   def.par <- par(no.readonly = TRUE) # save default, for resetting...
   if (pause) par(ask=TRUE)
   K <- ncol(x$experts)
-  w.order <- order(apply(x$weights,2,mean),decreasing = FALSE)
+  w.order <- order(colMeans(x$weights),decreasing = FALSE)
   
   if (is.null(col)) {
     if(!requireNamespace("RColorBrewer", quietly = TRUE)) {
@@ -69,17 +71,21 @@ plot.mixture <- function(x,
     } else{
       col <- rev(RColorBrewer::brewer.pal(n = max(min(K,11),4),name = "Spectral"))[1:min(K,11)]
     }
-  }
+  } 
   
-  my.colors <- col
-  
-  col <- numeric(K)
-  if (K <= length(my.colors)) {
-    col[w.order] <- my.colors[1:K]
+  if(length(col) > K){
+    col <- col[1:K]
   } else {
-    col[w.order] <- c(my.colors, rep(my.colors[length(my.colors)],K-length(my.colors)))
+    col <- rep(col, length.out = K)
   }
   
+  if(col_by_weight){
+    col <- rev(col)
+  } else {
+    my.colors <- col
+    col <- my.colors[w.order]
+  }
+
   if (!pause && type == "all") {
     layout(matrix(c(1,2,3,4,5,6),nrow = 3,ncol =  2, byrow = TRUE))  
   }
@@ -440,7 +446,7 @@ plot.mixture <- function(x,
         }
         
         cumulativePlot(W = x$weights,X = X, Y = Y,smooth = TRUE,
-                       alpha = alpha,plot.Y = TRUE, col.pal = rev(col),
+                       alpha = alpha,plot.Y = TRUE, col.pal = col,
                        max_experts = max_experts)
       }
     } else {
@@ -731,8 +737,8 @@ plot_dyn_avg_loss <- function(data,
   }
   
   pred.experts <- data.frame(data$experts * data$awake + data$prediction * (1-data$awake))
-  cumul.losses <- apply(loss(pred.experts, data$Y, data$loss.type), 2, cumsum)[seq(data$d, data$T*data$d, by = data$d), ] / 1:nrow(data$experts)
-  cumul.exploss <- cumsum(loss(data$prediction, data$Y, data$loss.type))[seq(data$d, data$T*data$d, by = data$d)] / 1:nrow(data$experts)
+  cumul.losses <- apply(loss(pred.experts, data$Y, data$loss.type), 2, cumsum)[seq(data$d, data$T*data$d, by = data$d), ] / 1:data$T
+  cumul.exploss <- cumsum(loss(data$prediction, data$Y, data$loss.type))[seq(data$d, data$T*data$d, by = data$d)] / 1:data$T
   
   data_loss <- data.frame(cbind(cumul.losses, cumul.exploss))
   data_loss$timestamp <- 1:nrow(data_loss)
@@ -968,7 +974,7 @@ plot_contrib <- function(data,
                             valueField = names_weights[index], valueAxis = "timestamp", 
                             type = "line", lineColor = colors[index],
                             fillToAxis = T, fillColors = colors[index], fillAlphas = .75,
-                            balloonText = paste0("<b>", names_weights[index], " : </b>", "[[", names_weights[index], ".1]]")) 
+                            balloonText = paste0("<b>", names_weights[index], " : </b>", "[[value]]")) 
       
     } else {
       plt <- plt %>>%
