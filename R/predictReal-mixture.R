@@ -210,7 +210,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     if (online) {
       if (newobject$parameters$averaged) {
         newweights <- newweights.avg
-        newpred <- apply(newweights.avg * newexperts,1,sum)
+        newpred <- rowSums(newweights.avg * newexperts)
       } else {
         newweights <- newobject$weights
         newpred <- newobject$prediction

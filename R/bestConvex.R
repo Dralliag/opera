@@ -68,7 +68,7 @@ bestConvex <- function(y, experts, awake = NULL, loss.type = list(name = "square
       }
     }
     coefficients <- matrix(best_p, ncol = N)
-    coefficients <- coefficients/apply(coefficients, 1, sum)
+    coefficients <- coefficients/rowSums(coefficients)
     pond <- awake %*% t(coefficients)
     prediction <- ((as.numeric(experts) * awake) %*% t(coefficients))/pond
   }

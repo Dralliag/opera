@@ -46,7 +46,7 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
   
   object$parameters <- list(lambda = lambda)
   object$weights <- w
-  object$prediction <- apply(experts * w, 1, sum)
+  object$prediction <- rowSums(experts * w)
   
   object$training <- list(At = At, bt = bt)
   

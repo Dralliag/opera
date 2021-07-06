@@ -67,8 +67,7 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
     eta[t] <- grid.eta[besteta]
     
     # Weights, predictions formed by each EWA(eta) for eta in the grid 'grid.eta'
-    pred <- experts[t, ] %*% t(t(weta * awake[t, ])/apply(weta * awake[t, ], 
-      2, sum))
+    pred <- experts[t, ] %*% t(t(weta * awake[t, ])/colSums(weta * awake[t, ]))
     cumulativeLoss <- cumulativeLoss + loss(pred, y[t], loss.type)  # cumulative loss without gradient trick
     if (neta == 1){
       lpred <- lossPred(pred, y[t], pred, loss.type, loss.gradient)
@@ -103,7 +102,7 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
       R.aux <- t(t(matrix(R.w0, ncol = neta)) * grid.eta)
       R.max <- apply(R.aux, 2, max)
       weta.aux <- exp(t(t(R.aux) - R.max))
-      weta <- t(t(weta.aux) / apply(weta.aux,2,sum))
+      weta <- t(t(weta.aux) / colSums(weta.aux))
     }
     
     if (besteta == 1) {
@@ -126,14 +125,14 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
       R.aux <- t(t(matrix(R.w0, ncol = neta)) * grid.eta)
       R.max <- apply(R.aux, 2, max)
       weta.aux <- exp(t(t(R.aux) - R.max))
-      weta <- t(t(weta.aux) / apply(weta.aux,2,sum))
+      weta <- t(t(weta.aux) / colSums(weta.aux))
     }
     
     if (!use_cpp){
       R.aux <- t(t(matrix(R.w0, ncol = neta)) * grid.eta)
       R.max <- apply(R.aux, 2, max)
       weta.aux <- exp(t(t(R.aux) - R.max))
-      weta <- t(t(weta.aux) / apply(weta.aux,2,sum))
+      weta <- t(t(weta.aux) / colSums(weta.aux))
     }
   }#end of time loop
   

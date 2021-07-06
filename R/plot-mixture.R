@@ -161,7 +161,7 @@ plot.mixture <- function(x,
       } 
       if (ncol(x$weights) > max_experts) {
         tmp_weights <- x$weights[]
-        tmp_weights <- cbind(apply(tmp_weights[1:(ncol(tmp_weights) - max_experts)], 1, sum), 
+        tmp_weights <- cbind(rowSums(tmp_weights[1:(ncol(tmp_weights) - max_experts)]), 
                              tmp_weights[, (ncol(tmp_weights) - max_experts + 1):ncol(tmp_weights)])
         names(tmp_weights)[1] <- "others"
         tmp_K <- min(K, max_experts + 1)
@@ -216,7 +216,7 @@ plot.mixture <- function(x,
   
   # boxplot of weights
   if (!is.null(x$awake)) {
-    pond <- apply(x$awake[d*(1:T),],1,sum)
+    pond <- rowSums(x$awake[d*(1:T),])
     normalized.weights <- x$weights * pond / (K*x$awake[d*(1:T),])
     normalized.weights[x$awake[d*(1:T),] == pond] <- NaN
   } else {
@@ -375,7 +375,7 @@ plot.mixture <- function(x,
   if (type == "all" || type == "avg_loss") {
     if (! dynamic) {
       pred.experts <- data.frame(x$experts * x$awake + x$prediction * (1-x$awake))
-      x$loss.experts <- apply(loss(x = pred.experts,y = x$Y,loss.type = x$loss.type),2,mean)
+      x$loss.experts <- colMeans(loss(x = pred.experts,y = x$Y,loss.type = x$loss.type))
       err.unif <- lossConv(rep(1/K, K), x$Y, x$experts, awake = x$awake, loss.type = x$loss.type)
       err.mixt <- x$loss
       
@@ -438,7 +438,7 @@ plot.mixture <- function(x,
         
       } else {
         X <- apply(seriesToBlock(X = x$experts,d = x$d),c(1,3),mean)
-        Y <- apply(seriesToBlock(x$Y,d = x$d),1,mean)
+        Y <- rowMeans(seriesToBlock(x$Y,d = x$d))
         colnames(X) <- names(x$weights)
         
         if (type == "all") {
@@ -515,7 +515,7 @@ cumulativePlot<-function(W,X,Y,col.pal=NULL, smooth = FALSE, plot.Y = FALSE, alp
   
   o<-order(colSums(W),decreasing = F)
   mat<-W[,o]*X[,o]
-  Agg<-apply(mat,1,sum)
+  Agg<-rowSums(mat)
   colnames(mat)<-colnames(X)[o]
   
   if (!smooth)Y.lim = range(Agg,Y,mat)
@@ -645,7 +645,7 @@ plot_weights <- function(data,
   data_weight <- data$weights
   
   if (ncol(data_weight) > max_experts + 2) {
-    data_weight <- cbind(apply(data_weight[1:(ncol(data_weight) - max_experts)], 1, sum), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight)])
+    data_weight <- cbind(rowSums(data_weight[1:(ncol(data_weight) - max_experts)]), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight)])
     names(data_weight)[1] <- "others"
     colors <- colors[-c(2:(ncol(data$weights) - max_experts))]
   }
@@ -862,7 +862,7 @@ plot_avg_loss <- function(data,
   
   K <- ncol(data$experts)
   pred.experts <- data.frame(data$experts * data$awake + data$prediction * (1-data$awake))
-  data$loss.experts <- apply(loss(x = pred.experts, y = data$Y, loss.type = data$loss.type), 2, mean)
+  data$loss.experts <- colMeans(loss(x = pred.experts, y = data$Y, loss.type = data$loss.type))
   err.unif <- lossConv(rep(1/K, K), data$Y, data$experts, awake = data$awake, loss.type = data$loss.type)
   err.mixt <- data$loss
   
@@ -926,7 +926,7 @@ plot_contrib <- function(data,
     Y = data$Y
   } else {
     X <- apply(seriesToBlock(X = data$experts, d = data$d), c(1, 3), mean)
-    Y <- apply(seriesToBlock(data$Y, d = data$d), 1, mean)
+    Y <- rowMeans(seriesToBlock(data$Y, d = data$d))
     colnames(X) <- names(data$weights)
   }
   
@@ -950,7 +950,7 @@ plot_contrib <- function(data,
   data_weight <- as.data.frame(mat)
   
   if (ncol(data_weight) > max_experts + 2) {
-    data_weight <- cbind(apply(data_weight[1:(ncol(data_weight) - max_experts)], 1, sum), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight)])
+    data_weight <- cbind(rowSums(data_weight[1:(ncol(data_weight) - max_experts)]), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight)])
     names(data_weight)[1] <- "others"
     colors <- colors[-c(2:(ncol(mat) - max_experts))]
   }

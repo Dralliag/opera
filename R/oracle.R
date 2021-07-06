@@ -156,16 +156,16 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
   }
   
   if (!is.null(awake)) {
-    pond <- apply(awake,1,mean)
-    pred.unif <- apply(experts * awake, 1,mean) /pond
+    pond <- rowMeans(awake)
+    pred.unif <- rowMeans(experts * awake) / pond
     experts.pred <- experts * awake + pred.unif * (1-awake)
   } else {
     experts.pred <- experts
   }
   
-  loss.experts <- apply(apply(experts.pred, 2, function(x) {
+  loss.experts <- colMeans(apply(experts.pred, 2, function(x) {
     loss(x, Y, loss.type = loss.type)
-  }), 2, mean)
+  }))
   
   if (model == "expert") {
     best.loss <- min(loss.experts)
