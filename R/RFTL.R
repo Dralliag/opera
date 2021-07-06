@@ -31,7 +31,8 @@
 RFTL <- function(y, 
                  experts, 
                  eta, 
-                 reg = function(x) sqrt(sum(x**2)), reg_grad = function(x) x * (x**2)**(-1/2),
+                 reg = function(x) sqrt(sum(x**2)), 
+                 reg_grad = function(x) x * (x**2)**(-1/2),
                  heq, heq_jac = NULL,
                  hin, hin_jac = NULL,
                  loss.type = "square",
@@ -50,7 +51,7 @@ RFTL <- function(y,
     stop("hin must be provided as a function (see ?auglag).")
   }
   if (! is.null(reg_grad) && ! is.function(reg_grad)) {
-    stop("reg_grad must be a function (the gradient of the regulation fonction).") 
+    stop("reg_grad must be a function (the gradient of the regulation function).") 
   }
   if (! is.null(heq_jac) && ! is.function(heq_jac)) {
    stop("heq_jac must be a function that returns a matrix (see ?auglag).") 
@@ -70,7 +71,7 @@ RFTL <- function(y,
   weights <- matrix(0, nrow = T, ncol = N)
   prediction <- rep(0, T)
   if (identical(as.character(attributes(reg)$srcref), "function(x) sqrt(sum(x**2))")) {
-    reg_grad <- function(x) x * (x**2)**(-1/2)
+    reg_grad <- function(x) x / sqrt(sum(x^2))
   }
   if (identical(as.character(attributes(heq)$srcref), "function(x) sum(x) - 1")) {
     heq_jac <- function(x) {matrix(1, ncol = N)}
@@ -86,10 +87,11 @@ RFTL <- function(y,
   p0 <- rep(1/N, N)
   if (is.null(w0)) {
     result <- alabama::auglag(par = p0, fn = reg, heq = heq, hin = hin, control.outer = list(trace = F))
-    w0 <- result$par
-  } 
+    weights[1, ] <- result$par
+  } else {
+    weights[1, ] <- w0
+  }
   
-  pred <- w0 %*% experts[1,]
   obj <- reg
   
   steps <- init_progress(T)
@@ -97,6 +99,9 @@ RFTL <- function(y,
     update_progress(t, steps)
     
     if (! loss.gradient == FALSE) {
+      
+      pred <- prediction[t] <- weights[t,] %*% X[t,]
+      
       # update gradient
       G <- G + lossPred(experts[t, ], Y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
       
@@ -106,11 +111,22 @@ RFTL <- function(y,
       # compute grad of obj function
       obj_grad <- function(x) {reg_grad(x) + eta * G}
       
-      weights[t,] <- alabama::auglag(par = if (t == 1) {w0} else {weights[t-1, ]}, 
-                                     fn = obj, gr = obj_grad, 
-                                     heq = heq, heq.jac = heq_jac,
-                                     hin = hin, hin.jac = hin_jac,
-                                     control.outer = list(trace = F, itmax = itmax, kkt2.check = FALSE))$par
+      res_optim <- alabama::auglag(par = if (t == 1) {w0} else {weights[t-1, ]}, 
+                      fn = obj, 
+                      gr = obj_grad, 
+                      heq = heq, 
+                      heq.jac = heq_jac,
+                      hin = hin, 
+                      hin.jac = hin_jac,
+                      control.outer = list(trace = F, itmax = itmax, kkt2.check = FALSE))
+      
+      # Q : check convergence / contraintes / .. et stop sinon
+      if(res_optim$convergence == 0){
+        weights[t + 1, ] <- res_optim$par
+      } else {
+        stop("No convergence...!")
+      }
+
     } 
     # pas d'intéret car dès lors qu'on a le gradient, on peut faire la méthode la plus rapide
     # else {
@@ -142,8 +158,6 @@ RFTL <- function(y,
     #                                  hin = hin, hin.jac = hin_jac,
     #                                  control.outer = list(trace = F, itmax = itmax))$par
     # }
-    
-    pred <- prediction[t] <- weights[t,] %*% X[t,]
   }
   end_progress()
   
