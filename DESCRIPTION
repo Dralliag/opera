@@ -22,7 +22,8 @@ Imports:
     RcppEigen,
     htmltools,
     rAmCharts,
-    pipeR
+    pipeR,
+    alabama
 Suggests:
     quantreg,
     quadprog,

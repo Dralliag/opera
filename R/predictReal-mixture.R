@@ -127,6 +127,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
       if (is.null(object$parameters$eta) || !is.null(object$parameters$grid.eta)) {
         if (is.null(object$parameters$grid.eta)) {
           object$parameters$grid.eta <- 1
+          # NULL
         }
         
         newobject <- ewaCalib(y = newY, experts = newexperts, awake = awake, 
@@ -162,6 +163,13 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
                                 loss.gradient = object$loss.gradient, w0 = object$coefficients, 
                                 training = object$training)
       }
+    }
+    
+    if (object$model == "RFTL") {
+      newobject <- RFTL(y = newY, experts = newexperts, eta = object$parameters$eta,
+                        reg = object$parameters$fn, heq = object$parameters$heq, hin = object$parameters$hin,
+                        loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
+                        w0 = object$coefficients)
     }
     
     
