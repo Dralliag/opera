@@ -22,6 +22,7 @@ Imports:
     RcppEigen,
     htmltools,
     rAmCharts,
+    htmlwidgets,
     pipeR,
     alabama
 Suggests:
