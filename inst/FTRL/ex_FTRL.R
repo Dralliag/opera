@@ -52,7 +52,7 @@ matplot(cbind(Y, X), type = 'l', col = 1:6, ylab = 'Weekly load', xlab = 'Week')
 
 
 res <- mixture(Y = Y, experts = X, 
-               model = 'RFTL', 
+               model = 'FTRL', 
                loss.gradient = TRUE, 
                use_cpp = FALSE, 
                parameters = list("eta" = 0.1, 

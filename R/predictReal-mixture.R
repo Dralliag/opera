@@ -165,13 +165,13 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
       }
     }
     
-    if (object$model == "RFTL") {
+    if (object$model == "FTRL") {
       if (! any(c("fun_reg", "constr_ineq", "constr_eq") %in% names(object$parameters))) {
         default <- TRUE
       } else {
         default <- FALSE
       }
-      newobject <- RFTL("y" = newY, "experts" = newexperts, 
+      newobject <- FTRL("y" = newY, "experts" = newexperts, 
                         "eta" = object$parameters$eta,
                         "fun_reg" = object$parameters$fun_reg, "fun_reg_grad" = object$parameters$fun_reg_grad, 
                         "constr_eq" = object$parameters$constr_eq, "constr_eq_jac" = object$parameters$constr_eq_jac, 

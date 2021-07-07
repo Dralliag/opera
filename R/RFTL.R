@@ -1,38 +1,45 @@
-#' Implementation of RFTL (Regularized Follow The Leader)
+#' Implementation of FTRL (Follow The Regulaized Leader)
 #'
 #' @param y \code{vector}. Real observations.
 #' @param experts \code{matrix}. Matrix of experts previsions.
 #' @param eta \code{numeric}. Regularization parameter.
-#' @param loss.type \code{character, list or function}. 
+#' @param fun_reg \code{function} (NULL). Regularization function to be applied during the optimization. 
+#' @param fun_reg_grad \code{function} (NULL). Gradient of the regularization function (to speed up the computations).
+#' @param constr_eq \code{function} (NULL). Constraints (equalities) to be applied during the optimization.
+#' @param constr_eq_jac \code{function} (NULL). Jacobian of the equality constraints (to speed up the computations). 
+#' @param constr_ineq \code{function} (NULL). Constraints (inequalities) to be applied during the optimization (... > 0).
+#' @param constr_ineq_jac \code{function} (NULL). Jacobian of the inequality constraints (to speed up the computations).
+#' @param loss.type \code{character, list or function} ("square").  
 #' \describe{
 #'      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
 #'      \item{list}{ When using pinball loss: list with field name equal to 'pinball' and field tau equal to the required quantile in [0,1];}
 #'      \item{function}{ A custom loss as a function of two parameters.}
 #' }
-#' @param loss.gradient \code{boolean, function}. 
+#' @param loss.gradient \code{boolean, function} (TRUE). 
 #' \describe{
 #'      \item{boolean}{ If TRUE, the aggregation rule will not be directly applied to the loss function at hand,
 #'      but to a gradient version of it. The aggregation rule is then similar to gradient descent aggregation rule. }
 #'      \item{function}{ If loss.type is a function, the derivative should be provided to be used (it is not automatically 
 #'      computed).}
 #' }
-#' @param parameters \code{list of 3 items}. Parameters for the optimization part of the algorithm (using CVXR package).
-#' \describe{
-#'      \item{p}{ Object of class variable, as defined in package CVXR.}
-#'      \item{reg}{ Regularization function to be applied on p.}
-#'      \item{constr (NULL)}{ List of constraints to be applied on p, stored in char expr.}
-#' }
+#' @param w0 \code{numeric} (NULL). Vector of initialization for the weights.
+#' @param max_iter \code{integer} (50). Maximum number of iterations of the optimization algorithm per round.
+#' @param default \code{boolean} (FALSE). Whether or not to use default parameters for fun_reg, constr_eq, constr_ineq and their grad/jac, 
+#' which values are ALL ignored when TRUE.
 #'
 #' @return object of class mixture.
 #'
 #' @import alabama
 #'
 #' @examples
-RFTL <- function(y, 
+#' 
+#' 
+#' 
+#' 
+FTRL <- function(y, 
                  experts, 
                  eta, 
-                 fun_reg = NULL, 
-                 fun_reg_grad = NULL,
+                 fun_reg = NULL, fun_reg_grad = NULL,
                  constr_eq = NULL, constr_eq_jac = NULL,
                  constr_ineq = NULL, constr_ineq_jac = NULL,
                  loss.type = "square",
@@ -184,21 +191,24 @@ RFTL <- function(y,
   end_progress()
   
   # round to 0 when coefficients are slightly negative
-  if (all(coeffs > -1e-5)) {
+  if (all(weights > -1e-5)) {
     coeffs <- pmax(0, coeffs)
     coeffs <- coeffs / sum(coeffs) 
+    
+    weights <- apply(weights, 2, pmax, 0)
+    weights <- weights / rowSums(weights)
   }
   
-  weights <- apply(weights, 2, pmax, 0)
-  weights <- weights / rowSums(weights)
-  
-  object <- list(model = "RFTL", loss.type = loss.type, loss.gradient = loss.gradient, 
+  object <- list(model = "FTRL", loss.type = loss.type, loss.gradient = loss.gradient, 
                  coefficients = coeffs)
   class(object) <- "mixture"
   
   object$parameters <- list("eta" = eta, 
-                            "reg" = fun_reg,
-                            "constr" = list("heq" = heq, "hin" = hin))
+                            "w0" = w0,
+                            "reg" = list("fun_reg" = fun_reg, "fun_reg_grad" = fun_reg_grad),
+                            "constr" = list("eq" = constr_eq, "ineq" = constr_ineq, "eq_jac" = constr_eq_jac, "ineq_jac" = constr_ineq_jac),
+                            "max_iter" = max_iter,
+                            "default" = default)
   object$weights <- weights
   object$prediction <- prediction
   
