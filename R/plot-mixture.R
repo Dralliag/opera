@@ -579,6 +579,7 @@ addPoly<-function(x,y,col)
 #' @import pipeR
 #' @importFrom rAmCharts amSerialChart addValueAxis addGraph addTitle setExport setChartCursor setChartScrollbar setLegend 
 #' amBoxplot setCategoryAxis controlShinyPlot
+#' @importFrom htmlwidgets JS
 #' 
 #' @rdname plot-opera-rAmCharts
 #' 
@@ -960,6 +961,21 @@ plot_contrib <- function(data,
   
   data_weight$pred <- round(lowess(x = time,y = Y,f = alpha)$y, round)
   
+  balloon_fun = htmlwidgets::JS(paste0('function(item, graph) {
+                              var result = graph.balloonText;
+                              for (var key in item.dataContext) {
+                                if (item.dataContext.hasOwnProperty(key) && !isNaN(item.dataContext[key])) {
+                                  var formatted = AmCharts.formatNumber(item.dataContext[key], {
+                                    precision: ', round, ',
+                                    decimalSeparator: ".",
+                                    thousandsSeparator: " "
+                                  }, 2);
+                                  result = result.replace("[[" + key + "]]", formatted);
+                                }
+                              }
+                              return result;
+                            }'))
+  
   plt <- amSerialChart(dataProvider = data_weight,
                        categoryField = c("timestamp"), 
                        creditsPosition = "bottom-right",
@@ -974,7 +990,8 @@ plot_contrib <- function(data,
                             valueField = names_weights[index], valueAxis = "timestamp", 
                             type = "line", lineColor = colors[index],
                             fillToAxis = T, fillColors = colors[index], fillAlphas = .75,
-                            balloonText = paste0("<b>", names_weights[index], " : </b>", "[[value]]")) 
+                            balloonText = paste0("<b>", names_weights[index], " : </b>", "[[", names_weights[index], ".1]]"), 
+                            balloonFunction = balloon_fun)
       
     } else {
       plt <- plt %>>%
@@ -982,7 +999,8 @@ plot_contrib <- function(data,
                             valueField = names_weights[index], valueAxis = "timestamp", 
                             type = "line", lineColor = colors[index],
                             fillToGraph = names_weights[index-1], fillColors = colors[index], fillAlphas = .75,
-                            balloonText = paste0("<b>", names_weights[index], " : </b>", "[[value]]"))
+                            balloonText = paste0("<b>", names_weights[index], " : </b>", "[[", names_weights[index], ".1]]"), 
+                            balloonFunction = balloon_fun)
     }
   }
   
@@ -990,7 +1008,8 @@ plot_contrib <- function(data,
     rAmCharts::addGraph(title = "Prediction", id = "pred",
                         valueField = "pred", valueAxis = "timestamp", 
                         type = "line", dashLength = 5, lineThickness = 2, lineColor = "black",
-                        balloonText = paste0("<b> Prediction : </b>", "[[value]]"))
+                        balloonText = paste0("<b> Prediction : </b>", "[[pred]]"), 
+                        balloonFunction = balloon_fun)
   
   plt <- plt %>>%
     rAmCharts::addTitle(text = "Contribution of each expert to the prediction") %>>%
