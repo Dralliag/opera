@@ -5,8 +5,8 @@ computeBOAEigen <- function(awake, eta, experts, weights, y, predictions, wc, w0
     invisible(.Call('_opera_computeBOAEigen', PACKAGE = 'opera', awake, eta, experts, weights, y, predictions, wc, w0c, Rc, Regc, Bc, Vc, loss_name, loss_tau, loss_gradient))
 }
 
-computeEWAEigen <- function(awake, experts, weights, y, predictions, w0c, eta, cumulativeLoss, loss_name, loss_tau, loss_gradient) {
-    .Call('_opera_computeEWAEigen', PACKAGE = 'opera', awake, experts, weights, y, predictions, w0c, eta, cumulativeLoss, loss_name, loss_tau, loss_gradient)
+computeEWAEigen <- function(awake, experts, weights, y, predictions, w0c, eta, cumulativeLoss, loss_name, loss_tau, loss_gradient, quiet) {
+    .Call('_opera_computeEWAEigen', PACKAGE = 'opera', awake, experts, weights, y, predictions, w0c, eta, cumulativeLoss, loss_name, loss_tau, loss_gradient, quiet)
 }
 
 computeMLPolCPP <- function(awake, eta, experts, weights, y, predictions, R, w, B, loss_name, loss_tau, loss_gradient) {
@@ -33,11 +33,27 @@ RidgeCalibStep2 <- function(wlambda, w0, At, bt, gridlambda) {
     invisible(.Call('_opera_RidgeCalibStep2', PACKAGE = 'opera', wlambda, w0, At, bt, gridlambda))
 }
 
-computeRidgeCPP <- function(experts, w, At, bt, y) {
-    .Call('_opera_computeRidgeCPP', PACKAGE = 'opera', experts, w, At, bt, y)
+computeRidgeCPP <- function(experts, w, At, bt, y, quiet) {
+    .Call('_opera_computeRidgeCPP', PACKAGE = 'opera', experts, w, At, bt, y, quiet)
 }
 
 computeEWACalib <- function(tp1, dbesteta, awake, experts, weights, weta, w0, grideta, y, eta, cumulativeloss, prediction, loss_name, loss_tau, loss_gradient) {
     .Call('_opera_computeEWACalib', PACKAGE = 'opera', tp1, dbesteta, awake, experts, weights, weta, w0, grideta, y, eta, cumulativeloss, prediction, loss_name, loss_tau, loss_gradient)
+}
+
+count_in <- function(x, y) {
+    .Call('_opera_count_in', PACKAGE = 'opera', x, y)
+}
+
+init_progress_cpp <- function(T) {
+    .Call('_opera_init_progress_cpp', PACKAGE = 'opera', T)
+}
+
+update_progress_cpp <- function(t, steps) {
+    invisible(.Call('_opera_update_progress_cpp', PACKAGE = 'opera', t, steps))
+}
+
+end_progress_cpp <- function() {
+    invisible(.Call('_opera_end_progress_cpp', PACKAGE = 'opera'))
 }
 

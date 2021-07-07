@@ -1,5 +1,6 @@
 #include "closspred.h"
 #include <RcppEigen.h>
+#include "progress.h"
 using namespace Rcpp;
 // [[Rcpp::depends(RcppEigen)]]
 
@@ -37,14 +38,20 @@ void BOAEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> et
   Row lexp = Row::Zero(N);
   Row reg = Row::Zero(N);
   
+  // init progress
+  IntegerVector steps = init_progress_cpp(T);
+  
   for (size_t t=0 ; t<T ; t++){
+    // update progress
+    update_progress_cpp(t+1, steps);
+    
     auto awaket = awake.row(t).array();
     p = awaket * w.array();
     p /= p.sum();
     const double pred = experts.row(t) * p.matrix().transpose();//scalar product
     weights.row(t).array() = p;
     predictions[t] = pred;
-
+    
     // Observe losses
     const auto lpf=LossPredFunctor<LT,G>(y[t],pred,loss_tau);
     const double lpred=lpf(pred);
@@ -69,6 +76,8 @@ void BOAEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> et
     
     w = (w0.log()+eta.row(t+1).array()*Reg).exp().unaryExpr(std::ptr_fun(truncate1));
   }
+  // end progress
+  end_progress_cpp();
   
   return ;
 }
@@ -76,12 +85,12 @@ void BOAEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> et
 
 // [[Rcpp::export]]
 void computeBOAEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> eta, 
-                         Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights,
-                         Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, 
-                         Eigen::Map<Eigen::VectorXd> wc, Eigen::Map<Eigen::VectorXd> w0c,
-                         Eigen::Map<Eigen::VectorXd> Rc, Eigen::Map<Eigen::VectorXd> Regc,
-                         Eigen::Map<Eigen::VectorXd> Bc, Eigen::Map<Eigen::VectorXd> Vc,
-                         String loss_name,double loss_tau,bool loss_gradient){
+                      Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights,
+                      Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, 
+                      Eigen::Map<Eigen::VectorXd> wc, Eigen::Map<Eigen::VectorXd> w0c,
+                      Eigen::Map<Eigen::VectorXd> Rc, Eigen::Map<Eigen::VectorXd> Regc,
+                      Eigen::Map<Eigen::VectorXd> Bc, Eigen::Map<Eigen::VectorXd> Vc,
+                      String loss_name,double loss_tau,bool loss_gradient){
   
   
   const std::string cs=std::string(loss_name.get_cstring());

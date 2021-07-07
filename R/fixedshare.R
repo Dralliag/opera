@@ -26,7 +26,11 @@ fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square
     cumulativeLoss <- training$cumulativeLoss
   }
   
+  steps <- init_progress(T)
+  
   for (t in 1:T) {
+    update_progress(t, steps)
+    
     # Weight update
     idx <- awake[t,] > 0
     R.aux<- eta * R
@@ -47,13 +51,15 @@ fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square
     v <- exp(R.aux - R.max)/sum(exp(R.aux - R.max))
     R <- log(alpha/N + (1 - alpha) * v)/eta
   }
+  end_progress()
+  
   R.aux <- eta * R
   R.max <- max(R.aux)
   w <- t(exp(R.aux - R.max))
   w <- w/sum(w)
   
   object <- list(model = "FS", loss.type = loss.type, loss.gradient = loss.gradient, 
-    coefficients = w)
+                 coefficients = w)
   
   object$parameters <- list(eta = eta, alpha = alpha)
   object$weights <- weights

@@ -30,8 +30,14 @@ void MLProdEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd>
   Row lexp = Row::Zero(N);
   Row neweta = Row::Zero(N);
   Row maxloss = Row::Ones(N)*dmaxloss;
-
+  
+  // init progress
+  IntegerVector steps = init_progress_cpp(T); 
+  
   for (size_t t=0 ; t<T ; t++){
+    // update progress
+    update_progress_cpp(t+1, steps);
+    
     w = R.exp().unaryExpr(std::ptr_fun(truncate1));
     w *= eta.row(t).array() ;
     w /= w.sum();
@@ -60,6 +66,8 @@ void MLProdEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd>
     if (std::isnan(R.sum())) Rcout << "Nan in R" << std::endl;
     
   }
+  // end progress
+  end_progress_cpp();
   
   return ;
 }

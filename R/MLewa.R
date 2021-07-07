@@ -37,7 +37,11 @@ MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     w <- w/sum(w)
   }
   
+  steps <- init_progress(T)
+  
   for (t in 1:T) {
+    update_progress(t, steps)
+    
     # form the each-instant updated mixture and prediction
     p <- awake[t, ] * w/sum(awake[t, ] * w)
     pred <- experts[t, ] %*% p
@@ -59,10 +63,12 @@ MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     R.max <- max(R.aux[idx])
     w[idx] <- exp(R.aux[idx] - R.max)
   }
+  end_progress()
+  
   w <- w/sum(w)
   
   object <- list(model = "MLewa", loss.type = loss.type, loss.gradient = loss.gradient, 
-    coefficients = w/sum(w))
+                 coefficients = w/sum(w))
   
   object$parameters <- list(eta = eta[1:T, ])
   object$weights <- weights

@@ -38,7 +38,10 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
                             R,L,maxloss,loss_name,loss_tau,loss.gradient);
   }
   else{
+    steps <- init_progress(T)
+    
     for (t in 1:T) {
+      update_progress(t, steps)
       
       # Update weights
       idx <- awake[t,] > 0
@@ -70,6 +73,7 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
         browser("Nan in R")
       }
     }
+    end_progress()
   }
   
   R.max <- max(R)

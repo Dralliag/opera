@@ -23,7 +23,12 @@ double MLPolEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd
   Row r = Row::Zero(N);
   Row lexp = Row::Zero(N);
   
+  // init progress
+  IntegerVector steps = init_progress_cpp(T);
+  
   for (size_t t=0 ; t<T ; t++){
+    // update progress
+    update_progress_cpp(t+1, steps);
     
     auto awaket = awake.row(t).array();
     
@@ -59,6 +64,8 @@ double MLPolEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd
     eta.row(t+1).array() = (eta.row(t).array().inverse() + r*r + newB -B).inverse();
     B = newB;
   }
+  // end progress
+  end_progress_cpp();
   
   if (R.maxCoeff()>0){
     w = eta.row(T).array() * R.unaryExpr(std::ptr_fun(ramp));

@@ -44,7 +44,12 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
   
   
   lambda <- rep(grid.lambda[bestlambda], T)
+  
+  steps <- init_progress(T)
+  
   for (t in 1:T) {
+    update_progress(t, steps)
+    
     # Display the state of progress of the algorithm
     if (!(t%%floor(T/10)) && trace) 
       cat(floor(10 * t/T) * 10, "% -- ")
@@ -86,7 +91,7 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
       nlambda <- nlambda + length(newlambda)
       for (k in 1:length(newlambda)) {
         perfnewlambda <- tryCatch(ridge(y = c(training$oldY, y[1:t]), experts = rbind(training$oldexperts, 
-          matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0, use_cpp = use_cpp), 
+          matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0, use_cpp = use_cpp, quiet = TRUE), 
           error = function(e) {
           list(prediction = rep(0, t))
           })
@@ -105,7 +110,7 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
       for (k in 1:length(newlambda)) {
         grid.lambda <- c(newlambda[k], grid.lambda)
         perfnewlambda <- tryCatch(y = ridge(c(training$oldY, y[1:t]), experts = rbind(training$oldexperts, 
-          matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0, use_cpp = use_cpp), 
+          matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0, use_cpp = use_cpp, quiet = TRUE), 
           error = function(e) {
           list(prediction = rep(NA, t))
           })
@@ -134,6 +139,7 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
     lambda.min <- which(!(is.na(wlambda[1, ])))[1]
     bestlambda <- max(lambda.min, bestlambda)
   }
+  end_progress()
   
   object <- list(model = "Ridge", loss.type = list(name = "square"), coefficients = wlambda[, 
     bestlambda])

@@ -1,5 +1,5 @@
 ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-                w0 = NULL, training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE)) {
+                w0 = NULL, training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -32,13 +32,14 @@ ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradie
     cumulativeLoss<-computeEWAEigen(
       awake, experts,weights,y,pred, 
       R.w0,eta,cumulativeLoss,
-      loss_name,loss_tau,loss.gradient);
-  }
-  else{
-    
-    
+      loss_name,loss_tau,loss.gradient, quiet = quiet);
+  } 
+  else {
+    if (! quiet) steps <- init_progress(T)
     
     for (t in 1:T) {
+      if (! quiet) update_progress(t, steps)
+      
       # Weight update
       idx = awake[t,] > 0 # index of active experts
       R.aux <- eta * R.w0
@@ -55,6 +56,7 @@ ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradie
       # Regret update
       R.w0 <- R.w0 + awake[t, ] * (c(c(lpred) - lexp))
     }
+    if (! quiet) end_progress()
   }
   R.aux <- eta * R.w0
   R.max <- max(R.aux)

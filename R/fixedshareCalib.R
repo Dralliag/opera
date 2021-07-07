@@ -42,7 +42,11 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
     T0 <- training$T
   }
   
+  steps <- init_progress(T)
+  
   for (t in 1:T) {
+    update_progress(t, steps)
+    
     # Display the state of progress of the algorithm
     if (!(t%%floor(T/10)) && trace) 
       cat(floor(10 * t/T) * 10, "% -- ")
@@ -133,6 +137,7 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
       }
     }
   }
+  end_progress()
   
   # Next weights
   w <- wpar[, bestpar[1], bestpar[2]]/sum(wpar[, bestpar[1], bestpar[2]])

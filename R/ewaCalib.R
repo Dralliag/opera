@@ -4,6 +4,11 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
   use_cpp = getOption("opera_use_cpp", default = TRUE)) {
   experts <- as.matrix(experts)
   
+  # si grid.eta = NULL
+  # faire tourner la boucle une fois 
+  # init avec eta 1/loss²
+  # ...
+  
   N <- ncol(experts)  # Number of experts
   T <- nrow(experts)  # Number of instants
   
@@ -47,7 +52,11 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
     R.w0[, k] <- R[, k] + log(w0)/grid.eta[k]
   }  # We initialize the regrets so that w0 is the initial weight vector
   
+  steps <- init_progress(T)
+  
   for (t in 1:T) {
+    update_progress(t, steps)
+    
     # Display the state of progress of the algorithm
     if (!(t%%floor(T/10)) && trace) 
       cat(floor(10 * t/T) * 10, "% -- ")
@@ -94,7 +103,7 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
         perfneweta <- ewa(c(training$oldY, y[1:t]), rbind(training$oldexperts, 
           matrix(experts[1:t, ], ncol = N)), neweta[k], awake = rbind(training$oldawake, 
           matrix(awake[1:t, ], ncol = N)), loss.type = loss.type, loss.gradient = loss.gradient, 
-          w0 = w0, use_cpp = use_cpp)
+          w0 = w0, use_cpp = use_cpp, quiet = TRUE)
         cumulativeLoss <- c(cumulativeLoss, perfneweta$training$cumulativeLoss)
         R.w0[, besteta + k] <- perfneweta$training$R + log(w0) / neweta[k]
       }
@@ -117,7 +126,7 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
         perfneweta <- ewa(y = c(training$oldY, y[1:t]), experts = rbind(training$oldexperts, 
           matrix(experts[1:t, ], ncol = N)), eta = neweta[k], awake = rbind(training$oldawake, 
           matrix(awake[1:t, ], ncol = N)), loss.type = loss.type, loss.gradient = loss.gradient, 
-          w0 = w0, use_cpp = use_cpp)
+          w0 = w0, use_cpp = use_cpp, quiet = T)
         cumulativeLoss <- c(perfneweta$training$cumulativeLoss, cumulativeLoss)
         R.w0[, besteta - k] <- perfneweta$training$R + log(w0) / neweta[k]
       }
@@ -135,6 +144,7 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
       weta <- t(t(weta.aux) / colSums(weta.aux))
     }
   }#end of time loop
+  end_progress()
   
   # Next weights
   w <- weta[, besteta]/sum(weta[, besteta])

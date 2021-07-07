@@ -31,8 +31,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // computeEWAEigen
-double computeEWAEigen(Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, Eigen::Map<Eigen::VectorXd> w0c, double eta, double cumulativeLoss, String loss_name, double loss_tau, bool loss_gradient);
-RcppExport SEXP _opera_computeEWAEigen(SEXP awakeSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP w0cSEXP, SEXP etaSEXP, SEXP cumulativeLossSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP) {
+double computeEWAEigen(Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, Eigen::Map<Eigen::VectorXd> w0c, double eta, double cumulativeLoss, String loss_name, double loss_tau, bool loss_gradient, bool quiet);
+RcppExport SEXP _opera_computeEWAEigen(SEXP awakeSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP w0cSEXP, SEXP etaSEXP, SEXP cumulativeLossSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP, SEXP quietSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -47,7 +47,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< String >::type loss_name(loss_nameSEXP);
     Rcpp::traits::input_parameter< double >::type loss_tau(loss_tauSEXP);
     Rcpp::traits::input_parameter< bool >::type loss_gradient(loss_gradientSEXP);
-    rcpp_result_gen = Rcpp::wrap(computeEWAEigen(awake, experts, weights, y, predictions, w0c, eta, cumulativeLoss, loss_name, loss_tau, loss_gradient));
+    Rcpp::traits::input_parameter< bool >::type quiet(quietSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeEWAEigen(awake, experts, weights, y, predictions, w0c, eta, cumulativeLoss, loss_name, loss_tau, loss_gradient, quiet));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -177,8 +178,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // computeRidgeCPP
-size_t computeRidgeCPP(Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> w, Eigen::Map<Eigen::MatrixXd> At, Eigen::Map<Eigen::MatrixXd> bt, Eigen::Map<Eigen::VectorXd> y);
-RcppExport SEXP _opera_computeRidgeCPP(SEXP expertsSEXP, SEXP wSEXP, SEXP AtSEXP, SEXP btSEXP, SEXP ySEXP) {
+size_t computeRidgeCPP(Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> w, Eigen::Map<Eigen::MatrixXd> At, Eigen::Map<Eigen::MatrixXd> bt, Eigen::Map<Eigen::VectorXd> y, bool quiet);
+RcppExport SEXP _opera_computeRidgeCPP(SEXP expertsSEXP, SEXP wSEXP, SEXP AtSEXP, SEXP btSEXP, SEXP ySEXP, SEXP quietSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -187,7 +188,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type At(AtSEXP);
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type bt(btSEXP);
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type y(ySEXP);
-    rcpp_result_gen = Rcpp::wrap(computeRidgeCPP(experts, w, At, bt, y));
+    Rcpp::traits::input_parameter< bool >::type quiet(quietSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeRidgeCPP(experts, w, At, bt, y, quiet));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -216,18 +218,65 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// count_in
+int count_in(int x, IntegerVector y);
+RcppExport SEXP _opera_count_in(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type x(xSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(count_in(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
+// init_progress_cpp
+IntegerVector init_progress_cpp(int T);
+RcppExport SEXP _opera_init_progress_cpp(SEXP TSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type T(TSEXP);
+    rcpp_result_gen = Rcpp::wrap(init_progress_cpp(T));
+    return rcpp_result_gen;
+END_RCPP
+}
+// update_progress_cpp
+void update_progress_cpp(int t, IntegerVector steps);
+RcppExport SEXP _opera_update_progress_cpp(SEXP tSEXP, SEXP stepsSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type t(tSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type steps(stepsSEXP);
+    update_progress_cpp(t, steps);
+    return R_NilValue;
+END_RCPP
+}
+// end_progress_cpp
+void end_progress_cpp();
+RcppExport SEXP _opera_end_progress_cpp() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    end_progress_cpp();
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_opera_computeBOAEigen", (DL_FUNC) &_opera_computeBOAEigen, 15},
-    {"_opera_computeEWAEigen", (DL_FUNC) &_opera_computeEWAEigen, 11},
+    {"_opera_computeEWAEigen", (DL_FUNC) &_opera_computeEWAEigen, 12},
     {"_opera_computeMLPolCPP", (DL_FUNC) &_opera_computeMLPolCPP, 12},
     {"_opera_computeMLPolEigen", (DL_FUNC) &_opera_computeMLPolEigen, 12},
     {"_opera_computeMLPolEigenSimpleLoss", (DL_FUNC) &_opera_computeMLPolEigenSimpleLoss, 12},
     {"_opera_computeMLProdEigen", (DL_FUNC) &_opera_computeMLProdEigen, 12},
     {"_opera_RidgeCalibStep1", (DL_FUNC) &_opera_RidgeCalibStep1, 14},
     {"_opera_RidgeCalibStep2", (DL_FUNC) &_opera_RidgeCalibStep2, 5},
-    {"_opera_computeRidgeCPP", (DL_FUNC) &_opera_computeRidgeCPP, 5},
+    {"_opera_computeRidgeCPP", (DL_FUNC) &_opera_computeRidgeCPP, 6},
     {"_opera_computeEWACalib", (DL_FUNC) &_opera_computeEWACalib, 15},
+    {"_opera_count_in", (DL_FUNC) &_opera_count_in, 2},
+    {"_opera_init_progress_cpp", (DL_FUNC) &_opera_init_progress_cpp, 1},
+    {"_opera_update_progress_cpp", (DL_FUNC) &_opera_update_progress_cpp, 2},
+    {"_opera_end_progress_cpp", (DL_FUNC) &_opera_end_progress_cpp, 0},
     {NULL, NULL, 0}
 };
 

@@ -1,6 +1,6 @@
 
 ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
-                  use_cpp = getOption("opera_use_cpp", default = TRUE)) {
+                  use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE) {
   experts <- as.matrix(experts)
   N <- ncol(experts)
   T <- nrow(experts)
@@ -23,26 +23,29 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
     At <- lambda * diag(1, N)
     bt <- matrix(lambda * w0, nrow = N)
   }
-  #start C++ insertion
-  
   
   if (use_cpp){
-    error_code<-computeRidgeCPP(experts,w,At,bt,y)
+    error_code<-computeRidgeCPP(experts,w,At,bt,y,quiet)
     if (error_code != 0){
       stop("matrix is not invertible")
     }
-  } #end C++ insertion
-  else{
-  for (t in 1:T) {
-    w[t, ] <- solve(At, bt)
-    At <- At + experts[t, ] %*% t(experts[t, ])
-    bt <- bt + y[t] * experts[t, ]
   }
+  else {
+    if (! quiet) steps <- init_progress(T)
+    
+    for (t in 1:T) {
+      if (! quiet) update_progress(t, steps)
+      
+      w[t, ] <- solve(At, bt)
+      At <- At + experts[t, ] %*% t(experts[t, ])
+      bt <- bt + y[t] * experts[t, ]
+    }
+    if (! quiet) end_progress()
   }
   # w[1,] = w0
   
   object <- list(model = "Ridge", loss.type = list(name = "square"), coefficients = solve(At, 
-    bt))
+                                                                                          bt))
   
   object$parameters <- list(lambda = lambda)
   object$weights <- w

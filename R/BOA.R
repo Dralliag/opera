@@ -43,7 +43,11 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
                     w,w0,R,R.reg,B,V,loss_name,loss_tau,loss.gradient);
   }
   else{
+    steps <- init_progress(T)
+    
     for (t in 1:T) {
+      update_progress(t, steps)
+      
       idx <- awake[t,] > 0
       R.aux <- log(w0) + eta[t, ] * R.reg
       R.max <- max(R.aux[idx])
@@ -78,6 +82,7 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
       R <- R + r
       R.reg <- R.reg + r.reg
     }
+    end_progress()
   }
   
   R.aux <- log(w0) + eta[T + 1, ] * R.reg

@@ -13,7 +13,12 @@ double MLPolCPP( NumericMatrix awake, NumericMatrix eta, NumericMatrix experts, 
   NumericVector lexp(N);
   NumericVector r(N);
   
+  // init progress
+  IntegerVector steps = init_progress_cpp(T);
+  
   for (size_t t=0 ; t<T ; t++){
+    // update progress
+    update_progress_cpp(t+1, steps);
     
     double mar=0;
     for (size_t k=0 ; k<N ; k++) mar = std::max(mar,awake(t,k)*R[k]);
@@ -60,6 +65,8 @@ double MLPolCPP( NumericMatrix awake, NumericMatrix eta, NumericMatrix experts, 
     for (size_t k=0 ; k<N ; k++) eta(t+1,k) = 1.0/((1.0/eta(t,k))+r[k]*r[k]+newB-B);
     B = newB;
   }
+  // end progress
+  end_progress_cpp();
   
   double mar=0;
   for (size_t k=0 ; k<N ; k++) mar = std::max(mar,R[k]);
