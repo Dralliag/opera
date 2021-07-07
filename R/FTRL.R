@@ -46,17 +46,19 @@ FTRL <- function(y,
                  loss.gradient = TRUE, 
                  w0 = NULL,
                  max_iter = 50,
+                 obj_tol = 1e-2,
                  default = FALSE) {
   
   # checks
   if (is.null(eta)) {
-    stop("eta must be provided as a numeric in argument 'parameters'.")
+    # stop("eta must be provided as a numeric in argument 'parameters'.")
+    eta = 0.1 # to be initialized and dynamically updated when NULL
   }
-  if (is.null(fun_reg) || ! is.function(fun_reg)) {
-    stop("fun_reg must cannot be missing when other optimization parameters are provided (see ?auglag... fn).") 
+  if (default == FALSE && (is.null(fun_reg) || ! is.function(fun_reg))) {
+    stop("fun_reg must cannot be missing when other optimization parameters are provided (see ?auglag... fn).")
   }
   if (! is.null(fun_reg_grad) && ! is.function(fun_reg_grad)) {
-    stop("fun_reg_grad must be a function (the gradient of the fun_reg function).") 
+    stop("fun_reg_grad must be a function (the gradient of the fun_reg function).")
   }
   if (! is.null(constr_eq) && ! is.function(constr_eq)) {
     stop("constr_eq must be provided as a function (see ?auglag... heq).")
@@ -65,10 +67,10 @@ FTRL <- function(y,
     stop("constr_ineq must be provided as a function (see ?auglag... hin).")
   }
   if (! is.null(constr_eq_jac) && ! is.function(constr_eq_jac)) {
-   stop("constr_eq_jac must be a function that returns a matrix (see ?auglag... heq.jac).") 
+   stop("constr_eq_jac must be a function that returns a matrix (see ?auglag... heq.jac).")
   }
   if (! is.null(constr_ineq_jac) && ! is.function(constr_ineq_jac)) {
-    stop("constr_ineq_jac must be a function that returns a matrix (see ?auglag... hin.jac).") 
+    stop("constr_ineq_jac must be a function that returns a matrix (see ?auglag... hin.jac).")
   }
   if (! is.null(constr_eq_jac) && is.null(constr_eq)) {
     stop("constr_eq_jac is not null but contr_eq is missing.")
@@ -79,7 +81,11 @@ FTRL <- function(y,
   if (is.null(max_iter)) {
     max_iter <- 50
   }
+  if (is.null(obj_tol)) {
+    obj_tol <- 1e-2 
+  }
   
+  # 
   N <- ncol(experts)  # Number of experts
   T <- nrow(experts)  # Number of instants
   
@@ -103,7 +109,7 @@ FTRL <- function(y,
                               fn = fun_reg, 
                               heq = constr_eq, 
                               hin = constr_ineq, 
-                              control.outer = list(trace = F, itmax = max_iter))
+                              control.outer = list(trace = FALSE, kkt2.check = FALSE, itmax = max_iter, eps = obj_tol))
     weights[1, ] <- result$par
   } else {
     weights[1, ] <- w0
@@ -137,25 +143,26 @@ FTRL <- function(y,
                     "control.outer" = list(trace = FALSE, itmax = max_iter, kkt2.check = FALSE))
       
       parms <- parms[! sapply(parms, is.null)]
+      # 
       if (is.null(parms$heq) && is.null(parms$hin)) {
-        parms <- c(parms[intersect(c("par", "fn", "gr"), names(parms))], "control" = list(list("trace" = 0, maxit = max_iter)))
+        parms <- c(parms[intersect(c("par", "fn", "gr"), names(parms))], "control" = list(list("trace" = 0, maxit = max_iter, abstol = obj_tol)))
         res_optim <- do.call(stats::optim, parms)
       }
       else {
         res_optim <- do.call(alabama::auglag, parms) 
       }
       
+      # update weights
+      if (t < T) {
+        weights[t + 1, ] <- res_optim$par
+      } else {
+        coeffs <- res_optim$par
+      }
       # check convergency
-      # if (res_optim$convergence == 0){
-        if (t < T) {
-          weights[t + 1, ] <- res_optim$par
-        } else {
-          coeffs <- res_optim$par
-        }
-      # } 
-      # else {
-        # stop(paste0("Optimization didn't converge at step ", t, "."))
-      # }
+      if (! res_optim$convergence == 0){
+        warning(paste0("Optimization didn't converge at step ", t, ". Your decision space might not be compact, 
+                       or your regularisation function not convex."))
+      }
     }
     # pas d'intéret car dès lors qu'on a le gradient, on peut faire la méthode la plus rapide
     # else {
