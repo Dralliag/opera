@@ -166,10 +166,20 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     }
     
     if (object$model == "RFTL") {
-      newobject <- RFTL(y = newY, experts = newexperts, eta = object$parameters$eta,
-                        reg = object$parameters$fn, heq = object$parameters$heq, hin = object$parameters$hin,
-                        loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
-                        w0 = object$coefficients)
+      if (! any(c("fun_reg", "constr_ineq", "constr_eq") %in% names(object$parameters))) {
+        default <- TRUE
+      } else {
+        default <- FALSE
+      }
+      newobject <- RFTL("y" = newY, "experts" = newexperts, 
+                        "eta" = object$parameters$eta,
+                        "fun_reg" = object$parameters$fun_reg, "fun_reg_grad" = object$parameters$fun_reg_grad, 
+                        "constr_eq" = object$parameters$constr_eq, "constr_eq_jac" = object$parameters$constr_eq_jac, 
+                        "constr_ineq" = object$parameters$constr_ineq, "constr_ineq_jac" = object$parameters$constr_ineq_jac, 
+                        "max_iter" = object$parameters$max_iter,
+                        "loss.type" = object$loss.type, "loss.gradient" = object$loss.gradient, 
+                        "w0" = object$coefficients, 
+                        "default" =  default)
     }
     
     

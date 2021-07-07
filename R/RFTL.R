@@ -31,103 +31,125 @@
 RFTL <- function(y, 
                  experts, 
                  eta, 
-                 reg = function(x) sqrt(sum(x**2)), 
-                 reg_grad = function(x) x * (x**2)**(-1/2),
-                 heq, heq_jac = NULL,
-                 hin, hin_jac = NULL,
+                 fun_reg = NULL, 
+                 fun_reg_grad = NULL,
+                 constr_eq = NULL, constr_eq_jac = NULL,
+                 constr_ineq = NULL, constr_ineq_jac = NULL,
                  loss.type = "square",
                  loss.gradient = TRUE, 
-                 w0,
-                 itmax = 50) {
+                 w0 = NULL,
+                 max_iter = 50,
+                 default = FALSE) {
   
   # checks
   if (is.null(eta)) {
-    stop("eta must be provided as a numeric.")
+    stop("eta must be provided as a numeric in argument 'parameters'.")
   }
-  if (is.null(heq) || ! is.function(heq)) {
-    stop("heq must be provided as a function (see ?auglag).")
+  if (is.null(fun_reg) || ! is.function(fun_reg)) {
+    stop("fun_reg must cannot be missing when other optimization parameters are provided (see ?auglag... fn).") 
   }
-  if (is.null(hin) || ! is.function(hin)) {
-    stop("hin must be provided as a function (see ?auglag).")
+  if (! is.null(fun_reg_grad) && ! is.function(fun_reg_grad)) {
+    stop("fun_reg_grad must be a function (the gradient of the fun_reg function).") 
   }
-  if (! is.null(reg_grad) && ! is.function(reg_grad)) {
-    stop("reg_grad must be a function (the gradient of the regulation function).") 
+  if (! is.null(constr_eq) && ! is.function(constr_eq)) {
+    stop("constr_eq must be provided as a function (see ?auglag... heq).")
   }
-  if (! is.null(heq_jac) && ! is.function(heq_jac)) {
-   stop("heq_jac must be a function that returns a matrix (see ?auglag).") 
+  if (! is.null(constr_ineq) && ! is.function(constr_ineq)) {
+    stop("constr_ineq must be provided as a function (see ?auglag... hin).")
   }
-  if (! is.null(hin_jac) && ! is.function(hin_jac)) {
-    stop("hin_jac must be a function that returns a matrix (see ?auglag).") 
+  if (! is.null(constr_eq_jac) && ! is.function(constr_eq_jac)) {
+   stop("constr_eq_jac must be a function that returns a matrix (see ?auglag... heq.jac).") 
   }
-  
+  if (! is.null(constr_ineq_jac) && ! is.function(constr_ineq_jac)) {
+    stop("constr_ineq_jac must be a function that returns a matrix (see ?auglag... hin.jac).") 
+  }
+  if (! is.null(constr_eq_jac) && is.null(constr_eq)) {
+    stop("constr_eq_jac is not null but contr_eq is missing.")
+  }
+  if (! is.null(constr_ineq_jac) && is.null(constr_ineq)) {
+    stop("constr_ineq_jac is not null but contr_ineq is missing.")
+  }
+  if (is.null(max_iter)) {
+    max_iter <- 50
+  }
   
   N <- ncol(experts)  # Number of experts
   T <- nrow(experts)  # Number of instants
   
-  # init
+  if (default) {
+    fun_reg <- function(x) sqrt(sum(x**2))
+    fun_reg_grad <- function(x) x / sqrt(sum(x**2))
+    constr_eq <- function(x) sum(x) - 1
+    constr_eq_jac <- function(x) matrix(1, ncol = N)
+    constr_ineq <- function(x) x
+    constr_ineq_jac <- function(x) diag(N)
+  }
+  
+  # inits
   if (! loss.gradient == FALSE) {
     G <- numeric(N) 
   }
   weights <- matrix(0, nrow = T, ncol = N)
   prediction <- rep(0, T)
-  if (identical(as.character(attributes(reg)$srcref), "function(x) sqrt(sum(x**2))")) {
-    reg_grad <- function(x) x / sqrt(sum(x^2))
-  }
-  if (identical(as.character(attributes(heq)$srcref), "function(x) sum(x) - 1")) {
-    heq_jac <- function(x) {matrix(1, ncol = N)}
-  } else {
-    heq_jac <- function(par, ...) jacobian(func = heq, x = par, method = "simple", ...)
-  }
-  if (identical(as.character(attributes(hin)$srcref), "function(x) x")) {
-    hin_jac <- function(x) {diag(N)}
-  } else {
-    hin_jac <- function(par, ...) jacobian(func = hin, x = par, method = "simple", ...)
-  }
-  
-  p0 <- rep(1/N, N)
   if (is.null(w0)) {
-    result <- alabama::auglag(par = p0, fn = reg, heq = heq, hin = hin, control.outer = list(trace = F))
+    result <- alabama::auglag(par = rep(1/N, N), 
+                              fn = fun_reg, 
+                              heq = constr_eq, 
+                              hin = constr_ineq, 
+                              control.outer = list(trace = F, itmax = max_iter))
     weights[1, ] <- result$par
   } else {
     weights[1, ] <- w0
   }
-  
-  obj <- reg
   
   steps <- init_progress(T)
   for (t in 1:T) {
     update_progress(t, steps)
     
     if (! loss.gradient == FALSE) {
-      
-      pred <- prediction[t] <- weights[t,] %*% X[t,]
+      # compute current prevision
+      prediction[t] <- weights[t,] %*% X[t,]
       
       # update gradient
-      G <- G + lossPred(experts[t, ], Y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
+      G <- G + lossPred(experts[t, ], Y[t], prediction[t], loss.type = loss.type, loss.gradient = loss.gradient)
       
       # update obj function
-      obj <- function(x) (reg(x) + eta * sum(G * x))
+      obj <- function(x) (fun_reg(x) + eta * sum(G * x))
       
       # compute grad of obj function
-      obj_grad <- function(x) {reg_grad(x) + eta * G}
+      obj_grad <- if(is.null(fun_reg_grad)) {NULL} else {function(x) fun_reg_grad(x) + eta * G}
       
-      res_optim <- alabama::auglag(par = if (t == 1) {w0} else {weights[t-1, ]}, 
-                      fn = obj, 
-                      gr = obj_grad, 
-                      heq = heq, 
-                      heq.jac = heq_jac,
-                      hin = hin, 
-                      hin.jac = hin_jac,
-                      control.outer = list(trace = F, itmax = itmax, kkt2.check = FALSE))
+      # run optimization
+      parms <- list("par" = if (t == 1) {w0} else {weights[t-1, ]},
+                    "fn" = obj,
+                    "gr" = obj_grad,
+                    "heq" = constr_eq,
+                    "heq.jac" = constr_eq_jac,
+                    "hin" = constr_ineq,
+                    "hin.jac" = constr_ineq_jac,
+                    "control.outer" = list(trace = FALSE, itmax = max_iter, kkt2.check = FALSE))
       
-      # Q : check convergence / contraintes / .. et stop sinon
-      if(res_optim$convergence == 0){
-        weights[t + 1, ] <- res_optim$par
-      } else {
-        stop("No convergence...!")
+      parms <- parms[! sapply(parms, is.null)]
+      if (is.null(parms$heq) && is.null(parms$hin)) {
+        parms <- c(parms[intersect(c("par", "fn", "gr"), names(parms))], "control" = list(list("trace" = 0, maxit = max_iter)))
+        res_optim <- do.call(stats::optim, parms)
       }
-
-    } 
+      else {
+        res_optim <- do.call(alabama::auglag, parms) 
+      }
+      
+      # check convergency
+      # if (res_optim$convergence == 0){
+        if (t < T) {
+          weights[t + 1, ] <- res_optim$par
+        } else {
+          coeffs <- res_optim$par
+        }
+      # } 
+      # else {
+        # stop(paste0("Optimization didn't converge at step ", t, "."))
+      # }
+    }
     # pas d'intéret car dès lors qu'on a le gradient, on peut faire la méthode la plus rapide
     # else {
     #   obj <- function(x) {
@@ -161,12 +183,21 @@ RFTL <- function(y,
   }
   end_progress()
   
+  # round to 0 when coefficients are slightly negative
+  if (all(coeffs > -1e-5)) {
+    coeffs <- pmax(0, coeffs)
+    coeffs <- coeffs / sum(coeffs) 
+  }
+  
+  weights <- apply(weights, 2, pmax, 0)
+  weights <- weights / rowSums(weights)
+  
   object <- list(model = "RFTL", loss.type = loss.type, loss.gradient = loss.gradient, 
-                 coefficients = weights[T, ])
+                 coefficients = coeffs)
   class(object) <- "mixture"
   
   object$parameters <- list("eta" = eta, 
-                            "reg" = reg,
+                            "reg" = fun_reg,
                             "constr" = list("heq" = heq, "hin" = hin))
   object$weights <- weights
   object$prediction <- prediction
