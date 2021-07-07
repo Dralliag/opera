@@ -1,4 +1,5 @@
 #include "closspred.h"
+#include "progress.h"
 #include <RcppEigen.h>
 using namespace Rcpp;
 // [[Rcpp::depends(RcppEigen)]]

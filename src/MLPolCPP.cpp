@@ -1,4 +1,5 @@
 #include "closspred.h"
+#include "progress.h"
 
 
 template <class L, bool G>
