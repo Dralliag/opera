@@ -32,7 +32,7 @@ lossPred <- function(x, y, pred = NULL, loss.type = "square", loss.gradient = FA
         }
       } else {
         if (! is.function(loss.gradient) && loss.gradient == FALSE) {
-          l <- loss.type(x, y) 
+          l <- c(loss.type(x, y))
         } else {
           l <- c(loss.gradient(pred, y)) * x
         }
@@ -69,7 +69,7 @@ lossPred <- function(x, y, pred = NULL, loss.type = "square", loss.gradient = FA
         else if (loss.type$name == "absolute") 
           l <- t(matrix(rep(sign(pred - y), nx), ncol = nx)) * matrix(rep(x, npred), ncol = npred) 
         else if (loss.type$name == "percentage") 
-          l <- matrix(rep(x, npred), ncol = npred)/y * t(matrix(rep(sign(pred - y), nx), ncol = nx))
+          l <- t(matrix(rep(sign(pred - y)/y, nx), ncol = nx)) * matrix(rep(x, npred), ncol = npred)
         else if (loss.type$name == "log") 
           l <- 2 * t(matrix(rep(-1/pred, nx), ncol = nx)) * matrix(rep(x, npred), ncol = npred) 
         else if (loss.type$name == "pinball") 
