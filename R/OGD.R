@@ -25,6 +25,7 @@ OGD <- function(y, experts, loss.type = "square", training = NULL, alpha, simple
   # Previous training ?
   if (!is.null(training)) {
     t0 <- training$t0
+    w0 <- training$w0
     w <- training$w
     B <- training$B
   } else {
@@ -66,7 +67,7 @@ OGD <- function(y, experts, loss.type = "square", training = NULL, alpha, simple
   object$weights <- weights
   object$prediction <- prediction
   
-  object$training <- list(w = w, t0 = t0 + T, B = B)
+  object$training <- list(w = w, w0 = w0,  t0 = t0 + T, B = B)
   class(object) <- "mixture"
   return(object)
 } 

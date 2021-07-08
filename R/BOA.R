@@ -18,7 +18,7 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
   
   R <- rep(0, N)
   R.reg <- rep(0, N)
-  w <- rep(1, N)
+  w <- w0
   weights <- matrix(0, ncol = N, nrow = T)
   prediction <- rep(0, T)
   eta <- matrix(exp(350), ncol = N, nrow = T + 1)

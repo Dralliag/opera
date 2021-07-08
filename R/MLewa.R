@@ -1,6 +1,6 @@
 
 MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-  w0 = NULL, training = NULL, quiet = FALSE) {
+                  w0 = NULL, training = NULL, quiet = FALSE) {
   experts <- as.matrix(experts)
   N <- ncol(experts)
   T <- nrow(experts)
@@ -30,17 +30,21 @@ MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     eta[1, ] <- training$eta
     R <- training$R
     # Update weights
-    
-    R.aux <- log(w0) + eta[t, ] * R
+    R.aux <- log(w0) + eta[1, ] * R
     R.max <- max(R.aux)
     w <- exp(R.aux - R.max)
-    w <- w/sum(w)
   }
   
   if (! quiet) steps <- init_progress(T)
   
   for (t in 1:T) {
     if (! quiet) update_progress(t, steps)
+    
+    idx <- awake[t,] > 0
+    R.aux <- log(w0) + eta[t, ] * R
+    R.max <- max(R.aux[idx])
+    w <- numeric(N)
+    w[idx] <- exp(R.aux[idx] - R.max)
     
     # form the each-instant updated mixture and prediction
     p <- awake[t, ] * w/sum(awake[t, ] * w)
