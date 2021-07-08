@@ -3,9 +3,11 @@
 #' @param x An object of class \code{oracle}. 
 #' @param sort if set to TRUE (default), it sorts the experts by performance before the plots.
 #' @param col colors
+#' @param dynamic If TRUE, graphs are generated with \code{rAmCharts}, else with base R.
+#' @param ... additional arguments to function plot.
 #' @importFrom graphics axis box mtext par plot
 #' @export 
-plot.oracle <- function(x, sort = TRUE, col = NULL, dynamic = T,  ...) {
+plot.oracle <- function(x, sort = TRUE, col = NULL, dynamic = TRUE,  ...) {
   def.par <- par(no.readonly = TRUE)
   
   ############# add checks on x$loss
@@ -147,6 +149,10 @@ plot.oracle <- function(x, sort = TRUE, col = NULL, dynamic = T,  ...) {
 ### dynamic version of the plots 
 
 #' Functions to render dynamic oracle graphs using rAmCharts
+#'
+#' @param data \code{named vector}. Vector of values to be displayed.
+#' @param colors \code{character}. Colors to  be used.
+#' @param round \code{integer} (2). Precision of the values in the tooltips..
 #'
 #' @return a rAmCharts plot
 #' 

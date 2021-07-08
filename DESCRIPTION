@@ -24,7 +24,8 @@ Imports:
     rAmCharts,
     htmlwidgets,
     pipeR,
-    alabama
+    alabama,
+    methods
 Suggests:
     quantreg,
     quadprog,

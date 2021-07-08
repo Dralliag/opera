@@ -72,8 +72,6 @@
 #'      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
 #'      \item{list}{ When using pinball loss: list with field name equal to 'pinball' and field tau equal to the required quantile in [0,1];}
 #'      \item{function}{ A custom loss as a function of two parameters.}
-#'      \item{list of 2 functions}{ A custom loss as a function of two parameters and 
-#'                                  a custom gradient loss as a function of 3 parameters, the third one being called 'pred'.}
 #' }
 #' 
 #' @param loss.gradient A boolean. If
@@ -119,10 +117,10 @@
 #'    more regularity assumption on the underlying process genearting the data (i.i.d. for instance). }
 #' }
 #' 
-#' @param \code{use_cpp}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
+#' @param use_cpp \code{boolean}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
 #' with the use of custom loss function.
 #' 
-#' @param \code{quiet}. Whether or not to display progress bars.
+#' @param quiet \code{boolean}. Whether or not to display progress bars.
 #' 
 #' 
 #' @return An object of class mixture that can be used to perform new predictions. 

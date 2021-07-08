@@ -38,8 +38,10 @@
 #'    \item{all}{return a list containing 'model', 'response', and 'weights'.}
 #'    }
 #'    
-#' @param \code{use_cpp}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
+#' @param use_cpp \code{boolean}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
 #' with the use of custom loss function.
+#' 
+#' @param quiet \code{boolean}. Whether or not to display progress bars.
 #' 
 #' @param ...  further arguments are ignored
 #' 
