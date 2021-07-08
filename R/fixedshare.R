@@ -1,6 +1,6 @@
 
 fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square", 
-  loss.gradient = TRUE, w0 = NULL, training = NULL) {
+  loss.gradient = TRUE, w0 = NULL, training = NULL, quiet = FALSE) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -26,10 +26,10 @@ fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square
     cumulativeLoss <- training$cumulativeLoss
   }
   
-  steps <- init_progress(T)
+  if (! quiet) steps <- init_progress(T)
   
   for (t in 1:T) {
-    update_progress(t, steps)
+    if (! quiet) update_progress(t, steps)
     
     # Weight update
     idx <- awake[t,] > 0
@@ -51,7 +51,7 @@ fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square
     v <- exp(R.aux - R.max)/sum(exp(R.aux - R.max))
     R <- log(alpha/N + (1 - alpha) * v)/eta
   }
-  end_progress()
+  if (! quiet) end_progress()
   
   R.aux <- eta * R
   R.max <- max(R.aux)

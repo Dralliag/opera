@@ -1,13 +1,8 @@
 
-ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square", 
+ewaCalib <- function(y, experts, grid.eta = NULL, awake = NULL, loss.type = "square", 
   loss.gradient = TRUE, w0 = NULL, trace = F, gamma = 2, training = NULL,
   use_cpp = getOption("opera_use_cpp", default = TRUE)) {
   experts <- as.matrix(experts)
-  
-  # si grid.eta = NULL
-  # faire tourner la boucle une fois 
-  # init avec eta 1/loss²
-  # ...
   
   N <- ncol(experts)  # Number of experts
   T <- nrow(experts)  # Number of instants
@@ -27,6 +22,14 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
   experts[idx.na] <- 0
   
   T0 <- 0  # number of observations in previous runs
+  
+  # if grid.eta == NULL, init during first computation of the loss as 1 / mean(abs(R.w0))
+  if (is.null(grid.eta)) {
+    init_grid_eta <- TRUE
+    grid.eta <- 1
+  } else {
+    init_grid_eta <- FALSE
+  }
   neta <- length(grid.eta)  # Initial number of learning parameter in the grid to be optimized
   besteta <- floor(neta)/2 + 1  # We start with the parameter eta in the middle of the grid
   eta <- rep(grid.eta[besteta], T)  # Vector of calibrated learning rates (will be filled online by the algorithm)
@@ -87,6 +90,12 @@ ewaCalib <- function(y, experts, grid.eta = 1, awake = NULL, loss.type = "square
     
     # Regret update
     R.w0 <- R.w0 + awake[t, ] * t(c(lpred) - t(lexp))
+    
+    # init value of grid.eta if NULL at first step
+    if (t == 1 && init_grid_eta) {
+      grid.eta <- 1 / mean(abs(R.w0))
+      eta <- c(NA, rep(grid.eta, T-1))
+    }
     
     # Update of the best parameter
     besteta <- order(cumulativeLoss)[1]
