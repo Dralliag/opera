@@ -1,5 +1,5 @@
 MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-                   w0 = NULL, training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE)) {
+                   w0 = NULL, training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -35,13 +35,13 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
     loss_tau <- ifelse(! is.null(loss.type$tau), loss.type$tau, 0)
     loss_name <- loss.type$name
     B <- computeMLProdEigen(awake,eta,experts,weights,y,prediction,
-                            R,L,maxloss,loss_name,loss_tau,loss.gradient);
+                            R,L,maxloss,loss_name,loss_tau,loss.gradient, quiet = quiet);
   }
   else{
-    steps <- init_progress(T)
+    if (! quiet) steps <- init_progress(T)
     
     for (t in 1:T) {
-      update_progress(t, steps)
+      if (! quiet) update_progress(t, steps)
       
       # Update weights
       idx <- awake[t,] > 0
@@ -73,7 +73,7 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
         browser("Nan in R")
       }
     }
-    end_progress()
+    if (! quiet) end_progress()
   }
   
   R.max <- max(R)

@@ -122,6 +122,8 @@
 #' @param \code{use_cpp}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
 #' with the use of custom loss function.
 #' 
+#' @param \code{quiet}. Whether or not to display progress bars.
+#' 
 #' 
 #' @return An object of class mixture that can be used to perform new predictions. 
 #' It contains the parameters \code{model}, \code{loss.type}, \code{loss.gradient},
@@ -152,13 +154,13 @@
 #' 
 mixture <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square", 
                     loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list(),
-                    use_cpp = getOption("opera_use_cpp", default = TRUE)) UseMethod("mixture")
+                    use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE) UseMethod("mixture")
 
 
 #' @export 
 mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square", 
                             loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list(),
-                            use_cpp = getOption("opera_use_cpp", default = TRUE)) {
+                            use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE) {
   
   # checks
   experts <- check_matrix(experts, "experts")
@@ -215,7 +217,7 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
     }
     object$d <- d
     object <- predict(object, newY = Y, newexperts = experts, awake = awake, 
-                      type = "model", use_cpp = use_cpp)
+                      type = "model", use_cpp = use_cpp, quiet = quiet)
     
   }
   return(object)

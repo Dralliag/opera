@@ -1,5 +1,5 @@
 MLpol <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-  training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE)) {
+  training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -34,13 +34,13 @@ MLpol <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     loss_tau <- ifelse(! is.null(loss.type$tau), loss.type$tau, 0)
     loss_name <- loss.type$name
     B <- computeMLPolEigen(awake,eta,experts,weights,y,prediction,
-                           R,w,B,loss_name,loss_tau,loss.gradient)
+                           R,w,B,loss_name,loss_tau,loss.gradient, quiet = quiet)
   }
   else{
-    steps <- init_progress(T)
+    if (! quiet) steps <- init_progress(T)
     
     for (t in 1:T) {
-      update_progress(t, steps)
+      if (! quiet) update_progress(t, steps)
       
       # We check if there is at least one expert with positive weight
       if (max(awake[t, ] * R) > 0) {
@@ -70,7 +70,7 @@ MLpol <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
       eta[t + 1, ] <- 1/(1/eta[t, ] + r^2 + newB - B)
       B <- newB
     }
-    end_progress()
+    if (! quiet) end_progress()
     
     # We check if there is at least one expert with positive weight
     if (max(R) > 0) {

@@ -25,7 +25,7 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
   }
   
   if (use_cpp){
-    error_code<-computeRidgeCPP(experts,w,At,bt,y,quiet)
+    error_code<-computeRidgeCPP(experts,w,At,bt,y, quiet = quiet)
     if (error_code != 0){
       stop("matrix is not invertible")
     }

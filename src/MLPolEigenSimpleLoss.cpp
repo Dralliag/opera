@@ -1,5 +1,6 @@
 #include "closspred.h"
 #include <RcppEigen.h>
+#include "progress.h"
 using namespace Rcpp;
 // [[Rcpp::depends(RcppEigen)]]
 
@@ -131,7 +132,7 @@ double computeMLPolEigenSimpleLoss( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Ma
                           Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, 
                           Eigen::Map<Eigen::VectorXd> Rc, Eigen::Map<Eigen::VectorXd> wc,
                           double B,
-                          String loss_name,double loss_tau,bool loss_gradient){
+                          String loss_name,double loss_tau,bool loss_gradient, bool quiet){
   
   
  
@@ -151,8 +152,13 @@ double computeMLPolEigenSimpleLoss( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Ma
   Row r = Row::Zero(N);
   Row lexp = Row::Zero(N);
 
+  // init progress
+  IntegerVector steps;
+  if (! quiet) steps = init_progress_cpp(T);
   
   for (size_t t=0 ; t<T ; t++){
+    // update progress
+    if (! quiet) update_progress_cpp(t+1, steps);
     
     auto awaket = awake.row(t).array();
     if ((awaket*R).maxCoeff()>0){
@@ -184,6 +190,8 @@ double computeMLPolEigenSimpleLoss( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Ma
     eta.row(t+1).array() = (eta.row(t).array().inverse() + r*r + newB -B).inverse();
     B = newB;
   }
+  // end progress
+  if (! quiet) end_progress_cpp();
   
   if (R.maxCoeff()>0){
     w = eta.row(T).array() * R.unaryExpr(std::ptr_fun(ramp));

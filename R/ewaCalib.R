@@ -1,7 +1,7 @@
 
 ewaCalib <- function(y, experts, grid.eta = NULL, awake = NULL, loss.type = "square", 
-  loss.gradient = TRUE, w0 = NULL, trace = F, gamma = 2, training = NULL,
-  use_cpp = getOption("opera_use_cpp", default = TRUE)) {
+  loss.gradient = TRUE, w0 = NULL, gamma = 2, training = NULL,
+  use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -55,15 +55,12 @@ ewaCalib <- function(y, experts, grid.eta = NULL, awake = NULL, loss.type = "squ
     R.w0[, k] <- R[, k] + log(w0)/grid.eta[k]
   }  # We initialize the regrets so that w0 is the initial weight vector
   
-  steps <- init_progress(T)
+  if (! quiet) steps <- init_progress(T)
   
   for (t in 1:T) {
-    update_progress(t, steps)
+    if (! quiet) update_progress(t, steps)
     
     # Display the state of progress of the algorithm
-    if (!(t%%floor(T/10)) && trace) 
-      cat(floor(10 * t/T) * 10, "% -- ")
-    
     if (use_cpp){
       loss_tau <- ifelse(! is.null(loss.type$tau), loss.type$tau, 0)
       loss_name <- loss.type$name
@@ -102,8 +99,6 @@ ewaCalib <- function(y, experts, grid.eta = NULL, awake = NULL, loss.type = "squ
     }
     # We increase the size of the grid if the best parameter lies in an extremity
     if (besteta == neta) {
-      if (trace) 
-        cat(" + ")
       neweta <- grid.eta[besteta] * gamma^(1:3)
       grid.eta <- c(grid.eta, neweta)
       neta <- neta + length(neweta)
@@ -124,8 +119,6 @@ ewaCalib <- function(y, experts, grid.eta = NULL, awake = NULL, loss.type = "squ
     }
     
     if (besteta == 1) {
-      if (trace) 
-        cat(" - ")
       neweta <- grid.eta[besteta]/gamma^(1:3)
       neta <- neta + length(neweta)
       besteta <- besteta + length(neweta)
@@ -153,7 +146,7 @@ ewaCalib <- function(y, experts, grid.eta = NULL, awake = NULL, loss.type = "squ
       weta <- t(t(weta.aux) / colSums(weta.aux))
     }
   }#end of time loop
-  end_progress()
+  if (! quiet) end_progress()
   
   # Next weights
   w <- weta[, besteta]/sum(weta[, besteta])
@@ -176,7 +169,6 @@ ewaCalib <- function(y, experts, grid.eta = NULL, awake = NULL, loss.type = "squ
       awake))
   
   class(object) <- "mixture"
-  if (trace) 
-    cat("\n")
+  
   return(object)
 } 

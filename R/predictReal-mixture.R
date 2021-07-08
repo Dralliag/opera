@@ -1,6 +1,6 @@
 predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL, 
                         online = TRUE, type = c("model", "response", "weights", "all"),
-                        use_cpp = getOption("opera_use_cpp", default = TRUE), ...) {
+                        use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE, ...) {
   
   type <- match.arg(type)
   
@@ -92,17 +92,17 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
       if (is.null(object$parameters$lambda) || !is.null(object$parameters$grid.lambda)) {
         newobject <- ridgeCalib(y = newY, experts = newexperts, w0 = object$coefficients, 
                                 gamma = object$parameters$gamma, grid.lambda = object$parameters$grid.lambda, 
-                                training = object$training, use_cpp = use_cpp)
+                                training = object$training, use_cpp = use_cpp, quiet = quiet)
         newobject$parameters$lambda <- c(object$parameters$lambda, newobject$parameters$lambda)
       } else {
         newobject <- ridge(y = newY, experts = newexperts, lambda = object$parameters$lambda, 
-                           w0 = object$coefficients, training = object$training, use_cpp = use_cpp)
+                           w0 = object$coefficients, training = object$training, use_cpp = use_cpp, quiet = quiet)
       }
     }
     
     if (object$model == "MLpol") {
       newobject <- MLpol(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
-                         loss.gradient = object$loss.gradient, training = object$training, use_cpp = use_cpp)
+                         loss.gradient = object$loss.gradient, training = object$training, use_cpp = use_cpp, quiet = quiet)
       newobject$parameters <- list(eta = rbind(object$parameters$eta, newobject$parameters$eta))
     }
     
@@ -111,7 +111,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
       if (is.null(object$parameters$simplex)) {object$parameters$simplex = TRUE}
       newobject <- OGD(y = newY, experts = newexperts, loss.type = object$loss.type, 
                        training = object$training, alpha = object$parameters$alpha, simplex = object$parameters$simplex,
-                       w0 = object$coefficients)
+                       w0 = object$coefficients, quiet = quiet)
     }
     
     if ((object$model == "BOA") || (object$model == "MLewa") || (object$model == 
@@ -119,49 +119,41 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
       algo <- eval(parse(text = object$model))
       newobject <- algo(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
                         loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training,
-                        use_cpp = use_cpp)
+                        use_cpp = use_cpp, quiet = quiet)
       newobject$parameters <- list(eta = rbind(object$parameters$eta, newobject$parameters$eta))
     }
     
     if (object$model == "EWA") {
       if (is.null(object$parameters$eta) || !is.null(object$parameters$grid.eta)) {
-        if (is.null(object$parameters$grid.eta)) {
-          object$parameters$grid.eta <- 1
-          # NULL
-        }
-        
         newobject <- ewaCalib(y = newY, experts = newexperts, awake = awake, 
                               loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
                               w0 = object$coefficients, gamma = object$parameters$gamma, grid.eta = sort(object$parameters$grid.eta), 
-                              training = object$training, use_cpp = use_cpp)
+                              training = object$training, use_cpp = use_cpp, quiet = quiet)
         newobject$parameters$eta <- c(object$parameters$eta, newobject$parameters$eta)
       } else {
         newobject <- ewa(y = newY, experts = newexperts, eta = object$parameters$eta, 
                          awake = awake, loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
-                         w0 = object$coefficients, training = object$training, use_cpp = use_cpp)
+                         w0 = object$coefficients, training = object$training, use_cpp = use_cpp, quiet = quiet)
       }
     }
     
     if (object$model == "FS") {
       if (is.null(object$parameters$eta) || is.null(object$parameters$alpha) || 
           !is.null(object$parameters$grid.eta) || !is.null(object$parameters$grid.alpha)) {
-        if (is.null(object$parameters$grid.eta)) {
-          object$parameters$grid.eta <- 1
-        }
         if (is.null(object$parameters$grid.alpha)) {
           object$parameters$grid.alpha <- 10^(-4:-1)
         }
         newobject <- fixedshareCalib(y = newY, experts = newexperts, awake = awake, 
                                      loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
                                      w0 = object$coefficients, gamma = object$parameters$gamma, grid.eta = object$parameters$grid.eta, 
-                                     grid.alpha = object$parameters$grid.alpha, training = object$training)
+                                     grid.alpha = object$parameters$grid.alpha, training = object$training, quiet = quiet)
         newobject$parameters$eta <- c(object$parameters$eta, newobject$parameters$eta)
         newobject$parameters$alpha <- c(object$parameters$alpha, newobject$parameters$alpha)
       } else {
         newobject <- fixedshare(y = newY, experts = newexperts, eta = object$parameters$eta, 
                                 alpha = object$parameters$alpha, awake = awake, loss.type = object$loss.type, 
                                 loss.gradient = object$loss.gradient, w0 = object$coefficients, 
-                                training = object$training)
+                                training = object$training, quiet = quiet)
       }
     }
     
@@ -177,9 +169,10 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
                         "constr_eq" = object$parameters$constr_eq, "constr_eq_jac" = object$parameters$constr_eq_jac, 
                         "constr_ineq" = object$parameters$constr_ineq, "constr_ineq_jac" = object$parameters$constr_ineq_jac, 
                         "max_iter" = object$parameters$max_iter,
+                        "obj_tol" = object$parameters$obj_tol,
                         "loss.type" = object$loss.type, "loss.gradient" = object$loss.gradient, 
                         "w0" = object$coefficients, 
-                        "default" =  default)
+                        "default" =  default, "quiet" = quiet)
     }
     
     

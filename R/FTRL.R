@@ -47,7 +47,8 @@ FTRL <- function(y,
                  w0 = NULL,
                  max_iter = 50,
                  obj_tol = 1e-2,
-                 default = FALSE) {
+                 default = FALSE,
+                 quiet = FALSE) {
   
   # checks
   if (is.null(eta)) {
@@ -85,7 +86,7 @@ FTRL <- function(y,
     obj_tol <- 1e-2 
   }
   
-  # 
+  
   N <- ncol(experts)  # Number of experts
   T <- nrow(experts)  # Number of instants
   
@@ -109,15 +110,15 @@ FTRL <- function(y,
                               fn = fun_reg, 
                               heq = constr_eq, 
                               hin = constr_ineq, 
-                              control.outer = list(trace = FALSE, kkt2.check = FALSE, itmax = max_iter, eps = obj_tol))
+                              control.outer = list(kkt2.check = FALSE, itmax = max_iter, eps = obj_tol))
     weights[1, ] <- result$par
   } else {
     weights[1, ] <- w0
   }
   
-  steps <- init_progress(T)
+  if (! quiet) steps <- init_progress(T)
   for (t in 1:T) {
-    update_progress(t, steps)
+    if (! quiet) update_progress(t, steps)
     
     if (! loss.gradient == FALSE) {
       # compute current prevision
@@ -140,7 +141,7 @@ FTRL <- function(y,
                     "heq.jac" = constr_eq_jac,
                     "hin" = constr_ineq,
                     "hin.jac" = constr_ineq_jac,
-                    "control.outer" = list(trace = FALSE, itmax = max_iter, kkt2.check = FALSE))
+                    "control.outer" = list(trace = FALSE, itmax = max_iter, eps = obj_tol, kkt2.check = FALSE))
       
       parms <- parms[! sapply(parms, is.null)]
       # 
@@ -195,7 +196,7 @@ FTRL <- function(y,
     #                                  control.outer = list(trace = F, itmax = itmax))$par
     # }
   }
-  end_progress()
+  if (! quiet) end_progress()
   
   # round to 0 when coefficients are slightly negative
   if (all(weights > -1e-5)) {

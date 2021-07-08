@@ -50,19 +50,18 @@
 #' @export 
 predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL, 
                             online = TRUE, type = c("model", "response", "weights", "all"),
-                            use_cpp = getOption("opera_use_cpp", default = TRUE), ...) {
+                            use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE, ...) {
   
   # checks
   newexperts <- check_matrix(newexperts, "newexperts")
   awake <- check_matrix(awake, "awake")
-  object$loss.type <- check_loss(loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
-                                 Y = newY, model = object$model, use_cpp = use_cpp)
+  
   result <- object
   d <- object$d
   if ((d == 1) || (d == "unknown" && is.null(dim(newY)))) {
     object$d <- 1
     return(predictReal(object, newexperts, newY, awake, 
-                online, type, use_cpp = use_cpp, ...))
+                       online, type, use_cpp = use_cpp, quiet = quiet, ...))
   } else {
     if (d == "unknown") {
       d = dim(newY)[2]
@@ -96,7 +95,7 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
         awakei <- awake[i,,]
       }
       result <- predictReal(result, newexperts = newexperts[i,,], newY = c(newY[i,]), awake = awakei,
-                            online = FALSE, type, use_cpp = use_cpp, ...)
+                            online = FALSE, type, use_cpp = use_cpp, quiet = quiet, ...)
     }
   }
   result$weights <- matrix(result$weights, nrow = result$T)

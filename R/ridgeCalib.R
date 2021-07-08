@@ -1,6 +1,6 @@
 # Ridge aggregation rule with automatic calibration of smoothing parameters
-ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, gamma = 2, 
-  training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE)) {
+ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, gamma = 2, 
+  training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -45,14 +45,10 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
   
   lambda <- rep(grid.lambda[bestlambda], T)
   
-  steps <- init_progress(T)
+  if (! quiet) steps <- init_progress(T)
   
   for (t in 1:T) {
-    update_progress(t, steps)
-    
-    # Display the state of progress of the algorithm
-    if (!(t%%floor(T/10)) && trace) 
-      cat(floor(10 * t/T) * 10, "% -- ")
+    if (! quiet) update_progress(t, steps)
     
     # Weights, prediction forme by Ridge(lambda[t]) where lambda[t] is the learning
     # rate calibrated online
@@ -84,8 +80,6 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
     }
     # Expand the grid if the best parameter lies on an extremity
     if (bestlambda == nlambda) {
-      if (trace) 
-        cat(" + ")
       newlambda <- grid.lambda[bestlambda] * gamma^(1:3)
       grid.lambda <- c(grid.lambda, newlambda)
       nlambda <- nlambda + length(newlambda)
@@ -102,8 +96,6 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
       }
     }
     if (bestlambda == 1) {
-      if (trace) 
-        cat(" - ")
       newlambda <- grid.lambda[bestlambda]/gamma^(1:3)
       nlambda <- nlambda + length(newlambda)
       bestlambda <- bestlambda + length(newlambda)
@@ -139,7 +131,7 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
     lambda.min <- which(!(is.na(wlambda[1, ])))[1]
     bestlambda <- max(lambda.min, bestlambda)
   }
-  end_progress()
+  if (! quiet) end_progress()
   
   object <- list(model = "Ridge", loss.type = list(name = "square"), coefficients = wlambda[, 
     bestlambda])
@@ -153,7 +145,5 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, trace = FALSE, ga
       T), oldexperts = rbind(training$oldexperts, experts), oldY = c(training$oldY, 
       y))
   
-  if (trace) 
-    cat("\n")
   return(object)
 } 

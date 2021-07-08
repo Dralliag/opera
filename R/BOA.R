@@ -1,6 +1,6 @@
 
 BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-                w0 = NULL, training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE)) {
+                w0 = NULL, training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -40,13 +40,13 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
     loss_tau <- ifelse(! is.null(loss.type$tau), loss.type$tau, 0) 
     loss_name <- loss.type$name
     computeBOAEigen(awake,eta,experts,weights,y,prediction,
-                    w,w0,R,R.reg,B,V,loss_name,loss_tau,loss.gradient);
+                    w,w0,R,R.reg,B,V,loss_name,loss_tau,loss.gradient, quiet = quiet);
   }
   else{
-    steps <- init_progress(T)
+    if (! quiet) steps <- init_progress(T)
     
     for (t in 1:T) {
-      update_progress(t, steps)
+      if (! quiet) update_progress(t, steps)
       
       idx <- awake[t,] > 0
       R.aux <- log(w0) + eta[t, ] * R.reg
@@ -82,7 +82,7 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
       R <- R + r
       R.reg <- R.reg + r.reg
     }
-    end_progress()
+    if (! quiet) end_progress()
   }
   
   R.aux <- log(w0) + eta[T + 1, ] * R.reg

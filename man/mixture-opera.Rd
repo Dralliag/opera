@@ -16,7 +16,8 @@ mixture(
   coefficients = "Uniform",
   awake = NULL,
   parameters = list(),
-  use_cpp = getOption("opera_use_cpp", default = TRUE)
+  use_cpp = getOption("opera_use_cpp", default = TRUE),
+  quiet = FALSE
 )
 
 \method{print}{mixture}(x, ...)
@@ -68,6 +69,17 @@ like 'BOA' (Bernstein online Aggregation see [Wintenberger, 2014] <doi:10.1007/s
  At time step \eqn{t \geq 1}, the learning rate is chosen to be \eqn{t^{-\alpha}}, where \eqn{\alpha} is provided by alpha in the parameters argument.
  The algorithm may or not perform a projection step into the simplex space (non-negative weights that sum to one) according to
  the value of the parameter 'simplex' provided by the user.}
+ \item{'FTRL'}{Follow The Regularized Leader (see McMahan, H Brendan 2017). description to be added... The user must provide (in the \strong{parameters}'s list):
+   \itemize{
+     \item{'eta' }{The learning rate.}
+     \item{'fun_reg' }{The regularization function to be applied on the weigths. See \code{\link{auglag}}: fn.}
+     \item{'constr_eq' }{The equality constraints (e.g. sum(w) = 1). See \code{\link{auglag}}: heq.}
+     \item{'constr_ineq' }{The inequality constraints (e.g. w > 0). See \code{\link{auglag}}: hin.}
+     \item{'fun_reg_grad' }{(optional) The gradient of the regulrization function. See \code{\link{auglag}}: gr.}
+     \item{'constr_eq_jac' }{(optional) The jacobian of the equality constraints. See \code{\link{auglag}}: heq.jac}
+     \item{'constr_ineq_jac' }{(optional) The jacobian of the inequality constraints. See \code{\link{auglag}}: hin.jac}
+   } or set \strong{default} to TRUE. Parameters \strong{w0} (weight initialization), and \strong{max_iter} can also be provided.
+ }
 }}
 
 \item{loss.type}{\code{character, list or function}. 
@@ -130,6 +142,8 @@ online. Possible parameters are:
 
 \item{\code{use_cpp}.}{Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
 with the use of custom loss function.}
+
+\item{\code{quiet}.}{Whether or not to display progress bars.}
 }
 \value{
 An object of class mixture that can be used to perform new predictions. 

@@ -1,6 +1,6 @@
 fixedshareCalib <- function(y, experts, grid.eta = NULL, grid.alpha = 10^(-4:-1), awake = NULL, 
-  loss.type = "square", loss.gradient = TRUE, w0 = NULL, trace = F, gamma = 2, 
-  training = NULL) {
+  loss.type = "square", loss.gradient = TRUE, w0 = NULL, gamma = 2, 
+  training = NULL, quiet = FALSE) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -50,14 +50,10 @@ fixedshareCalib <- function(y, experts, grid.eta = NULL, grid.alpha = 10^(-4:-1)
     T0 <- training$T
   }
   
-  steps <- init_progress(T)
+  if (! quiet) steps <- init_progress(T)
   
   for (t in 1:T) {
-    update_progress(t, steps)
-    
-    # Display the state of progress of the algorithm
-    if (!(t%%floor(T/10)) && trace) 
-      cat(floor(10 * t/T) * 10, "% -- ")
+    if (! quiet) update_progress(t, steps)
     
     # Weights, prediction forme by FixedShare(eta[t],alpha[t]) where par[t,] =
     # c(eta[t],alpha[t]) are the parameters calibrated online
@@ -107,8 +103,6 @@ fixedshareCalib <- function(y, experts, grid.eta = NULL, grid.alpha = 10^(-4:-1)
     # Expand the grid if the best parameter lies on an extremity (only for the first
     # component)
     if (bestpar[1] == neta) {
-      if (trace) 
-        cat(" + ")
       neweta <- grid.eta[neta] * gamma^(1:3)
       grid.eta <- c(grid.eta, neweta)
       neta <- neta + length(neweta)
@@ -128,8 +122,6 @@ fixedshareCalib <- function(y, experts, grid.eta = NULL, grid.alpha = 10^(-4:-1)
       }
     }
     if (bestpar[1] == 1) {
-      if (trace) 
-        cat(" - ")
       neweta <- grid.eta[1]/gamma^(1:3)
       neta <- neta + length(neweta)
       bestpar[1] <- bestpar[1] + length(neweta)
@@ -150,7 +142,7 @@ fixedshareCalib <- function(y, experts, grid.eta = NULL, grid.alpha = 10^(-4:-1)
       }
     }
   }
-  end_progress()
+  if (! quiet) end_progress()
   
   # Next weights
   w <- wpar[, bestpar[1], bestpar[2]]/sum(wpar[, bestpar[1], bestpar[2]])
@@ -174,7 +166,5 @@ fixedshareCalib <- function(y, experts, grid.eta = NULL, grid.alpha = 10^(-4:-1)
   colnames(object$training$grid.loss) <- grid.alpha
   class(object) <- "mixture"
   
-  if (trace) 
-    cat("\n")
   return(object)
 } 

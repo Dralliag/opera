@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // computeBOAEigen
-void computeBOAEigen(Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> eta, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, Eigen::Map<Eigen::VectorXd> wc, Eigen::Map<Eigen::VectorXd> w0c, Eigen::Map<Eigen::VectorXd> Rc, Eigen::Map<Eigen::VectorXd> Regc, Eigen::Map<Eigen::VectorXd> Bc, Eigen::Map<Eigen::VectorXd> Vc, String loss_name, double loss_tau, bool loss_gradient);
-RcppExport SEXP _opera_computeBOAEigen(SEXP awakeSEXP, SEXP etaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP wcSEXP, SEXP w0cSEXP, SEXP RcSEXP, SEXP RegcSEXP, SEXP BcSEXP, SEXP VcSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP) {
+void computeBOAEigen(Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> eta, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, Eigen::Map<Eigen::VectorXd> wc, Eigen::Map<Eigen::VectorXd> w0c, Eigen::Map<Eigen::VectorXd> Rc, Eigen::Map<Eigen::VectorXd> Regc, Eigen::Map<Eigen::VectorXd> Bc, Eigen::Map<Eigen::VectorXd> Vc, String loss_name, double loss_tau, bool loss_gradient, bool quiet);
+RcppExport SEXP _opera_computeBOAEigen(SEXP awakeSEXP, SEXP etaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP wcSEXP, SEXP w0cSEXP, SEXP RcSEXP, SEXP RegcSEXP, SEXP BcSEXP, SEXP VcSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP, SEXP quietSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type awake(awakeSEXP);
@@ -26,7 +26,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< String >::type loss_name(loss_nameSEXP);
     Rcpp::traits::input_parameter< double >::type loss_tau(loss_tauSEXP);
     Rcpp::traits::input_parameter< bool >::type loss_gradient(loss_gradientSEXP);
-    computeBOAEigen(awake, eta, experts, weights, y, predictions, wc, w0c, Rc, Regc, Bc, Vc, loss_name, loss_tau, loss_gradient);
+    Rcpp::traits::input_parameter< bool >::type quiet(quietSEXP);
+    computeBOAEigen(awake, eta, experts, weights, y, predictions, wc, w0c, Rc, Regc, Bc, Vc, loss_name, loss_tau, loss_gradient, quiet);
     return R_NilValue;
 END_RCPP
 }
@@ -53,8 +54,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // computeMLPolCPP
-double computeMLPolCPP(NumericMatrix awake, NumericMatrix eta, NumericMatrix experts, NumericMatrix weights, NumericVector y, NumericVector predictions, NumericVector R, NumericVector w, double B, String loss_name, double loss_tau, bool loss_gradient);
-RcppExport SEXP _opera_computeMLPolCPP(SEXP awakeSEXP, SEXP etaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP RSEXP, SEXP wSEXP, SEXP BSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP) {
+double computeMLPolCPP(NumericMatrix awake, NumericMatrix eta, NumericMatrix experts, NumericMatrix weights, NumericVector y, NumericVector predictions, NumericVector R, NumericVector w, double B, String loss_name, double loss_tau, bool loss_gradient, bool quiet);
+RcppExport SEXP _opera_computeMLPolCPP(SEXP awakeSEXP, SEXP etaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP RSEXP, SEXP wSEXP, SEXP BSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP, SEXP quietSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -70,13 +71,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< String >::type loss_name(loss_nameSEXP);
     Rcpp::traits::input_parameter< double >::type loss_tau(loss_tauSEXP);
     Rcpp::traits::input_parameter< bool >::type loss_gradient(loss_gradientSEXP);
-    rcpp_result_gen = Rcpp::wrap(computeMLPolCPP(awake, eta, experts, weights, y, predictions, R, w, B, loss_name, loss_tau, loss_gradient));
+    Rcpp::traits::input_parameter< bool >::type quiet(quietSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeMLPolCPP(awake, eta, experts, weights, y, predictions, R, w, B, loss_name, loss_tau, loss_gradient, quiet));
     return rcpp_result_gen;
 END_RCPP
 }
 // computeMLPolEigen
-double computeMLPolEigen(Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> eta, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, Eigen::Map<Eigen::VectorXd> R, Eigen::Map<Eigen::VectorXd> w, double B, String loss_name, double loss_tau, bool loss_gradient);
-RcppExport SEXP _opera_computeMLPolEigen(SEXP awakeSEXP, SEXP etaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP RSEXP, SEXP wSEXP, SEXP BSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP) {
+double computeMLPolEigen(Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> eta, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, Eigen::Map<Eigen::VectorXd> R, Eigen::Map<Eigen::VectorXd> w, double B, String loss_name, double loss_tau, bool loss_gradient, bool quiet);
+RcppExport SEXP _opera_computeMLPolEigen(SEXP awakeSEXP, SEXP etaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP RSEXP, SEXP wSEXP, SEXP BSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP, SEXP quietSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -92,13 +94,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< String >::type loss_name(loss_nameSEXP);
     Rcpp::traits::input_parameter< double >::type loss_tau(loss_tauSEXP);
     Rcpp::traits::input_parameter< bool >::type loss_gradient(loss_gradientSEXP);
-    rcpp_result_gen = Rcpp::wrap(computeMLPolEigen(awake, eta, experts, weights, y, predictions, R, w, B, loss_name, loss_tau, loss_gradient));
+    Rcpp::traits::input_parameter< bool >::type quiet(quietSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeMLPolEigen(awake, eta, experts, weights, y, predictions, R, w, B, loss_name, loss_tau, loss_gradient, quiet));
     return rcpp_result_gen;
 END_RCPP
 }
 // computeMLPolEigenSimpleLoss
-double computeMLPolEigenSimpleLoss(Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> eta, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, Eigen::Map<Eigen::VectorXd> Rc, Eigen::Map<Eigen::VectorXd> wc, double B, String loss_name, double loss_tau, bool loss_gradient);
-RcppExport SEXP _opera_computeMLPolEigenSimpleLoss(SEXP awakeSEXP, SEXP etaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP RcSEXP, SEXP wcSEXP, SEXP BSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP) {
+double computeMLPolEigenSimpleLoss(Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> eta, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, Eigen::Map<Eigen::VectorXd> Rc, Eigen::Map<Eigen::VectorXd> wc, double B, String loss_name, double loss_tau, bool loss_gradient, bool quiet);
+RcppExport SEXP _opera_computeMLPolEigenSimpleLoss(SEXP awakeSEXP, SEXP etaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP RcSEXP, SEXP wcSEXP, SEXP BSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP, SEXP quietSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -114,13 +117,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< String >::type loss_name(loss_nameSEXP);
     Rcpp::traits::input_parameter< double >::type loss_tau(loss_tauSEXP);
     Rcpp::traits::input_parameter< bool >::type loss_gradient(loss_gradientSEXP);
-    rcpp_result_gen = Rcpp::wrap(computeMLPolEigenSimpleLoss(awake, eta, experts, weights, y, predictions, Rc, wc, B, loss_name, loss_tau, loss_gradient));
+    Rcpp::traits::input_parameter< bool >::type quiet(quietSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeMLPolEigenSimpleLoss(awake, eta, experts, weights, y, predictions, Rc, wc, B, loss_name, loss_tau, loss_gradient, quiet));
     return rcpp_result_gen;
 END_RCPP
 }
 // computeMLProdEigen
-void computeMLProdEigen(Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> eta, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, Eigen::Map<Eigen::VectorXd> R, Eigen::Map<Eigen::VectorXd> L, double maxloss, String loss_name, double loss_tau, bool loss_gradient);
-RcppExport SEXP _opera_computeMLProdEigen(SEXP awakeSEXP, SEXP etaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP RSEXP, SEXP LSEXP, SEXP maxlossSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP) {
+void computeMLProdEigen(Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> eta, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, Eigen::Map<Eigen::VectorXd> R, Eigen::Map<Eigen::VectorXd> L, double maxloss, String loss_name, double loss_tau, bool loss_gradient, bool quiet);
+RcppExport SEXP _opera_computeMLProdEigen(SEXP awakeSEXP, SEXP etaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP RSEXP, SEXP LSEXP, SEXP maxlossSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP, SEXP quietSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type awake(awakeSEXP);
@@ -135,7 +139,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< String >::type loss_name(loss_nameSEXP);
     Rcpp::traits::input_parameter< double >::type loss_tau(loss_tauSEXP);
     Rcpp::traits::input_parameter< bool >::type loss_gradient(loss_gradientSEXP);
-    computeMLProdEigen(awake, eta, experts, weights, y, predictions, R, L, maxloss, loss_name, loss_tau, loss_gradient);
+    Rcpp::traits::input_parameter< bool >::type quiet(quietSEXP);
+    computeMLProdEigen(awake, eta, experts, weights, y, predictions, R, L, maxloss, loss_name, loss_tau, loss_gradient, quiet);
     return R_NilValue;
 END_RCPP
 }
@@ -263,12 +268,12 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_opera_computeBOAEigen", (DL_FUNC) &_opera_computeBOAEigen, 15},
+    {"_opera_computeBOAEigen", (DL_FUNC) &_opera_computeBOAEigen, 16},
     {"_opera_computeEWAEigen", (DL_FUNC) &_opera_computeEWAEigen, 12},
-    {"_opera_computeMLPolCPP", (DL_FUNC) &_opera_computeMLPolCPP, 12},
-    {"_opera_computeMLPolEigen", (DL_FUNC) &_opera_computeMLPolEigen, 12},
-    {"_opera_computeMLPolEigenSimpleLoss", (DL_FUNC) &_opera_computeMLPolEigenSimpleLoss, 12},
-    {"_opera_computeMLProdEigen", (DL_FUNC) &_opera_computeMLProdEigen, 12},
+    {"_opera_computeMLPolCPP", (DL_FUNC) &_opera_computeMLPolCPP, 13},
+    {"_opera_computeMLPolEigen", (DL_FUNC) &_opera_computeMLPolEigen, 13},
+    {"_opera_computeMLPolEigenSimpleLoss", (DL_FUNC) &_opera_computeMLPolEigenSimpleLoss, 13},
+    {"_opera_computeMLProdEigen", (DL_FUNC) &_opera_computeMLProdEigen, 13},
     {"_opera_RidgeCalibStep1", (DL_FUNC) &_opera_RidgeCalibStep1, 14},
     {"_opera_RidgeCalibStep2", (DL_FUNC) &_opera_RidgeCalibStep2, 5},
     {"_opera_computeRidgeCPP", (DL_FUNC) &_opera_computeRidgeCPP, 6},

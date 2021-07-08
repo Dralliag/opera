@@ -1,4 +1,4 @@
-OGD <- function(y, experts, loss.type = "square", training = NULL, alpha, simplex, w0 = NULL) {
+OGD <- function(y, experts, loss.type = "square", training = NULL, alpha, simplex, w0 = NULL, quiet = FALSE) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -31,10 +31,10 @@ OGD <- function(y, experts, loss.type = "square", training = NULL, alpha, simple
     training <- list()
   }
   
-  steps <- init_progress(T)
+  if (! quiet) steps <- init_progress(T)
   
   for (t in 1:T) {
-    update_progress(t, steps)
+    if (! quiet) update_progress(t, steps)
     
     pred <- experts[t, ] %*% w
     
@@ -55,7 +55,7 @@ OGD <- function(y, experts, loss.type = "square", training = NULL, alpha, simple
       w <- simplexProj(w)
     }
   }
-  end_progress()
+  if (! quiet) end_progress()
   
   object <- list(model = "OGD", loss.type = loss.type, loss.gradient = TRUE, 
                  coefficients = w)

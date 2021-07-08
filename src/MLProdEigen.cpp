@@ -15,7 +15,7 @@ void MLProdEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd>
                  Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights,
                  Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, 
                  Eigen::Map<Eigen::VectorXd> Rc, Eigen::Map<Eigen::VectorXd> Lc,
-                 double dmaxloss,double loss_tau){
+                 double dmaxloss,double loss_tau, bool quiet){
   
   const size_t T=experts.rows();
   const size_t N=experts.cols();
@@ -33,11 +33,12 @@ void MLProdEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd>
   Row maxloss = Row::Ones(N)*dmaxloss;
   
   // init progress
-  IntegerVector steps = init_progress_cpp(T); 
+  IntegerVector steps;
+  if (! quiet) steps = init_progress_cpp(T); 
   
   for (size_t t=0 ; t<T ; t++){
     // update progress
-    update_progress_cpp(t+1, steps);
+    if (! quiet) update_progress_cpp(t+1, steps);
     
     w = R.exp().unaryExpr(std::ptr_fun(truncate1));
     w *= eta.row(t).array() ;
@@ -68,7 +69,7 @@ void MLProdEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd>
     
   }
   // end progress
-  end_progress_cpp();
+  if (! quiet) end_progress_cpp();
   
   return ;
 }
@@ -80,24 +81,24 @@ void computeMLProdEigen(Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::Mat
                         Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, 
                         Eigen::Map<Eigen::VectorXd> R, Eigen::Map<Eigen::VectorXd> L,
                         double maxloss,
-                        String loss_name,double loss_tau,bool loss_gradient){
+                        String loss_name,double loss_tau,bool loss_gradient, bool quiet){
   
   
   const std::string cs=std::string(loss_name.get_cstring());
   
   if (loss_gradient){
-    if (cs=="square" ) return MLProdEigen<SquL,true>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau);
-    if (cs=="absolute") return MLProdEigen<AbsL,true>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau);
-    if (cs=="percentage") return MLProdEigen<PerL,true>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau);
-    if (cs=="log") return MLProdEigen<LogL,true>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau);
-    if (cs=="pinball") return MLProdEigen<PinL,true>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau);
+    if (cs=="square" ) return MLProdEigen<SquL,true>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau,quiet);
+    if (cs=="absolute") return MLProdEigen<AbsL,true>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau,quiet);
+    if (cs=="percentage") return MLProdEigen<PerL,true>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau,quiet);
+    if (cs=="log") return MLProdEigen<LogL,true>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau,quiet);
+    if (cs=="pinball") return MLProdEigen<PinL,true>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau,quiet);
   }
   else{
-    if (cs=="square" ) return MLProdEigen<SquL,false>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau);
-    if (cs=="absolute") return MLProdEigen<AbsL,false>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau);
-    if (cs=="percentage") return MLProdEigen<PerL,false>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau);
-    if (cs=="log") return MLProdEigen<LogL,false>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau);
-    if (cs=="pinball") return MLProdEigen<PinL,false>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau);
+    if (cs=="square" ) return MLProdEigen<SquL,false>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau,quiet);
+    if (cs=="absolute") return MLProdEigen<AbsL,false>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau,quiet);
+    if (cs=="percentage") return MLProdEigen<PerL,false>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau,quiet);
+    if (cs=="log") return MLProdEigen<LogL,false>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau,quiet);
+    if (cs=="pinball") return MLProdEigen<PinL,false>(awake,eta,experts,weights,y,predictions,R,L,maxloss,loss_tau,quiet);
   }
   
   Rcout << "********** ERROR !!! " << cs << std::endl;

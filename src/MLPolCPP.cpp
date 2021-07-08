@@ -5,7 +5,7 @@
 template <class L, bool G>
 double MLPolCPP( NumericMatrix awake, NumericMatrix eta, NumericMatrix experts, NumericMatrix weights,
                  NumericVector y, NumericVector predictions, NumericVector R, NumericVector w,
-                 double B,double loss_tau){
+                 double B,double loss_tau, bool quiet){
   
   const size_t T=experts.nrow();
   const size_t N=experts.ncol();
@@ -15,11 +15,12 @@ double MLPolCPP( NumericMatrix awake, NumericMatrix eta, NumericMatrix experts, 
   NumericVector r(N);
   
   // init progress
-  IntegerVector steps = init_progress_cpp(T);
+  IntegerVector steps;
+  if (! quiet) steps = init_progress_cpp(T);
   
   for (size_t t=0 ; t<T ; t++){
     // update progress
-    update_progress_cpp(t+1, steps);
+    if (! quiet) update_progress_cpp(t+1, steps);
     
     double mar=0;
     for (size_t k=0 ; k<N ; k++) mar = std::max(mar,awake(t,k)*R[k]);
@@ -67,7 +68,7 @@ double MLPolCPP( NumericMatrix awake, NumericMatrix eta, NumericMatrix experts, 
     B = newB;
   }
   // end progress
-  end_progress_cpp();
+  if (! quiet) end_progress_cpp();
   
   double mar=0;
   for (size_t k=0 ; k<N ; k++) mar = std::max(mar,R[k]);
@@ -93,24 +94,24 @@ double MLPolCPP( NumericMatrix awake, NumericMatrix eta, NumericMatrix experts, 
 double computeMLPolCPP( NumericMatrix awake, NumericMatrix eta, NumericMatrix experts, NumericMatrix weights,
                       NumericVector y, NumericVector predictions, NumericVector R, NumericVector w,
                       double B,
-                      String loss_name,double loss_tau,bool loss_gradient){
+                      String loss_name,double loss_tau,bool loss_gradient, bool quiet){
   
   
   const std::string cs=std::string(loss_name.get_cstring());
   
   if (loss_gradient){
-    if (cs=="square" ) return MLPolCPP<SquL,true>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau);
-    if (cs=="absolute") return MLPolCPP<AbsL,true>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau);
-    if (cs=="percentage") return MLPolCPP<PerL,true>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau);
-    if (cs=="log") return MLPolCPP<LogL,true>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau);
-    if (cs=="pinball") return MLPolCPP<PinL,true>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau);
+    if (cs=="square" ) return MLPolCPP<SquL,true>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau,quiet);
+    if (cs=="absolute") return MLPolCPP<AbsL,true>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau,quiet);
+    if (cs=="percentage") return MLPolCPP<PerL,true>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau,quiet);
+    if (cs=="log") return MLPolCPP<LogL,true>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau,quiet);
+    if (cs=="pinball") return MLPolCPP<PinL,true>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau,quiet);
   }
   else{
-    if (cs=="square" ) return MLPolCPP<SquL,false>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau);
-    if (cs=="absolute") return MLPolCPP<AbsL,false>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau);
-    if (cs=="percentage") return MLPolCPP<PerL,false>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau);
-    if (cs=="log") return MLPolCPP<LogL,false>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau);
-    if (cs=="pinball") return MLPolCPP<PinL,false>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau);
+    if (cs=="square" ) return MLPolCPP<SquL,false>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau,quiet);
+    if (cs=="absolute") return MLPolCPP<AbsL,false>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau,quiet);
+    if (cs=="percentage") return MLPolCPP<PerL,false>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau,quiet);
+    if (cs=="log") return MLPolCPP<LogL,false>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau,quiet);
+    if (cs=="pinball") return MLPolCPP<PinL,false>(awake,eta,experts,weights,y,predictions,R,w,B,loss_tau,quiet);
   }
   
   Rcout << "********** ERROR !!! " << cs << std::endl;

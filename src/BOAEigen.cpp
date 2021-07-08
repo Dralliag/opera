@@ -19,7 +19,7 @@ void BOAEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> et
                  Eigen::Map<Eigen::VectorXd> wc, Eigen::Map<Eigen::VectorXd> w0c,
                  Eigen::Map<Eigen::VectorXd> Rc, Eigen::Map<Eigen::VectorXd> Regc,
                  Eigen::Map<Eigen::VectorXd> Bc, Eigen::Map<Eigen::VectorXd> Vc,
-                 double loss_tau){
+                 double loss_tau, bool quiet){
   
   const size_t T=experts.rows();
   const size_t N=experts.cols();
@@ -39,11 +39,12 @@ void BOAEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> et
   Row reg = Row::Zero(N);
   
   // init progress
-  IntegerVector steps = init_progress_cpp(T);
+  IntegerVector steps;
+  if (! quiet) steps = init_progress_cpp(T);
   
   for (size_t t=0 ; t<T ; t++){
     // update progress
-    update_progress_cpp(t+1, steps);
+    if (! quiet) update_progress_cpp(t+1, steps);
     
     auto awaket = awake.row(t).array();
     p = awaket * w.array();
@@ -77,7 +78,7 @@ void BOAEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> et
     w = (w0.log()+eta.row(t+1).array()*Reg).exp().unaryExpr(std::ptr_fun(truncate1));
   }
   // end progress
-  end_progress_cpp();
+  if (! quiet) end_progress_cpp();
   
   return ;
 }
@@ -90,24 +91,24 @@ void computeBOAEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::Matri
                       Eigen::Map<Eigen::VectorXd> wc, Eigen::Map<Eigen::VectorXd> w0c,
                       Eigen::Map<Eigen::VectorXd> Rc, Eigen::Map<Eigen::VectorXd> Regc,
                       Eigen::Map<Eigen::VectorXd> Bc, Eigen::Map<Eigen::VectorXd> Vc,
-                      String loss_name,double loss_tau,bool loss_gradient){
+                      String loss_name,double loss_tau,bool loss_gradient, bool quiet){
   
   
   const std::string cs=std::string(loss_name.get_cstring());
   
   if (loss_gradient){
-    if (cs=="square" ) return BOAEigen<SquL,true>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau);
-    if (cs=="absolute") return BOAEigen<AbsL,true>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau);
-    if (cs=="percentage") return BOAEigen<PerL,true>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau);
-    if (cs=="log") return BOAEigen<LogL,true>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau);
-    if (cs=="pinball") return BOAEigen<PinL,true>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau);
+    if (cs=="square" ) return BOAEigen<SquL,true>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau,quiet);
+    if (cs=="absolute") return BOAEigen<AbsL,true>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau,quiet);
+    if (cs=="percentage") return BOAEigen<PerL,true>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau,quiet);
+    if (cs=="log") return BOAEigen<LogL,true>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau,quiet);
+    if (cs=="pinball") return BOAEigen<PinL,true>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau,quiet);
   }
   else{
-    if (cs=="square" ) return BOAEigen<SquL,false>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau);
-    if (cs=="absolute") return BOAEigen<AbsL,false>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau);
-    if (cs=="percentage") return BOAEigen<PerL,false>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau);
-    if (cs=="log") return BOAEigen<LogL,false>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau);
-    if (cs=="pinball") return BOAEigen<PinL,false>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau);
+    if (cs=="square" ) return BOAEigen<SquL,false>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau,quiet);
+    if (cs=="absolute") return BOAEigen<AbsL,false>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau,quiet);
+    if (cs=="percentage") return BOAEigen<PerL,false>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau,quiet);
+    if (cs=="log") return BOAEigen<LogL,false>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau,quiet);
+    if (cs=="pinball") return BOAEigen<PinL,false>(awake,eta,experts,weights,y,predictions,wc,w0c,Rc,Regc,Bc,Vc,loss_tau,quiet);
   }
   
   Rcout << "********** ERROR !!! " << cs << std::endl;
