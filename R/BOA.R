@@ -18,7 +18,8 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
   
   R <- rep(0, N)
   R.reg <- rep(0, N)
-  w <- w0
+  # /!\ caution with *Copy on Write* before using RCPP
+  w <- w0[]
   weights <- matrix(0, ncol = N, nrow = T)
   prediction <- rep(0, T)
   eta <- matrix(exp(350), ncol = N, nrow = T + 1)
@@ -98,5 +99,6 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
   
   object$training <- list(eta = eta[T + 1, ], R = R, w0 = w0, R.reg = R.reg, V= V, B=B)
   class(object) <- "mixture"
+  
   return(object)
 } 
