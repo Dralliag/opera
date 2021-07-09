@@ -117,9 +117,15 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     if ((object$model == "BOA") || (object$model == "MLewa") || (object$model == 
                                                                  "MLprod")) {
       algo <- eval(parse(text = object$model))
-      newobject <- algo(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
-                        loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training,
-                        use_cpp = use_cpp, quiet = quiet)
+      if (object$model != "MLewa")  {
+        newobject <- algo(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
+                          loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training,
+                          use_cpp = use_cpp, quiet = quiet) 
+      } else {
+        newobject <- algo(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
+                          loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training,
+                          quiet = quiet)
+      }
       newobject$parameters <- list(eta = rbind(object$parameters$eta, newobject$parameters$eta))
     }
     
