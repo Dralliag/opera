@@ -17,9 +17,11 @@ int count_in(int x, IntegerVector y) {
 IntegerVector init_progress_cpp(int T) {
   REprintf("[---------|---------|----------|---------|---------|---------|---------|---------|---------|---------]\r");
   REprintf("[");
-  IntegerVector steps = seq(1, 100);
-  for (int i=1; i<=100; i++) {
-    steps[i] = (steps[i]*T + 0.499)/100;
+
+  IntegerVector steps(100);
+
+  for (int i=0; i<100; i++) {
+    steps[i] = int(((i+1)*T + 0.49999)/100);
   }
   
   return steps;
@@ -29,7 +31,7 @@ IntegerVector init_progress_cpp(int T) {
 void update_progress_cpp(int t, IntegerVector steps){
   
   int count = count_in(t, steps);
-  
+
   if (count > 0) {
     for (int i=0; i<count; i++) {
       REprintf("="); 
