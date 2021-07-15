@@ -22,7 +22,7 @@ bestShifts <- function(y, experts, awake = NULL, loss.type = list(name = "square
     Et1 <- which(awake[t - 1, ] > 0)
     Et <- which(awake[t, ] > 0)
     for (l in 1:3) {
-      instanceLoss <- loss(experts[t, ], y[t], loss.type) * awake[t, 
+      instanceLoss <- lossPred(x = experts[t, ], y = y[t], loss.type = loss.type) * awake[t, 
         ]
     }
     L[1:t, -Et] <- INF

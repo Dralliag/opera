@@ -18,11 +18,11 @@ summary.mixture <- function(object, ...) {
     K <- length(object$coefficients)
     d <- object$d
     
-    rmse.algo <- sqrt(mean(loss(c(object$prediction), c(object$Y), loss.type = "square")))
-    mape.algo <- mean(loss(c(object$prediction), c(object$Y), loss.type = "percentage"))
+    rmse.algo <- sqrt(mean(loss(x = c(object$prediction), y = c(object$Y), loss.type = "square")))
+    mape.algo <- mean(loss(x = c(object$prediction), y = c(object$Y), loss.type = "percentage"))
     rmse.unif <- sqrt(lossConv(rep(1/K, K), c(t(object$Y)), object$experts, awake = object$awake))
     mape.unif <- lossConv(rep(1/K, K), c(t(object$Y)), object$experts, awake = object$awake, 
-                          loss.type = "percentage")
+                          loss.type = list(name = "percentage"))
     
     TAB <- data.frame(rmse = c(rmse.algo, rmse.unif), mape = c(mape.algo, mape.unif))
     rownames(TAB) <- c(object$model, "Uniform")

@@ -36,7 +36,7 @@ bestLinear <- function(y, experts, lambda = 0, loss.type = list(name = "square")
   if (is.null(coefficients)) {
     warning("The best linear oracle is only approximated (using optim).")
     lossu <- function(u) {
-      return(mean(loss(x = experts %*% matrix(u, nrow = ncol(experts)), y = y, 
+      return(mean(lossPred(x = experts %*% matrix(u, nrow = ncol(experts)), y = y, 
         loss.type = loss.type)))
     }
     

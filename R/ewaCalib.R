@@ -77,7 +77,7 @@ ewaCalib <- function(y, experts, grid.eta = NULL, awake = NULL, loss.type = "squ
     
     # Weights, predictions formed by each EWA(eta) for eta in the grid 'grid.eta'
     pred <- experts[t, ] %*% t(t(weta * awake[t, ])/colSums(weta * awake[t, ]))
-    cumulativeLoss <- cumulativeLoss + loss(pred, y[t], loss.type)  # cumulative loss without gradient trick
+    cumulativeLoss <- cumulativeLoss + lossPred(x = pred, y = y[t], loss.type = loss.type)  # cumulative loss without gradient trick
     if (neta == 1){
       lpred <- lossPred(pred, y[t], pred, loss.type, loss.gradient)
     } else {

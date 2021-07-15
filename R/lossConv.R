@@ -1,4 +1,4 @@
-lossConv <- function(p, y, experts, awake = NULL, loss.type = "square") {
+lossConv <- function(p, y, experts, awake = NULL, loss.type = list(name = "square")) {
   
   N <- ncol(experts)  # Number of experts
   T <- nrow(experts)  # Number of instants
@@ -15,6 +15,6 @@ lossConv <- function(p, y, experts, awake = NULL, loss.type = "square") {
   
   pond <- awake %*% p
   pred <- ((experts * awake) %*% p)/pond
-  l <- mean(loss(pred, y, loss.type = loss.type))
+  l <- mean(lossPred(x = pred, y = y, loss.type = loss.type))
   return(l)
 } 

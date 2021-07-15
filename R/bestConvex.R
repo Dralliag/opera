@@ -32,7 +32,7 @@ bestConvex <- function(y, experts, awake = NULL, loss.type = list(name = "square
     if (!is.null(res)) {
       coefficients <- matrix(res$solution, ncol = N)
       prediction <- experts %*% t(coefficients)
-      bestLoss <- mean(loss(x = prediction, y))
+      bestLoss <- mean(lossPred(x = prediction, y = y))
     }
   } else {
     res <- NULL

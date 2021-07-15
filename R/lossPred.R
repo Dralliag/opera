@@ -17,90 +17,78 @@
 # \code{loss.type = 'pinball'}.  @return A vector containing the loss suffered
 # by the \code{N} predictions in \code{x}.  @author Pierre Gaillard
 # <pierre@@gaillard.me> @seealso \code{\link{loss}} @keywords ~kwd1 ~kwd2
-lossPred <- function(x, y, pred = NULL, loss.type = "square", loss.gradient = FALSE) {
+lossPred <- function(x, y, pred = NULL, loss.type = list(name = "square"), loss.gradient = FALSE) {
   
   npred <- length(pred)
   nx <- length(x)
   
-  if (class(loss.type) == "function") {
-    l <- tryCatch({
-      if (npred > 1 && nx > 1) {
-        if (! is.function(loss.gradient) && loss.gradient == FALSE) {
-          l <- matrix(rep(loss.type(x, y), npred), ncol = npred) 
-        } else {
-          l <- t(matrix(rep(loss.gradient(pred, y), nx), ncol = nx)) * matrix(rep(x, npred), ncol = npred)
-        }
-      } else {
-        if (! is.function(loss.gradient) && loss.gradient == FALSE) {
-          l <- c(loss.type(x, y))
-        } else {
-          l <- c(loss.gradient(pred, y)) * x
-        }
-      }
-    }, 
-    error = function(e) {
-      stop("Error when trying to apply custom loss function : \n",
-           e$message)
-    })
+  args <- list("x" = if (! is.function(loss.gradient) && loss.gradient == FALSE) {x} else {pred},
+               "y" = y)
+  
+  if (! class(loss.type) == "function") {
+    args <- c(args, if (length(loss.type) > 1) {loss.type[setdiff(names(loss.type), "name")]}  else {NULL})
     
-  } else {
-    if (!is.list(loss.type)) {
-      loss.type <- list(name = loss.type)
+    if (loss.gradient) {
+      loss.gradient <- get(paste0("gradient_", loss.type$name))
     }
-    if (is.null(loss.type$tau) && loss.type$name == "pinball") {
-      loss.type$tau <- 0.5
-    }
-    
+    loss.type <- get(paste0("loss_", loss.type$name))
+  }
+  
+  l <- tryCatch({
     if (npred > 1 && nx > 1) {
-      if (!loss.gradient) {
-        if (loss.type$name == "square") 
-          l <- matrix(rep((x - y)^2, npred), ncol = npred) 
-        else if (loss.type$name == "absolute") 
-          l <- matrix(rep(abs(x - y), npred), ncol = npred) 
-        else if (loss.type$name == "percentage") 
-          l <- matrix(rep(abs(x - y)/y, npred), ncol = npred) 
-        else if (loss.type$name == "log") 
-          l <- matrix(rep(-log(x), npred), ncol = npred) 
-        else if (loss.type$name == "pinball") 
-          l <- matrix(rep(((y < x) - loss.type$tau) * (x - y), npred), ncol = npred)
+      if (! is.function(loss.gradient) && loss.gradient == FALSE) {
+        matrix(rep(do.call(loss.type, args), npred), ncol = npred) 
       } else {
-        if (loss.type$name == "square") 
-          l <- 2 * t(matrix(rep(pred - y, nx), ncol = nx)) * matrix(rep(x, npred), ncol = npred) 
-        else if (loss.type$name == "absolute") 
-          l <- t(matrix(rep(sign(pred - y), nx), ncol = nx)) * matrix(rep(x, npred), ncol = npred) 
-        else if (loss.type$name == "percentage") 
-          l <- t(matrix(rep(sign(pred - y)/y, nx), ncol = nx)) * matrix(rep(x, npred), ncol = npred)
-        else if (loss.type$name == "log") 
-          l <- 2 * t(matrix(rep(-1/pred, nx), ncol = nx)) * matrix(rep(x, npred), ncol = npred) 
-        else if (loss.type$name == "pinball") 
-          l <- t(matrix(rep((y < pred) - loss.type$tau, nx), ncol = nx)) * matrix(rep(x, npred), ncol = npred)
+        t(matrix(rep(do.call(loss.gradient, args), nx), ncol = nx)) * matrix(rep(x, npred), ncol = npred)
       }
     } else {
-      if (!loss.gradient) {
-        if (loss.type$name == "square") 
-          l <- (c(x - y))^2 
-        else if (loss.type$name == "absolute") 
-          l <- abs(c(x - y))
-        else if (loss.type$name == "percentage") 
-          l <- c(abs(x - y)/y)
-        if (loss.type$name == "log") 
-          l <- -log(c(x))
-        else if (loss.type$name == "pinball") 
-          l <- c((y < x) - loss.type$tau) * c(x - y)
+      if (! is.function(loss.gradient) && loss.gradient == FALSE) {
+        c(do.call(loss.type, args))
       } else {
-        if (loss.type$name == "square") 
-          l <- 2 * c(pred - y) * x 
-        else if (loss.type$name == "absolute") 
-          l <- sign(c(pred - y)) * x 
-        else if (loss.type$name == "percentage") 
-          l <- x/y * sign(c(pred - y))
-        if (loss.type$name == "log") 
-          l <- -c(x/pred)
-        else if (loss.type$name == "pinball") 
-          l <- c((y < pred) - loss.type$tau) * x
+        c(do.call(loss.gradient, args)) * x
       }
     }
-  }
+  }, 
+  error = function(e) {
+    stop("Error when trying to apply custom loss function : \n",
+         e$message)
+  })
   
   return(l)
 } 
+
+
+
+### loss funs + gradients
+
+# SQUARE LOSS
+loss_square <- function(x, y) {
+  (x - y)^2
+}
+gradient_square <- function(x, y) {
+  2 * (x - y)
+}
+
+# ABSOLUTE LOSS
+loss_absolute <- function(x, y) {
+  abs(x - y)
+}
+gradient_absolute <- function(x, y) {
+  sign(c(x - y))
+}
+
+# PERCENTAGE LOSS
+loss_percentage <- function(x, y) {
+  abs(x - y) / y
+}
+gradient_percentage <- function(x, y) {
+  1 / y * sign(c(x - y))
+}
+
+# PINBALL LOSS
+loss_pinball <- function(x, y, tau) {
+  c((y < x) - tau) * c(x - y)
+}
+gradient_pinball <- function(x, y, tau) {
+  (y < x) - tau
+}

@@ -40,7 +40,7 @@ fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square
     
     # Prediction and loss
     pred[t] <- experts[t, ] %*% weights[t, ]
-    cumulativeLoss <- cumulativeLoss + loss(pred[t], y[t], loss.type)
+    cumulativeLoss <- cumulativeLoss + lossPred(x = pred[t], y = y[t], loss.type = loss.type)
     lpred <- lossPred(pred[t], y[t], pred[t], loss.type, loss.gradient)
     lexp <- lossPred(experts[t, ], y[t], pred[t], loss.type, loss.gradient)
     

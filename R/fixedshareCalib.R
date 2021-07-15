@@ -71,7 +71,7 @@ fixedshareCalib <- function(y, experts, grid.eta = NULL, grid.alpha = 10^(-4:-1)
         ])))
       pred <- experts[t, ] %*% waux
       
-      cumulativeLoss[, k] <- cumulativeLoss[, k] + loss(pred, y[t], loss.type)  # Non gradient cumulative losses
+      cumulativeLoss[, k] <- cumulativeLoss[, k] + lossPred(x = pred, y = y[t], loss.type = loss.type)  # Non gradient cumulative losses
       
       if (neta == 1){
         lpred <- lossPred(pred, y[t], pred, loss.type, loss.gradient)
