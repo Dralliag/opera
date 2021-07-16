@@ -164,7 +164,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     }
     
     if (object$model == "FTRL") {
-      if (! any(c("fun_reg", "constr_ineq", "constr_eq") %in% names(object$parameters))) {
+      if (is.null(object$training) && ! any(c("fun_reg", "constr_ineq", "constr_eq") %in% names(object$parameters))) {
         default <- TRUE
       } else {
         default <- FALSE
@@ -177,7 +177,8 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
                         "max_iter" = object$parameters$max_iter,
                         "obj_tol" = object$parameters$obj_tol,
                         "loss.type" = object$loss.type, "loss.gradient" = object$loss.gradient, 
-                        "w0" = object$coefficients, 
+                        "w0" = object$coefficients,
+                        "training" = object$training,
                         "default" =  default, "quiet" = quiet)
     }
     

@@ -24,17 +24,15 @@
 #' }
 #' @param w0 \code{numeric} (NULL). Vector of initialization for the weights.
 #' @param max_iter \code{integer} (50). Maximum number of iterations of the optimization algorithm per round.
+#' @param obj_tol \code{numeric} (1e-2). Tolerance over objective function between two iterations of the optimization.
+#' @param training \code{list} (NULL). List of previous parameters.
 #' @param default \code{boolean} (FALSE). Whether or not to use default parameters for fun_reg, constr_eq, constr_ineq and their grad/jac, 
 #' which values are ALL ignored when TRUE.
+#' @param quiet \code{boolean} (FALSE). Whether or not to display progress bars.
 #'
 #' @return object of class mixture.
 #'
 #' @import alabama
-#'
-#' @examples
-#' 
-#' 
-#' 
 #' 
 FTRL <- function(y, 
                  experts, 
@@ -47,10 +45,28 @@ FTRL <- function(y,
                  w0 = NULL,
                  max_iter = 50,
                  obj_tol = 1e-2,
+                 training = NULL, 
                  default = FALSE,
                  quiet = FALSE) {
   
+  # retrieve training values
+  if (! is.null(training)) {
+    eta <- training$eta
+    fun_reg <- training$fun_reg ; fun_reg_grad <- training$fun_reg_grad ;
+    constr_eq <- training$constr_eq ; constr_eq_jac <- training$constr_eq_jac ; 
+    constr_ineq <- training$constr_ineq ; constr_ineq_jac <- training$constr_ineq_jac ; 
+    loss.type <- training$loss.type
+    loss.gradient <- training$loss.gradient
+    w0 <- training$w0
+    G <- training$G
+    max_iter <- training$max_iter
+    obj_tol <- training$obj_tol
+  }
+  
   # checks
+  if (! is.null(loss.gradient) && ! is.function(loss.gradient) && loss.gradient == FALSE) {
+    stop("loss.gradient must be provided to use the FTRL algorithm.")
+  }
   if (is.null(eta)) {
     # stop("eta must be provided as a numeric in argument 'parameters'.")
     eta = 0.1 # to be initialized and dynamically updated when NULL
@@ -100,7 +116,7 @@ FTRL <- function(y,
   }
   
   # inits
-  if (! loss.gradient == FALSE) {
+  if (is.null(training) && (is.function(loss.gradient) || loss.gradient)) {
     G <- numeric(N) 
   }
   weights <- matrix(0, nrow = T, ncol = N)
@@ -120,12 +136,12 @@ FTRL <- function(y,
   for (t in 1:T) {
     if (! quiet) update_progress(t, steps)
     
-    if (! loss.gradient == FALSE) {
+    if (is.function(loss.gradient) || loss.gradient) {
       # compute current prevision
-      prediction[t] <- weights[t,] %*% X[t,]
+      prediction[t] <- weights[t,] %*% experts[t,]
       
       # update gradient
-      G <- G + lossPred(experts[t, ], Y[t], prediction[t], loss.type = loss.type, loss.gradient = loss.gradient)
+      G <- G + lossPred(experts[t, ], y[t], prediction[t], loss.type = loss.type, loss.gradient = loss.gradient)
       
       # update obj function
       obj <- function(x) (fun_reg(x) + eta * sum(G * x))
@@ -134,7 +150,7 @@ FTRL <- function(y,
       obj_grad <- if(is.null(fun_reg_grad)) {NULL} else {function(x) fun_reg_grad(x) + eta * G}
       
       # run optimization
-      parms <- list("par" = if (t == 1) {w0} else {weights[t-1, ]},
+      parms <- list("par" = weights[t, ],
                     "fn" = obj,
                     "gr" = obj_grad,
                     "heq" = constr_eq,
@@ -152,7 +168,8 @@ FTRL <- function(y,
       else {
         res_optim <- do.call(alabama::auglag, parms) 
       }
-      
+      print(round(res_optim$par, 3))
+      print("")
       # update weights
       if (t < T) {
         weights[t + 1, ] <- res_optim$par
@@ -203,7 +220,7 @@ FTRL <- function(y,
     coeffs <- pmax(0, coeffs)
     coeffs <- coeffs / sum(coeffs) 
     
-    weights <- apply(weights, 2, pmax, 0)
+    weights[] <- apply(weights, 2, pmax, 0)
     weights <- weights / rowSums(weights)
   }
   
@@ -219,6 +236,17 @@ FTRL <- function(y,
                             "default" = default)
   object$weights <- weights
   object$prediction <- prediction
+  
+  object$training <- list("eta" = eta, 
+                          "fun_reg" = fun_reg, "fun_reg_grad" = fun_reg_grad,
+                          "constr_eq" = constr_eq, "constr_eq_jac" = constr_eq_jac,
+                          "constr_ineq" = constr_ineq, "constr_ineq_jac" = constr_ineq_jac,
+                          "loss.type" = loss.type,
+                          "loss.gradient" = loss.gradient,
+                          "w0" = res_optim$par,
+                          "G" = G,
+                          "max_iter" = max_iter,
+                          "obj_tol" = obj_tol)
   
   return(object)
 }
