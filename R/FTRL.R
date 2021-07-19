@@ -12,7 +12,7 @@
 #' @param loss.type \code{character, list or function} ("square").  
 #' \describe{
 #'      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
-#'      \item{list}{ When using pinball loss: list with field name equal to 'pinball' and field tau equal to the required quantile in [0,1];}
+#'      \item{list}{ List with field \code{name} equal to the loss name. If using pinball loss, field \code{tau} equal to the required quantile in [0,1];}
 #'      \item{function}{ A custom loss as a function of two parameters.}
 #' }
 #' @param loss.gradient \code{boolean, function} (TRUE). 
@@ -52,6 +52,7 @@ FTRL <- function(y,
   # retrieve training values
   if (! is.null(training)) {
     eta <- training$eta
+    default_eta <- training$default_eta
     fun_reg <- training$fun_reg ; fun_reg_grad <- training$fun_reg_grad ;
     constr_eq <- training$constr_eq ; constr_eq_jac <- training$constr_eq_jac ; 
     constr_ineq <- training$constr_ineq ; constr_ineq_jac <- training$constr_ineq_jac ; 
@@ -68,8 +69,11 @@ FTRL <- function(y,
     stop("loss.gradient must be provided to use the FTRL algorithm.")
   }
   if (is.null(eta)) {
-    # stop("eta must be provided as a numeric in argument 'parameters'.")
-    eta = 0.1 # to be initialized and dynamically updated when NULL
+    default_eta <- TRUE
+    eta = Inf
+  }
+  else {
+    default_eta <- FALSE
   }
   if (default == FALSE && (is.null(fun_reg) || ! is.function(fun_reg))) {
     stop("fun_reg must cannot be missing when other optimization parameters are provided (see ?auglag... fn).")
@@ -141,7 +145,12 @@ FTRL <- function(y,
       prediction[t] <- weights[t,] %*% experts[t,]
       
       # update gradient
-      G <- G + lossPred(experts[t, ], y[t], prediction[t], loss.type = loss.type, loss.gradient = loss.gradient)
+      G_t <- lossPred(experts[t, ], y[t], prediction[t], loss.type = loss.type, loss.gradient = loss.gradient)
+      G <- G + G_t
+      if (default_eta) {
+        eta <- 1/sqrt(1/eta^2 + sum(G_t^2))  
+      }
+      
       
       # update obj function
       obj <- function(x) (fun_reg(x) + eta * sum(G * x))
@@ -168,8 +177,7 @@ FTRL <- function(y,
       else {
         res_optim <- do.call(alabama::auglag, parms) 
       }
-      print(round(res_optim$par, 3))
-      print("")
+      
       # update weights
       if (t < T) {
         weights[t + 1, ] <- res_optim$par
@@ -182,36 +190,6 @@ FTRL <- function(y,
                        or your regularisation function not convex."))
       }
     }
-    # pas d'intéret car dès lors qu'on a le gradient, on peut faire la méthode la plus rapide
-    # else {
-    #   obj <- function(x) {
-    #     res <- sapply(1:t, function(it) {
-    #       eta * lossPred(sum(experts[it, ] * x), Y[it], loss.type = loss.type, loss.gradient = FALSE)
-    #     })
-    # 
-    #     reg(x) + sum(res)
-    #   }
-    # 
-    #   if (is.list(loss.type)) {
-    #     loss_grad <- get_custom_loss_grad(loss.type)
-    #     obj_grad <- function(x) {
-    #       res <- sapply(1:t, function(it) {
-    #         eta * loss_grad(sum(experts[it, ] * x), Y[it])
-    #       })
-    # 
-    #       reg_grad(x) + sum(res)
-    #     }
-    #   }
-    #   else {
-    #     obj_grad <- function(par, ...) grad(func = obj, x = par, method = "simple", ...)
-    #   }
-    # 
-    #   weights[t,] <- alabama::auglag(par = if (t == 1) {w0} else {weights[t-1, ]},
-    #                                  fn = obj, gr = obj_grad,
-    #                                  heq = heq, heq.jac = heq_jac,
-    #                                  hin = hin, hin.jac = hin_jac,
-    #                                  control.outer = list(trace = F, itmax = itmax))$par
-    # }
   }
   if (! quiet) end_progress()
   
@@ -238,6 +216,7 @@ FTRL <- function(y,
   object$prediction <- prediction
   
   object$training <- list("eta" = eta, 
+                          "default_eta" = default_eta, 
                           "fun_reg" = fun_reg, "fun_reg_grad" = fun_reg_grad,
                           "constr_eq" = constr_eq, "constr_eq_jac" = constr_eq_jac,
                           "constr_ineq" = constr_ineq, "constr_ineq_jac" = constr_ineq_jac,
