@@ -15,13 +15,13 @@ int count_in(int x, IntegerVector y) {
 
 // [[Rcpp::export]]
 IntegerVector init_progress_cpp(int T) {
-  REprintf("[---------|---------|----------|---------|---------|---------|---------|---------|---------|---------]\r");
-  REprintf("[");
+  Rprintf("[---------|---------|----------|---------|---------|---------|---------|---------|---------|---------]\r");
+  Rprintf("[");
 
   IntegerVector steps(100);
 
   for (int i=0; i<100; i++) {
-    steps[i] = int(((i+1)*T + 0.49999)/100);
+    steps[i] = int(round((i+1)*T/100.0 + 0.49999));
   }
   
   return steps;
@@ -34,12 +34,12 @@ void update_progress_cpp(int t, IntegerVector steps){
 
   if (count > 0) {
     for (int i=0; i<count; i++) {
-      REprintf("="); 
+      Rprintf("="); 
     } 
   }
 }
 
 // [[Rcpp::export]]
 void end_progress_cpp(){
-  REprintf("]\n");
+  Rprintf("]\n");
 }

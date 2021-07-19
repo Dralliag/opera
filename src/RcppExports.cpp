@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // computeBOAEigen
 void computeBOAEigen(Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> eta, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, Eigen::Map<Eigen::VectorXd> wc, Eigen::Map<Eigen::VectorXd> w0c, Eigen::Map<Eigen::VectorXd> Rc, Eigen::Map<Eigen::VectorXd> Regc, Eigen::Map<Eigen::VectorXd> Bc, Eigen::Map<Eigen::VectorXd> Vc, String loss_name, double loss_tau, bool loss_gradient, bool quiet);
 RcppExport SEXP _opera_computeBOAEigen(SEXP awakeSEXP, SEXP etaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP wcSEXP, SEXP w0cSEXP, SEXP RcSEXP, SEXP RegcSEXP, SEXP BcSEXP, SEXP VcSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP, SEXP quietSEXP) {
