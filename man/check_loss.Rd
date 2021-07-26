@@ -28,6 +28,10 @@ check_loss(
      computed).}
 }}
 
+\item{Y}{\code{numeric} (NULL). (Optional) Target values (to perform some checks).}
+
+\item{model}{\code{character} (NULL). (Optional) Model used (to perform some checks).}
+
 \item{use_cpp}{\code{boolean}. Whether or not to use cpp function to increase perf.}
 }
 \value{

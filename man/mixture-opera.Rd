@@ -63,13 +63,13 @@ A finite grid of coefficient to be optimized can be specified with a parameter \
    \item{'MLpol'}{Polynomial Potential aggregation rule
 with different learning rates for each expert.  The learning rates are
 calibrated using theoretical values. There are similar aggregation rules 
-like 'BOA' (Bernstein online Aggregation see [Wintenberger, 2014] <doi:10.1007/s10994-016-5592-6>, 'MLewa', and 'MLprod' 
-(see [Gaillard, Erven, and Stoltz, 2014])} 
+like 'BOA' (Bernstein online Aggregation see \href{http://pierre.gaillard.me/}{Wintenberger, 2014} 
+<doi:10.1007/s10994-016-5592-6>, 'MLewa', and 'MLprod' (see \href{}{Gaillard, Erven, and Stoltz, 2014})} 
  \item{'OGD'}{Online Gradient descent (see Zinkevich, 2003). The optimization is performed with a time-varying learning rate. 
  At time step \eqn{t \geq 1}, the learning rate is chosen to be \eqn{t^{-\alpha}}, where \eqn{\alpha} is provided by alpha in the parameters argument.
  The algorithm may or not perform a projection step into the simplex space (non-negative weights that sum to one) according to
  the value of the parameter 'simplex' provided by the user.}
- \item{'FTRL'}{Follow The Regularized Leader (see McMahan, H Brendan 2017). description to be added... The user must provide (in the \strong{parameters}'s list):
+ \item{'FTRL'}{Follow The Regularized Leader (see \href{http://pierre.gaillard.me/}{McMahan, H Brendan 2017}). description to be added... The user must provide (in the \strong{parameters}'s list):
    \itemize{
      \item{'eta' }{The learning rate.}
      \item{'fun_reg' }{The regularization function to be applied on the weigths. See \code{\link{auglag}}: fn.}
@@ -82,19 +82,20 @@ like 'BOA' (Bernstein online Aggregation see [Wintenberger, 2014] <doi:10.1007/s
  }
 }}
 
-\item{loss.type}{\code{character, list or function}. 
+\item{loss.type}{\code{character, list or function} ("square").
 \describe{
      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
-     \item{list}{ When using pinball loss: list with field name equal to 'pinball' and field tau equal to the required quantile in [0,1];}
+     \item{list}{ List with field \code{name} equal to the loss name. If using pinball loss, field \code{tau} equal to the required quantile in [0,1];}
      \item{function}{ A custom loss as a function of two parameters.}
-     \item{list of 2 functions}{ A custom loss as a function of two parameters and 
-                                 a custom gradient loss as a function of 3 parameters, the third one being called 'pred'.}
 }}
 
-\item{loss.gradient}{A boolean. If
-TRUE (default) the aggregation rule will not be directly applied to the loss
-function at hand but to a gradient version of it.  The aggregation rule is
-then similar to gradient descent aggregation rule.}
+\item{loss.gradient}{\code{boolean, function} (TRUE). 
+\describe{
+     \item{boolean}{ If TRUE, the aggregation rule will not be directly applied to the loss function at hand,
+     but to a gradient version of it. The aggregation rule is then similar to gradient descent aggregation rule. }
+     \item{function}{ If loss.type is a function, the derivative should be provided to be used (it is not automatically 
+     computed).}
+}}
 
 \item{coefficients}{A probability vector of length K containing the prior weights of the experts
 (not possible for 'MLpol'). The weights must be non-negative and sum to 1.}
@@ -134,16 +135,18 @@ online. Possible parameters are:
    more regularity assumption on the underlying process genearting the data (i.i.d. for instance). }
 }}
 
+\item{use_cpp}{\code{boolean}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
+with the use of custom loss function.}
+
+\item{quiet}{\code{boolean}. Whether or not to display progress bars.
+
+\insertCite{AA}{opera}}
+
 \item{x}{An object of class mixture}
 
 \item{...}{Additional parameters}
 
 \item{object}{An object of class mixture}
-
-\item{\code{use_cpp}.}{Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
-with the use of custom loss function.}
-
-\item{\code{quiet}.}{Whether or not to display progress bars.}
 }
 \value{
 An object of class mixture that can be used to perform new predictions. 
@@ -239,14 +242,14 @@ m0.BOA <- mixture(model = 'BOA', loss.type = 'square')
 # start with an empty model and update the model sequentially
 m1.BOA <- m0.BOA
 for (i in 1:length(Y)) {
-  m1.BOA <- predict(m1.BOA, newexperts = X[i, ], newY = Y[i])
+  m1.BOA <- predict(m1.BOA, newexperts = X[i, ], newY = Y[i], quiet = TRUE)
 }
 
 # 2) perform online prediction directly from the empty model
-m2.BOA <- predict(m0.BOA, newexpert = X, newY = Y, online = TRUE)
+m2.BOA <- predict(m0.BOA, newexpert = X, newY = Y, online = TRUE, quiet = TRUE)
 
 # 3) perform the online aggregation directly
-m3.BOA <- mixture(Y = Y, experts = X, model = 'BOA', loss.type = 'square')
+m3.BOA <- mixture(Y = Y, experts = X, model = 'BOA', loss.type = 'square', quiet = TRUE)
 
 # These predictions are equivalent:
 identical(m1.BOA, m2.BOA)  # TRUE
@@ -268,7 +271,8 @@ XBlock <- seriesToBlock(X = X, d = 4)
 # The four-week-by-four-week predictions can then be obtained 
 # by directly using the `mixture` function as we did earlier. 
 
-MLpolBlock <- mixture(Y = YBlock, experts = XBlock, model = "MLpol", loss.type = "square")
+MLpolBlock <- mixture(Y = YBlock, experts = XBlock, model = "MLpol", loss.type = "square", 
+                      quiet = TRUE)
 
 
 # The predictions can finally be transformed back to a 
@@ -281,16 +285,20 @@ prediction <- blockToSeries(MLpolBlock$prediction)
 # Equivalent solution is to use the `online = FALSE` option in the predict function. 
 # The latter ensures that the model coefficients are not 
 # updated between the next four weeks to forecast.
-MLpolBlock <- MLpol0
+MLpolBlock <- mixture(model = "BOA", loss.type = "square")
 d = 4
 n <- length(Y)/d
 for (i in 0:(n-1)) { 
   idx <- 4*i + 1:4 # next four weeks to be predicted
-  MLpolBlock <- predict(MLpolBlock, newexperts = X[idx, ], newY = Y[idx], online = FALSE)
+  MLpolBlock <- predict(MLpolBlock, newexperts = X[idx, ], newY = Y[idx], online = FALSE, 
+                        quiet = TRUE)
 }
 
 print(head(MLpolBlock$weights))
 
+}
+\references{
+\insertAllCited{}
 }
 \seealso{
 See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.

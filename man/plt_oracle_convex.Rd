@@ -6,6 +6,13 @@
 \usage{
 plt_oracle_convex(data, colors, round = 2)
 }
+\arguments{
+\item{data}{\code{named vector}. Vector of values to be displayed.}
+
+\item{colors}{\code{character}. Colors to  be used.}
+
+\item{round}{\code{integer} (2). Precision of the values in the tooltips..}
+}
 \value{
 a rAmCharts plot
 }

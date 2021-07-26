@@ -51,10 +51,12 @@ information in newY). If TRUE, newY and newexperts should not be null.}
    \item{all}{return a list containing 'model', 'response', and 'weights'.}
    }}
 
-\item{...}{further arguments are ignored}
-
-\item{\code{use_cpp}.}{Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
+\item{use_cpp}{\code{boolean}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
 with the use of custom loss function.}
+
+\item{quiet}{\code{boolean}. Whether or not to display progress bars.}
+
+\item{...}{further arguments are ignored}
 }
 \value{
 \code{predict.mixture} produces a matrix of predictions 
