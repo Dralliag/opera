@@ -9,7 +9,7 @@
 #' @param constr_eq_jac \code{function} (NULL). Jacobian of the equality constraints (to speed up the computations). 
 #' @param constr_ineq \code{function} (NULL). Constraints (inequalities) to be applied during the optimization (... > 0).
 #' @param constr_ineq_jac \code{function} (NULL). Jacobian of the inequality constraints (to speed up the computations).
-#' @param loss.type \code{character, list or function} ("square").  
+#' @param loss.type \code{character, list or function} ("square").
 #' \describe{
 #'      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
 #'      \item{list}{ List with field \code{name} equal to the loss name. If using pinball loss, field \code{tau} equal to the required quantile in [0,1];}
@@ -145,7 +145,7 @@ FTRL <- function(y,
       prediction[t] <- weights[t,] %*% experts[t,]
       
       # update gradient
-      G_t <- lossPred(experts[t, ], y[t], prediction[t], loss.type = loss.type, loss.gradient = loss.gradient)
+      G_t <- loss(experts[t, ], y[t], prediction[t], loss.type = loss.type, loss.gradient = loss.gradient)
       G <- G + G_t
       if (default_eta) {
         eta <- 1/sqrt(1/eta^2 + sum(G_t^2))  

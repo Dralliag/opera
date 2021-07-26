@@ -49,9 +49,9 @@ ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradie
       
       # Prediction and losses
       pred[t] <- experts[t, ] %*% weights[t, ]
-      cumulativeLoss <- cumulativeLoss + lossPred(x = pred[t], y = y[t], loss.type = loss.type)
-      lpred <- lossPred(pred[t], y[t], pred[t], loss.type, loss.gradient)
-      lexp <- lossPred(experts[t, ], y[t], pred[t], loss.type, loss.gradient)
+      cumulativeLoss <- cumulativeLoss + loss(x = pred[t], y = y[t], loss.type = loss.type)
+      lpred <- loss(pred[t], y[t], pred[t], loss.type, loss.gradient)
+      lexp <- loss(experts[t, ], y[t], pred[t], loss.type, loss.gradient)
       
       # Regret update
       R.w0 <- R.w0 + awake[t, ] * (c(c(lpred) - lexp))

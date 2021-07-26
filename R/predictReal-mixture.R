@@ -238,7 +238,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     newobject$prediction <- rbind(object$prediction, matrix(newpred, ncol = object$d))
     newobject$weights <- rbind(object$weights, newweights)
     rownames(newobject$weights) <- NULL
-    newobject$loss <- mean(lossPred(x = c(newobject$prediction), y = c(newobject$Y), loss.type = newobject$loss.type)) 
+    newobject$loss <- mean(loss(x = c(newobject$prediction), y = c(newobject$Y), loss.type = newobject$loss.type)) 
     newobject$T <- object$T + T/object$d
     newobject$d <- object$d
   } else {

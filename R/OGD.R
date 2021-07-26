@@ -44,7 +44,7 @@ OGD <- function(y, experts, loss.type = "square", training = NULL, alpha, simple
     prediction[t] <- pred
     
     # Observe losses
-    lexp <- lossPred(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = TRUE)
+    lexp <- loss(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = TRUE)
     B <- max(B, sqrt(sum(lexp^2)))
     
     # Update the learning rate

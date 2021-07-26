@@ -7,6 +7,7 @@
 #' @param x \code{numeric}. A vector of length \code{T} containing the sequence of prediction to be evaluated.
 #' @param y \code{numeric}. A vector of length \code{T} that contains the observations to be predicted.
 #' @param pred \code{numeric}. A vector of length \code{T} containing the sequence of real values.
+#' @param loss.type \code{character, list or function} ("square").
 #' \itemize{
 #'      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
 #'      \item{list}{ List with field \code{name} equal to the loss name. If using pinball loss, field \code{tau} 
@@ -26,7 +27,7 @@
 #' 
 #' @author Pierre Gaillard <pierre@@gaillard.me>
 #' @export
-lossPred <- function(x, y, pred = NULL, loss.type = list(name = "square"), loss.gradient = FALSE) {
+loss <- function(x, y, pred = NULL, loss.type = list(name = "square"), loss.gradient = FALSE) {
   
   npred <- length(pred)
   nx <- length(x)

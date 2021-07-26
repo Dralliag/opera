@@ -32,8 +32,8 @@ summary.oracle <- function(object, ...) {
     T <- length(object$Y)
     K <- ncol(object$experts)
     
-    rmse.algo <- sqrt(mean(lossPred(x = object$prediction, y = object$Y)))
-    mape.algo <- mean(lossPred(x = object$prediction, y = object$Y, loss.type = list(name = "percentage")))
+    rmse.algo <- sqrt(mean(loss(x = object$prediction, y = object$Y)))
+    mape.algo <- mean(loss(x = object$prediction, y = object$Y, loss.type = list(name = "percentage")))
     rmse.unif <- sqrt(lossConv(rep(1/K, K), object$Y, object$experts, awake = object$awake))
     mape.unif <- lossConv(rep(1/K, K), object$Y, object$experts, awake = object$awake, 
                           loss.type = list(name = "percentage"))
@@ -48,8 +48,8 @@ summary.oracle <- function(object, ...) {
     x <- summary(oracle(object$Y, object$experts, model = "expert", loss.type = object$loss.type, 
                  awake = object$awake))
     
-    rmse.algo <- sqrt(mean(lossPred(x = object$prediction, y = object$Y)))
-    mape.algo <- mean(lossPred(x = object$prediction, y = object$Y, loss.type = list(name = "percentage")))
+    rmse.algo <- sqrt(mean(loss(x = object$prediction, y = object$Y)))
+    mape.algo <- mean(loss(x = object$prediction, y = object$Y, loss.type = list(name = "percentage")))
     
     TAB.lin <- data.frame(rmse = rmse.algo, mape = mape.algo)
     rownames(TAB.lin) <- paste("Best", object$model, "oracle: ")

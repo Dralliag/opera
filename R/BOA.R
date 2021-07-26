@@ -55,14 +55,14 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
       w <- numeric(N)
       w[idx] <- exp(R.aux[idx] - R.max)
       
-      p <- awake[t, ] * w/sum(awake[t, ] * w)
+      p <- awake[t, ] * w/sum(awake[t, ] * w) # * eta[t,] (/!\ dims) + facteur 1/2
       pred <- experts[t, ] %*% p
       
       weights[t, ] <- p
       prediction[t] <- pred
       
-      lpred <- lossPred(pred, y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
-      lexp <- lossPred(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
+      lpred <- loss(pred, y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
+      lexp <- loss(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
       
       # Instantaneous regret
       r <-  awake[t, ] * c(c(lpred) - lexp)

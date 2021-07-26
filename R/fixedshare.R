@@ -40,9 +40,9 @@ fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square
     
     # Prediction and loss
     pred[t] <- experts[t, ] %*% weights[t, ]
-    cumulativeLoss <- cumulativeLoss + lossPred(x = pred[t], y = y[t], loss.type = loss.type)
-    lpred <- lossPred(pred[t], y[t], pred[t], loss.type, loss.gradient)
-    lexp <- lossPred(experts[t, ], y[t], pred[t], loss.type, loss.gradient)
+    cumulativeLoss <- cumulativeLoss + loss(x = pred[t], y = y[t], loss.type = loss.type)
+    lpred <- loss(pred[t], y[t], pred[t], loss.type, loss.gradient)
+    lexp <- loss(experts[t, ], y[t], pred[t], loss.type, loss.gradient)
     
     # Regret and weight update
     R <- R + awake[t, ] * (c(c(lpred) - lexp))
