@@ -63,13 +63,13 @@ A finite grid of coefficient to be optimized can be specified with a parameter \
    \item{'MLpol'}{Polynomial Potential aggregation rule
 with different learning rates for each expert.  The learning rates are
 calibrated using theoretical values. There are similar aggregation rules 
-like 'BOA' (Bernstein online Aggregation see [Wintenberger, 2014] <doi:10.1007/s10994-016-5592-6>, 'MLewa', and 'MLprod' 
-(see [Gaillard, Erven, and Stoltz, 2014])} 
+like 'BOA' (Bernstein online Aggregation see \href{add url here}{Wintenberger, 2014} 
+<doi:10.1007/s10994-016-5592-6>, 'MLewa', and 'MLprod' (see \href{}{Gaillard, Erven, and Stoltz, 2014})} 
  \item{'OGD'}{Online Gradient descent (see Zinkevich, 2003). The optimization is performed with a time-varying learning rate. 
  At time step \eqn{t \geq 1}, the learning rate is chosen to be \eqn{t^{-\alpha}}, where \eqn{\alpha} is provided by alpha in the parameters argument.
  The algorithm may or not perform a projection step into the simplex space (non-negative weights that sum to one) according to
  the value of the parameter 'simplex' provided by the user.}
- \item{'FTRL'}{Follow The Regularized Leader (see McMahan, H Brendan 2017). description to be added... The user must provide (in the \strong{parameters}'s list):
+ \item{'FTRL'}{Follow The Regularized Leader (see \href{add url here}{McMahan, H Brendan 2017}). description to be added... The user must provide (in the \strong{parameters}'s list):
    \itemize{
      \item{'eta' }{The learning rate.}
      \item{'fun_reg' }{The regularization function to be applied on the weigths. See \code{\link{auglag}}: fn.}
@@ -80,21 +80,21 @@ like 'BOA' (Bernstein online Aggregation see [Wintenberger, 2014] <doi:10.1007/s
      \item{'constr_ineq_jac' }{(optional) The jacobian of the inequality constraints. See \code{\link{auglag}}: hin.jac}
    } or set \strong{default} to TRUE. Parameters \strong{w0} (weight initialization), and \strong{max_iter} can also be provided.
  }
-}}
+}
 
-\item{loss.type}{\code{character, list or function}. 
 \describe{
      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
-     \item{list}{ When using pinball loss: list with field name equal to 'pinball' and field tau equal to the required quantile in [0,1];}
+     \item{list}{ List with field \code{name} equal to the loss name. If using pinball loss, field \code{tau} equal to the required quantile in [0,1];}
      \item{function}{ A custom loss as a function of two parameters.}
-     \item{list of 2 functions}{ A custom loss as a function of two parameters and 
-                                 a custom gradient loss as a function of 3 parameters, the third one being called 'pred'.}
 }}
 
-\item{loss.gradient}{A boolean. If
-TRUE (default) the aggregation rule will not be directly applied to the loss
-function at hand but to a gradient version of it.  The aggregation rule is
-then similar to gradient descent aggregation rule.}
+\item{loss.gradient}{\code{boolean, function} (TRUE). 
+\describe{
+     \item{boolean}{ If TRUE, the aggregation rule will not be directly applied to the loss function at hand,
+     but to a gradient version of it. The aggregation rule is then similar to gradient descent aggregation rule. }
+     \item{function}{ If loss.type is a function, the derivative should be provided to be used (it is not automatically 
+     computed).}
+}}
 
 \item{coefficients}{A probability vector of length K containing the prior weights of the experts
 (not possible for 'MLpol'). The weights must be non-negative and sum to 1.}
@@ -134,16 +134,16 @@ online. Possible parameters are:
    more regularity assumption on the underlying process genearting the data (i.i.d. for instance). }
 }}
 
+\item{use_cpp}{\code{boolean}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
+with the use of custom loss function.}
+
+\item{quiet}{\code{boolean}. Whether or not to display progress bars.}
+
 \item{x}{An object of class mixture}
 
 \item{...}{Additional parameters}
 
 \item{object}{An object of class mixture}
-
-\item{\code{use_cpp}.}{Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
-with the use of custom loss function.}
-
-\item{\code{quiet}.}{Whether or not to display progress bars.}
 }
 \value{
 An object of class mixture that can be used to perform new predictions. 

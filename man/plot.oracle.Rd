@@ -4,7 +4,7 @@
 \alias{plot.oracle}
 \title{Plot an aggregation procedure}
 \usage{
-\method{plot}{oracle}(x, sort = TRUE, col = NULL, dynamic = T, ...)
+\method{plot}{oracle}(x, sort = TRUE, col = NULL, dynamic = TRUE, ...)
 }
 \arguments{
 \item{x}{An object of class \code{oracle}.}
@@ -12,6 +12,10 @@
 \item{sort}{if set to TRUE (default), it sorts the experts by performance before the plots.}
 
 \item{col}{colors}
+
+\item{dynamic}{If TRUE, graphs are generated with \code{rAmCharts}, else with base R.}
+
+\item{...}{additional arguments to function plot.}
 }
 \description{
 oracle \code{plot}. It has one optional arguments.
