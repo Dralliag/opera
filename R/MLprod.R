@@ -19,7 +19,7 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
   R <- log(w0)
   
   L <- rep(1, N)
-  maxloss <- 0
+  maxloss <- rep(0, N)
   
   eta <- matrix(exp(700), ncol = N, nrow = T + 1)
   prediction <- rep(0, T)
