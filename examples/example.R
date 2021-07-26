@@ -63,14 +63,14 @@ m0.BOA <- mixture(model = 'BOA', loss.type = 'square')
 # start with an empty model and update the model sequentially
 m1.BOA <- m0.BOA
 for (i in 1:length(Y)) {
-  m1.BOA <- predict(m1.BOA, newexperts = X[i, ], newY = Y[i])
+  m1.BOA <- predict(m1.BOA, newexperts = X[i, ], newY = Y[i], quiet = TRUE)
 }
 
 # 2) perform online prediction directly from the empty model
-m2.BOA <- predict(m0.BOA, newexpert = X, newY = Y, online = TRUE)
+m2.BOA <- predict(m0.BOA, newexpert = X, newY = Y, online = TRUE, quiet = TRUE)
 
 # 3) perform the online aggregation directly
-m3.BOA <- mixture(Y = Y, experts = X, model = 'BOA', loss.type = 'square')
+m3.BOA <- mixture(Y = Y, experts = X, model = 'BOA', loss.type = 'square', quiet = TRUE)
 
 # These predictions are equivalent:
 identical(m1.BOA, m2.BOA)  # TRUE
@@ -92,7 +92,8 @@ XBlock <- seriesToBlock(X = X, d = 4)
 # The four-week-by-four-week predictions can then be obtained 
 # by directly using the `mixture` function as we did earlier. 
 
-MLpolBlock <- mixture(Y = YBlock, experts = XBlock, model = "MLpol", loss.type = "square")
+MLpolBlock <- mixture(Y = YBlock, experts = XBlock, model = "MLpol", loss.type = "square", 
+                      quiet = TRUE)
 
 
 # The predictions can finally be transformed back to a 
@@ -105,12 +106,13 @@ prediction <- blockToSeries(MLpolBlock$prediction)
 # Equivalent solution is to use the `online = FALSE` option in the predict function. 
 # The latter ensures that the model coefficients are not 
 # updated between the next four weeks to forecast.
-MLpolBlock <- MLpol0
+MLpolBlock <- mixture(model = "BOA", loss.type = "square")
 d = 4
 n <- length(Y)/d
 for (i in 0:(n-1)) { 
   idx <- 4*i + 1:4 # next four weeks to be predicted
-  MLpolBlock <- predict(MLpolBlock, newexperts = X[idx, ], newY = Y[idx], online = FALSE)
+  MLpolBlock <- predict(MLpolBlock, newexperts = X[idx, ], newY = Y[idx], online = FALSE, 
+                        quiet = TRUE)
 }
 
 print(head(MLpolBlock$weights))
