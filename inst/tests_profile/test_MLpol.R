@@ -51,7 +51,7 @@ Ms<-rbind(10)
 #Ms<-rbind(5)
 #mods <- c("Ridge","EWA","MLpol","MLprod","BOA")
 mods <- c("MLpol","MLprod","BOA","EWA","Ridge")
-ls <- c("absolute", "square", "pinball")
+ls <- c("absolute", "square", "pinball", "percentage")
 #ls <- c("square")
 gs <- c(TRUE,FALSE)
 #gs <- c(TRUE)
@@ -86,13 +86,13 @@ for (n in ns) {
             break;
           }
           
-          use_cpp=FALSE
+          options("opera_use_cpp" = F)
           {
             result<-computeloss(n,M,mod,l,g)
             rloss<-result[[1]]
             relapsed<-result[[2]]
           }
-          use_cpp=TRUE
+          options("opera_use_cpp" = T)
           {
             result<-computeloss(n,M,mod,l,g)
             closs<-result[[1]]
