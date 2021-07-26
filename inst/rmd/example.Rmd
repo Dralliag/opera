@@ -181,7 +181,7 @@ procedure.
 ```{r MLpolFit}
 MLpol <- MLpol0
 for (i in 1:length(Y)) {
-  MLpol <- predict(MLpol, newexperts = X[i, ], newY = Y[i])
+  MLpol <- predict(MLpol, newexperts = X[i, ], newY = Y[i], quiet = TRUE)
 }
 ```
 
@@ -294,7 +294,7 @@ d = 4
 n <- length(Y)/d
 for (i in 0:(n-1)) { 
   idx <- 4*i + 1:4 # next four weeks to be predicted
-  MLpolBlock <- predict(MLpolBlock, newexperts = X[idx, ], newY = Y[idx], online = FALSE)
+  MLpolBlock <- predict(MLpolBlock, newexperts = X[idx, ], newY = Y[idx], online = FALSE, quiet = TRUE)
 }
 ```
 

@@ -55,8 +55,8 @@ MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     prediction[t] <- pred
     
     # observe losses
-    lpred <- lossPred(pred, y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
-    lexp <- lossPred(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
+    lpred <- loss(pred, y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
+    lexp <- loss(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
     
     # update regret and weights
     r <- awake[t, ] * (c(c(lpred) - lexp))

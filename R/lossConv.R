@@ -15,6 +15,6 @@ lossConv <- function(p, y, experts, awake = NULL, loss.type = list(name = "squar
   
   pond <- awake %*% p
   pred <- ((experts * awake) %*% p)/pond
-  l <- mean(lossPred(x = pred, y = y, loss.type = loss.type))
+  l <- mean(loss(x = pred, y = y, loss.type = loss.type))
   return(l)
 } 

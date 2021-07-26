@@ -282,8 +282,8 @@ plot.mixture <- function(x,
   if (type == "all" || type == "dyn_avg_loss") {
     if (! dynamic) {
       pred.experts <- data.frame(x$experts * x$awake + x$prediction * (1-x$awake))
-      cumul.losses <- apply(sapply(lossPred(x = pred.experts, y = x$Y, loss.type = x$loss.type), "["), 2, cumsum)[seq(d,T*d,by=d),] / 1:T
-      cumul.exploss <- cumsum(lossPred(x = x$prediction, y = x$Y, loss.type = x$loss.type))[seq(d,T*d,by=d)] / 1:T
+      cumul.losses <- apply(sapply(loss(x = pred.experts, y = x$Y, loss.type = x$loss.type), "["), 2, cumsum)[seq(d,T*d,by=d),] / 1:T
+      cumul.exploss <- cumsum(loss(x = x$prediction, y = x$Y, loss.type = x$loss.type))[seq(d,T*d,by=d)] / 1:T
       
       if (ncol(x$weights) > max_experts + 2) {
         cumul.losses <- cumul.losses[, -c(2:(ncol(x$weights) - max_experts - 1))]
@@ -375,7 +375,7 @@ plot.mixture <- function(x,
   if (type == "all" || type == "avg_loss") {
     if (! dynamic) {
       pred.experts <- data.frame(x$experts * x$awake + x$prediction * (1-x$awake))
-      x$loss.experts <- colMeans(matrix(unlist(lossPred(x = pred.experts, y = x$Y, loss.type = x$loss.type)), ncol = K))
+      x$loss.experts <- colMeans(matrix(unlist(loss(x = pred.experts, y = x$Y, loss.type = x$loss.type)), ncol = K))
       err.unif <- lossConv(rep(1/K, K), x$Y, x$experts, awake = x$awake, loss.type = x$loss.type)
       err.mixt <- x$loss
       
@@ -738,8 +738,8 @@ plot_dyn_avg_loss <- function(data,
   }
   
   pred.experts <- data.frame(data$experts * data$awake + data$prediction * (1-data$awake))
-  cumul.losses <- apply(sapply(lossPred(x = pred.experts, y = data$Y, loss.type = data$loss.type), "["), 2, cumsum)[seq(data$d, data$T*data$d, by = data$d), ] / 1:data$T
-  cumul.exploss <- cumsum(lossPred(x = data$prediction, y = data$Y, loss.type = data$loss.type))[seq(data$d, data$T*data$d, by = data$d)] / 1:data$T
+  cumul.losses <- apply(sapply(loss(x = pred.experts, y = data$Y, loss.type = data$loss.type), "["), 2, cumsum)[seq(data$d, data$T*data$d, by = data$d), ] / 1:data$T
+  cumul.exploss <- cumsum(loss(x = data$prediction, y = data$Y, loss.type = data$loss.type))[seq(data$d, data$T*data$d, by = data$d)] / 1:data$T
   
   data_loss <- data.frame(cbind(cumul.losses, cumul.exploss))
   data_loss$timestamp <- 1:nrow(data_loss)
@@ -862,7 +862,7 @@ plot_avg_loss <- function(data,
                           round = 3) {
   K <- ncol(data$experts)
   pred.experts <- data.frame(data$experts * data$awake + data$prediction * (1-data$awake))
-  data$loss.experts <- colMeans(sapply(lossPred(x = pred.experts, y = data$Y, loss.type = data$loss.type),  "["))
+  data$loss.experts <- colMeans(sapply(loss(x = pred.experts, y = data$Y, loss.type = data$loss.type),  "["))
   err.unif <- lossConv(rep(1/K, K), data$Y, data$experts, awake = data$awake, loss.type = data$loss.type)
   err.mixt <- data$loss
   

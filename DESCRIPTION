@@ -38,6 +38,7 @@ Suggests:
     knitr,
     gbm,
     rmarkdown
+RdMacros: Rdpack
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1

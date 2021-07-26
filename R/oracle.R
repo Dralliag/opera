@@ -164,7 +164,7 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
   }
   
   loss.experts <- colMeans(apply(experts.pred, 2, function(x) {
-    lossPred(x = x, y = Y, loss.type = loss.type)
+    loss(x = x, y = Y, loss.type = loss.type)
   }))
   
   if (model == "expert") {
@@ -182,8 +182,8 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
   res$call <- match.call()
   if (model != "shifting") {
     res$residuals <- Y - res$prediction
-    res$loss <- mean(lossPred(x = res$prediction, y = Y, loss.type = loss.type))
-    res$rmse <- sqrt(mean(lossPred(x = res$prediction, y = Y, loss.type = list(name = "square"))))
+    res$loss <- mean(loss(x = res$prediction, y = Y, loss.type = loss.type))
+    res$rmse <- sqrt(mean(loss(x = res$prediction, y = Y, loss.type = list(name = "square"))))
   }
   
   # we convert the data back to d-dimensional series if needed

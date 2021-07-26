@@ -77,13 +77,13 @@ ewaCalib <- function(y, experts, grid.eta = NULL, awake = NULL, loss.type = "squ
     
     # Weights, predictions formed by each EWA(eta) for eta in the grid 'grid.eta'
     pred <- experts[t, ] %*% t(t(weta * awake[t, ])/colSums(weta * awake[t, ]))
-    cumulativeLoss <- cumulativeLoss + lossPred(x = pred, y = y[t], loss.type = loss.type)  # cumulative loss without gradient trick
+    cumulativeLoss <- cumulativeLoss + loss(x = pred, y = y[t], loss.type = loss.type)  # cumulative loss without gradient trick
     if (neta == 1){
-      lpred <- lossPred(pred, y[t], pred, loss.type, loss.gradient)
+      lpred <- loss(pred, y[t], pred, loss.type, loss.gradient)
     } else {
-      lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient))  # gradient loss suffered by each eta on the grid
+      lpred <- diag(loss(pred, y[t], pred, loss.type, loss.gradient))  # gradient loss suffered by each eta on the grid
     }
-    lexp <- lossPred(experts[t, ], y[t], pred, loss.type, loss.gradient)  # gradient loss suffered by each expert
+    lexp <- loss(experts[t, ], y[t], pred, loss.type, loss.gradient)  # gradient loss suffered by each expert
     
     # Regret update
     R.w0 <- R.w0 + awake[t, ] * t(c(lpred) - t(lexp))
