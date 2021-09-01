@@ -1,6 +1,9 @@
 
 ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
                   use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE) {
+  
+  new = getOption("opera_use_new", default = FALSE)
+  
   experts <- as.matrix(experts)
   N <- ncol(experts)
   T <- nrow(experts)
@@ -20,7 +23,7 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
     At <- training$At
     bt <- training$bt
   } else {
-    At <- lambda * diag(1, N)
+    At <- 1/lambda * diag(1, N)
     bt <- matrix(lambda * w0, nrow = N)
   }
   
@@ -34,18 +37,18 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
     if (! quiet) steps <- init_progress(T)
     
     for (t in 1:T) {
-      if (! quiet) update_progress(t, steps)
+      if (!quiet) update_progress(t, steps)
       
-      w[t, ] <- solve(At, bt)
-      At <- At + experts[t, ] %*% t(experts[t, ])
+      w[t, ] <- At %*% bt
+      a <- At %*% experts[t, ]
+      At <- At - a %*% t(a) / c(1 + experts[t,] %*% a)
       bt <- bt + y[t] * experts[t, ]
     }
     if (! quiet) end_progress()
   }
   # w[1,] = w0
   
-  object <- list(model = "Ridge", loss.type = list(name = "square"), coefficients = solve(At, 
-                                                                                          bt))
+  object <- list(model = "Ridge", loss.type = list(name = "square"), coefficients = At%*%bt)
   
   object$parameters <- list(lambda = lambda)
   object$weights <- w
@@ -54,4 +57,4 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
   object$training <- list(At = At, bt = bt)
   
   return(object)
-} 
+}
