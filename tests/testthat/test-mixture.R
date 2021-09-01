@@ -330,7 +330,7 @@ test_that("Predict method is ok, with and without awake, use_cpp or not", {
 
 # test that regret and cumulative loss of the expert are coherent
 test_that("Regrets and Losses are coherent", {
-  for (model in c("BOA", "MLpol", "MLprod", "MLewa", "FS", "EWA")) {
+  for (model in c("BOA", "EWA", "MLpol", "MLprod", "MLewa", "FS")) {
     for (possible_loss in c("percentage", "absolute", "square", "pinball")) {
       cur_loss <- list("name" = possible_loss)
       if (possible_loss == "pinball") {cur_loss$tau <- 0.5}
@@ -351,7 +351,7 @@ test_that("Dimension d>1 is ok",{
   # load some basic data to perform tests
   n <- 10
   d <- 3
-  for (algo in c("BOA", "MLpol", "MLprod", "MLewa", "FS", "Ridge","OGD")) {
+  for (algo in c("BOA", "EWA", "MLpol", "MLprod", "MLewa", "FS", "Ridge","OGD")) {
     for (possible_loss in c("percentage", "absolute", "square", "pinball")) {
       cur_loss <- list("name" = possible_loss)
       if (possible_loss == "pinball") {cur_loss$tau <- 0.5}

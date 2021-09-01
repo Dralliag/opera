@@ -36,7 +36,7 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
     for (t in 1:T) {
       if (! quiet) update_progress(t, steps)
       
-      w[t, ] <- solve(At, bt)
+      w[t, ] <- solve(At, bt) # version online a partir du poids précédent ? + Calib
       At <- At + experts[t, ] %*% t(experts[t, ])
       bt <- bt + y[t] * experts[t, ]
     }
