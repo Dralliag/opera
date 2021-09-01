@@ -37,5 +37,5 @@
 
 # set options
 .onLoad <- function(libname, pkgname) {
-  options(opera_use_cpp = TRUE)
+  options(opera_use_cpp = FALSE)
 }

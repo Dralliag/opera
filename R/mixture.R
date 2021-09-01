@@ -48,13 +48,13 @@
 #'    \item{'MLpol'}{Polynomial Potential aggregation rule
 #' with different learning rates for each expert.  The learning rates are
 #' calibrated using theoretical values. There are similar aggregation rules 
-#' like 'BOA' (Bernstein online Aggregation see \href{http://pierre.gaillard.me/}{Wintenberger, 2014} 
+#' like 'BOA' (Bernstein online Aggregation see \href{TODO}{Wintenberger, 2014} 
 #' <doi:10.1007/s10994-016-5592-6>, 'MLewa', and 'MLprod' (see \href{}{Gaillard, Erven, and Stoltz, 2014})} 
 #'  \item{'OGD'}{Online Gradient descent (see Zinkevich, 2003). The optimization is performed with a time-varying learning rate. 
 #'  At time step \eqn{t \geq 1}, the learning rate is chosen to be \eqn{t^{-\alpha}}, where \eqn{\alpha} is provided by alpha in the parameters argument.
 #'  The algorithm may or not perform a projection step into the simplex space (non-negative weights that sum to one) according to
 #'  the value of the parameter 'simplex' provided by the user.}
-#'  \item{'FTRL'}{Follow The Regularized Leader (see \href{http://pierre.gaillard.me/}{McMahan, H Brendan 2017}). description to be added... The user must provide (in the \strong{parameters}'s list):
+#'  \item{'FTRL'}{Follow The Regularized Leader (see \href{TODO}{McMahan, H Brendan 2017}). description to be added... The user must provide (in the \strong{parameters}'s list):
 #'    \itemize{
 #'      \item{'eta' }{The learning rate.}
 #'      \item{'fun_reg' }{The regularization function to be applied on the weigths. See \code{\link{auglag}}: fn.}
