@@ -121,7 +121,7 @@
 #' }
 #' 
 #' @param use_cpp \code{boolean}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
-#' with the use of custom loss function.
+#' with the use of custom loss function. Use \code{options(opera_use_cpp = FALSE)} to change the default value.
 #' 
 #' @param quiet \code{boolean}. Whether or not to display progress bars.
 #' 

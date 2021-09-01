@@ -18,7 +18,6 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
   
   w <- matrix(0, ncol = N, nrow = T)
   
-  
   if (!is.null(training)) {
     At <- training$At
     bt <- training$bt
@@ -34,7 +33,7 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
     }
   }
   else {
-    if (! quiet) steps <- init_progress(T)
+    if (!quiet) steps <- init_progress(T)
     
     for (t in 1:T) {
       if (!quiet) update_progress(t, steps)
@@ -46,7 +45,6 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
     }
     if (! quiet) end_progress()
   }
-  # w[1,] = w0
   
   object <- list(model = "Ridge", loss.type = list(name = "square"), coefficients = At%*%bt)
   

@@ -370,12 +370,13 @@ plot.mixture <- function(x,
     } 
   }
   
-  
+
   # losses
   if (type == "all" || type == "avg_loss") {
     if (! dynamic) {
       pred.experts <- data.frame(x$experts * x$awake + x$prediction * (1-x$awake))
       x$loss.experts <- colMeans(matrix(unlist(loss(x = pred.experts, y = x$Y, loss.type = x$loss.type)), ncol = K))
+      names(x$loss.experts) <- names(pred.experts)
       err.unif <- lossConv(rep(1/K, K), x$Y, x$experts, awake = x$awake, loss.type = x$loss.type)
       err.mixt <- x$loss
       

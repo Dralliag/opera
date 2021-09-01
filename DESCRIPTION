@@ -25,7 +25,8 @@ Imports:
     htmlwidgets,
     pipeR,
     alabama,
-    methods
+    methods,
+    Rdpack
 Suggests:
     quantreg,
     quadprog,
