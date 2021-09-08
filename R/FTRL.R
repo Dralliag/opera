@@ -72,7 +72,7 @@ FTRL <- function(y,
     default_eta <- TRUE
     eta = Inf
   }
-  else {
+  else if (! exists("default_eta")) {
     default_eta <- FALSE
   }
   if (default == FALSE && (is.null(fun_reg) || ! is.function(fun_reg))) {
@@ -133,7 +133,7 @@ FTRL <- function(y,
                               control.outer = list(kkt2.check = FALSE, itmax = max_iter, eps = obj_tol))
     weights[1, ] <- result$par
   } else {
-    weights[1, ] <- w0
+    weights[1, ] <- if (is.null(training)) {w0} else {training$last_weights}
   }
   
   if (! quiet) steps <- init_progress(T)
@@ -150,7 +150,6 @@ FTRL <- function(y,
       if (default_eta) {
         eta <- 1/sqrt(1/eta^2 + sum(G_t^2))  
       }
-      
       
       # update obj function
       obj <- function(x) (fun_reg(x) + eta * sum(G * x))
@@ -222,7 +221,8 @@ FTRL <- function(y,
                           "constr_ineq" = constr_ineq, "constr_ineq_jac" = constr_ineq_jac,
                           "loss.type" = loss.type,
                           "loss.gradient" = loss.gradient,
-                          "w0" = res_optim$par,
+                          "w0" = w0,
+                          "last_weights" = res_optim$par,
                           "G" = G,
                           "max_iter" = max_iter,
                           "obj_tol" = obj_tol)

@@ -326,9 +326,61 @@ test_that("Predict method is ok, with and without awake, use_cpp or not", {
   }
 })
 
+# test of predict function on FTRL
+test_that("Predict FTRL is ok, use_cpp or not", {
+  model <- "FTRL"
+  
+  for (possible_loss in c("percentage", "absolute", "square", "pinball")) {
+    cur_loss <- list("name" = possible_loss)
+    # if (possible_loss == "pinball") {cur_loss$tau <- 0.5}
+    if (model == "Ridge") {
+      cur_loss <- list("name" = "square")
+      awake <- NULL
+    }
+    m <- mixture(model = model, loss.type = cur_loss, quiet = TRUE)
+    expect_warning(predict(m, quiet = TRUE))
+    
+    # without awake
+    # single online prediction and sequential prediction return similar models
+    m1_cpp <- predict(m, newY = Y, newexperts = X, type = "m", quiet = TRUE, use_cpp = TRUE)
+    m2_cpp <- m
+    for (t in 1:n) {
+      m2_cpp <- predict(m2_cpp, newY = Y[t], newexperts = X[t, ], online = TRUE, type = "model",
+                        quiet = TRUE, use_cpp = TRUE)
+    }
+    expect_equal(m1_cpp[! which(names(m1_cpp) %in% c("training", "parameters"))], m2_cpp[! which(names(m2_cpp) %in% c("training", "parameters"))])
+    expect_equal(m1_cpp[[which(names(m1_cpp) == "training")]][c(1:2, 9:15)], m2_cpp[[which(names(m2_cpp) == "training")]][c(1:2, 9:15)])
+    expect_equal(m1_cpp[[which(names(m1_cpp) == "parameters")]][c(1:2, 5, 7)], m2_cpp[[which(names(m2_cpp) == "parameters")]][c(1:2, 5, 7)])
+    # /!\ environment is kept with function declaration
+    
+    m1_r <- predict(m, newY = Y, newexperts = X, type = "m", quiet = TRUE, use_cpp = FALSE)
+    m2_r <- m
+    for (t in 1:n) {
+      m2_r <- predict(m2_r, newY = Y[t], newexperts = X[t, ], online = TRUE, type = "model",
+                      quiet = TRUE, use_cpp = FALSE)
+    }
+    expect_equal(m1_r[! which(names(m1_r) %in% c("training", "parameters"))], m2_r[! which(names(m2_r) %in% c("training", "parameters"))])
+    expect_equal(m1_r[[which(names(m1_r) == "training")]][c(1:2, 9:15)], m2_r[[which(names(m2_r) == "training")]][c(1:2, 9:15)])
+    expect_equal(m1_r[[which(names(m1_r) == "parameters")]][c(1:2, 5, 7)], m2_r[[which(names(m2_r) == "parameters")]][c(1:2, 5, 7)])
+    # /!\ environment is kept with function declaration
+    
+    expect_equal(m1_r[! which(names(m1_r) %in% c("training", "parameters"))], m1_cpp[! which(names(m1_cpp) %in% c("training", "parameters"))])
+    expect_equal(m1_r[[which(names(m1_r) == "training")]][c(1:2, 9:15)], m1_cpp[[which(names(m1_cpp) == "training")]][c(1:2, 9:15)])
+    expect_equal(m1_r[[which(names(m1_r) == "parameters")]][c(1:2, 5, 7)], m1_cpp[[which(names(m1_cpp) == "parameters")]][c(1:2, 5, 7)])
+    # /!\ environment is kept with function declaration
+    
+    # batch prediction is ok
+    m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, quiet = TRUE, use_cpp = TRUE)
+    expect_equal(m1$coefficients, m2_cpp$coefficients)
+    
+    expect_warning(m2 <- predict(m, newexperts = X, type = "r", online = FALSE, quiet = TRUE, use_cpp = TRUE))
+    expect_equal(m1$prediction, m2)
+  }
+})
+
 # test that regret and cumulative loss of the expert are coherent
 test_that("Regrets and Losses are coherent", {
-  for (model in c("BOA", "EWA", "MLpol", "MLprod", "MLewa", "FS")) {
+  for (model in c("BOA", "EWA", "MLpol", "MLprod", "MLewa", "FS", "FTRL")) {
     for (possible_loss in c("percentage", "absolute", "square", "pinball")) {
       cur_loss <- list("name" = possible_loss)
       if (possible_loss == "pinball") {cur_loss$tau <- 0.5}
@@ -349,7 +401,7 @@ test_that("Dimension d>1 is ok",{
   # load some basic data to perform tests
   n <- 10
   d <- 3
-  for (algo in c("BOA", "EWA", "MLpol", "MLprod", "MLewa", "FS", "Ridge","OGD")) {
+  for (algo in c("BOA", "EWA", "MLpol", "MLprod", "MLewa", "FS", "Ridge","OGD", "FTRL")) {
     for (possible_loss in c("percentage", "absolute", "square", "pinball")) {
       cur_loss <- list("name" = possible_loss)
       if (possible_loss == "pinball") {cur_loss$tau <- 0.5}
