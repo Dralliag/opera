@@ -42,16 +42,16 @@ plot.mixture <- function(x,
                          col = NULL, 
                          alpha = 0.01,
                          dynamic = T, 
-                         type = c('all', 'plot_weight', 'boxplot_weight', 
-                                  'dyn_avg_loss', 'cumul_res', 
-                                  'avg_loss', 'contrib'
-                         ), 
+                         type = 'all', 
                          max_experts = 50,
                          col_by_weight = TRUE, 
                          ...) {
   
   type <- tryCatch({
-    match.arg(type)
+    match.arg(type, c('all', 'plot_weight', 'boxplot_weight', 
+                      'dyn_avg_loss', 'cumul_res', 
+                      'avg_loss', 'contrib'
+    ))
   }, error = function(e){
     warning("Invalid 'type' argument. Set to 'all'")
     'all'
@@ -589,18 +589,19 @@ plot_ridge_weights <- function(data,
                                max_experts = 50,
                                round = 3) {
   
-  if (is.null(colors)) {
-    colors <- RColorBrewer::brewer.pal(n = min(max(3, ncol(data)), 9), name = "Spectral")
-  }
   
   data <- data$weights
+  if (is.null(colors)) {
+    colors <- rev(RColorBrewer::brewer.pal(n = max(min(ncol(data),11),4),name = "Spectral"))[1:min(K,11)]
+  }
+  
   
   if (ncol(data) > max_experts + 2) {
     colors <- colors[-c(1:(ncol(data) - max_experts - 2))]
     data <- data[, c(1, (ncol(data) - max_experts):ncol(data))]
     names(data)[1:2] <- c("worst_others", "best_others")
   } else {
-    colors <- colors[-c(1:(ncol(data) - max_experts))]
+    # colors <- colors[-c(1:(ncol(data) - max_experts))]
     data <- data[, max(1, ncol(data) - max_experts + 1):ncol(data)]
   }
   
