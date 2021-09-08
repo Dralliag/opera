@@ -14,11 +14,9 @@ size_t computeRidgeCPP(Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::Ma
 
   auto tw=w.transpose();
   auto texperts=experts.transpose();
-  
-  //Pre-allocate LU matrix storage
-  Eigen::FullPivLU<Eigen::MatrixXd> lu(At);
-  //Eigen::PartialPivLU<Eigen::MatrixXd> lu(At);
 
+  Eigen::VectorXd a(N);
+    
   // init progress
   IntegerVector steps;
   if (! quiet) steps = init_progress_cpp(T);
@@ -27,10 +25,11 @@ size_t computeRidgeCPP(Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::Ma
     // update progress
     if (! quiet) update_progress_cpp(t+1, steps);
     
-    lu.compute(At); //compute factorization (no allocation)
-    tw.col(t)=lu.solve(bt);
-    At+=texperts.col(t) * experts.row(t);
-    bt+=y[t]*texperts.col(t);
+    tw.col(t) = At * bt;
+    a =  At * texperts.col(t);
+    At+= - a * a.transpose() / (1 + experts.row(t) * a);
+    bt+= y[t] * texperts.col(t);
+    
   }
   // end progress
   if (! quiet) end_progress_cpp();

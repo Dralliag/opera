@@ -25,12 +25,8 @@ computeMLProdEigen <- function(awake, eta, experts, weights, y, predictions, R, 
     invisible(.Call('_opera_computeMLProdEigen', PACKAGE = 'opera', awake, eta, experts, weights, y, predictions, R, L, maxloss, loss_name, loss_tau, loss_gradient, quiet))
 }
 
-RidgeCalibStep1 <- function(tp1, dbestlambda, experts, weights, wlambda, w0, At, bt, gridlambda, predlambda, y, lambda, cumulativeloss, prediction) {
-    .Call('_opera_RidgeCalibStep1', PACKAGE = 'opera', tp1, dbestlambda, experts, weights, wlambda, w0, At, bt, gridlambda, predlambda, y, lambda, cumulativeloss, prediction)
-}
-
-RidgeCalibStep2 <- function(wlambda, w0, At, bt, gridlambda) {
-    invisible(.Call('_opera_RidgeCalibStep2', PACKAGE = 'opera', wlambda, w0, At, bt, gridlambda))
+RidgeCalibStep1 <- function(tp1, dbestlambda, experts, weights, wlambda, w0, bt, gridlambda, y, lambda, cumulativeloss, prediction) {
+    .Call('_opera_RidgeCalibStep1', PACKAGE = 'opera', tp1, dbestlambda, experts, weights, wlambda, w0, bt, gridlambda, y, lambda, cumulativeloss, prediction)
 }
 
 computeRidgeCPP <- function(experts, w, At, bt, y, quiet) {

@@ -98,6 +98,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
         newobject <- ridge(y = newY, experts = newexperts, lambda = object$parameters$lambda, 
                            w0 = object$coefficients, training = object$training, use_cpp = use_cpp, quiet = quiet)
       }
+      newobject$loss.gradient = FALSE
     }
     
     if (object$model == "MLpol") {

@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // computeBOAEigen
 void computeBOAEigen(Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> eta, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> predictions, Eigen::Map<Eigen::VectorXd> wc, Eigen::Map<Eigen::VectorXd> w0c, Eigen::Map<Eigen::VectorXd> Rc, Eigen::Map<Eigen::VectorXd> Regc, Eigen::Map<Eigen::VectorXd> Bc, Eigen::Map<Eigen::VectorXd> Vc, String loss_name, double loss_tau, bool loss_gradient, bool quiet);
 RcppExport SEXP _opera_computeBOAEigen(SEXP awakeSEXP, SEXP etaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP ySEXP, SEXP predictionsSEXP, SEXP wcSEXP, SEXP w0cSEXP, SEXP RcSEXP, SEXP RegcSEXP, SEXP BcSEXP, SEXP VcSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP, SEXP quietSEXP) {
@@ -145,8 +150,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // RidgeCalibStep1
-size_t RidgeCalibStep1(size_t tp1, double dbestlambda, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::MatrixXd> wlambda, Eigen::Map<Eigen::MatrixXd> w0, Eigen::Map<Eigen::MatrixXd> At, Eigen::Map<Eigen::MatrixXd> bt, Eigen::Map<Eigen::MatrixXd> gridlambda, Eigen::Map<Eigen::MatrixXd> predlambda, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> lambda, Eigen::Map<Eigen::VectorXd> cumulativeloss, Eigen::Map<Eigen::VectorXd> prediction);
-RcppExport SEXP _opera_RidgeCalibStep1(SEXP tp1SEXP, SEXP dbestlambdaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP wlambdaSEXP, SEXP w0SEXP, SEXP AtSEXP, SEXP btSEXP, SEXP gridlambdaSEXP, SEXP predlambdaSEXP, SEXP ySEXP, SEXP lambdaSEXP, SEXP cumulativelossSEXP, SEXP predictionSEXP) {
+size_t RidgeCalibStep1(size_t tp1, double dbestlambda, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::MatrixXd> wlambda, Eigen::Map<Eigen::MatrixXd> w0, Eigen::Map<Eigen::MatrixXd> bt, Eigen::Map<Eigen::MatrixXd> gridlambda, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> lambda, Eigen::Map<Eigen::VectorXd> cumulativeloss, Eigen::Map<Eigen::VectorXd> prediction);
+RcppExport SEXP _opera_RidgeCalibStep1(SEXP tp1SEXP, SEXP dbestlambdaSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP wlambdaSEXP, SEXP w0SEXP, SEXP btSEXP, SEXP gridlambdaSEXP, SEXP ySEXP, SEXP lambdaSEXP, SEXP cumulativelossSEXP, SEXP predictionSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -156,30 +161,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type weights(weightsSEXP);
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type wlambda(wlambdaSEXP);
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type w0(w0SEXP);
-    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type At(AtSEXP);
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type bt(btSEXP);
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type gridlambda(gridlambdaSEXP);
-    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type predlambda(predlambdaSEXP);
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type y(ySEXP);
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type cumulativeloss(cumulativelossSEXP);
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type prediction(predictionSEXP);
-    rcpp_result_gen = Rcpp::wrap(RidgeCalibStep1(tp1, dbestlambda, experts, weights, wlambda, w0, At, bt, gridlambda, predlambda, y, lambda, cumulativeloss, prediction));
+    rcpp_result_gen = Rcpp::wrap(RidgeCalibStep1(tp1, dbestlambda, experts, weights, wlambda, w0, bt, gridlambda, y, lambda, cumulativeloss, prediction));
     return rcpp_result_gen;
-END_RCPP
-}
-// RidgeCalibStep2
-void RidgeCalibStep2(Eigen::Map<Eigen::MatrixXd> wlambda, Eigen::Map<Eigen::VectorXd> w0, Eigen::Map<Eigen::MatrixXd> At, Eigen::Map<Eigen::MatrixXd> bt, Eigen::Map<Eigen::VectorXd> gridlambda);
-RcppExport SEXP _opera_RidgeCalibStep2(SEXP wlambdaSEXP, SEXP w0SEXP, SEXP AtSEXP, SEXP btSEXP, SEXP gridlambdaSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type wlambda(wlambdaSEXP);
-    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type w0(w0SEXP);
-    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type At(AtSEXP);
-    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type bt(btSEXP);
-    Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type gridlambda(gridlambdaSEXP);
-    RidgeCalibStep2(wlambda, w0, At, bt, gridlambda);
-    return R_NilValue;
 END_RCPP
 }
 // computeRidgeCPP
@@ -274,8 +263,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_opera_computeMLPolEigen", (DL_FUNC) &_opera_computeMLPolEigen, 13},
     {"_opera_computeMLPolEigenSimpleLoss", (DL_FUNC) &_opera_computeMLPolEigenSimpleLoss, 13},
     {"_opera_computeMLProdEigen", (DL_FUNC) &_opera_computeMLProdEigen, 13},
-    {"_opera_RidgeCalibStep1", (DL_FUNC) &_opera_RidgeCalibStep1, 14},
-    {"_opera_RidgeCalibStep2", (DL_FUNC) &_opera_RidgeCalibStep2, 5},
+    {"_opera_RidgeCalibStep1", (DL_FUNC) &_opera_RidgeCalibStep1, 12},
     {"_opera_computeRidgeCPP", (DL_FUNC) &_opera_computeRidgeCPP, 6},
     {"_opera_computeEWACalib", (DL_FUNC) &_opera_computeEWACalib, 15},
     {"_opera_count_in", (DL_FUNC) &_opera_count_in, 2},

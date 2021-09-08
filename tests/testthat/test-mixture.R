@@ -123,10 +123,9 @@ test_that("Ridge is ok", {
   expect_equal(m$loss, mean(loss(m$prediction, Y)))
   expect_identical(as.numeric(m$weights[1, ]), w0)
   expect_true(!is.na(sum(m$weights)))
+  nlambda <- length(m$parameters$grid.lambda)
+  lambda <- m$parameters$grid.lambda[nlambda]
   
-  # e <- c(0.3,0.5) expect_equal(c(predict(m,e)), sum(c(e)*c(m$coefficients)))
-  
-  lambda <- 2
   m.fixed <- mixture(Y = Y, experts = X, model = "Ridge", parameters = list(lambda = lambda),
                      coefficients = w0, quiet = TRUE)
   idx.lambda <- which(m$parameters$grid.lambda == lambda)
@@ -287,7 +286,6 @@ test_that("Predict method is ok, with and without awake, use_cpp or not", {
                       awake = awake[t, ], quiet = TRUE, use_cpp = FALSE)
       }
       expect_equal(m1_r, m2_r)
-      
       expect_equal(m1_r, m1_cpp)
       
       # batch prediction is ok
