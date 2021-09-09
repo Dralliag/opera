@@ -188,6 +188,7 @@ test_that("MLpol, MLprod, MLewa, and BOA are ok", {
     
     m1 <- mixture(Y = Y, experts = X, model = "MLewa", awake = awake, quiet = TRUE)
     expect_equal(m, m1)
+    
   }
 })
 
@@ -205,7 +206,6 @@ test_that("Quantile mixture are ok", {
                parameters = list(eta = 1, gamma = 100), quiet = TRUE)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_lt(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
-  # e <- rnorm(K) expect_equal(c(predict(m,e)), sum(c(e)*c(m$coefficients)))
   
   m <- mixture(Y = Y, experts = X[, c(1, K)], model = "EWA", loss.type = l, parameters = list(gamma = 100), quiet = TRUE)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
@@ -237,8 +237,6 @@ test_that("Quantile mixture are ok", {
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.8)
   
-  # expect_equal(c(predict(m,e[c(1,K)])), sum(c(e[c(1,K)])*c(m$coefficients)))
-  
   m <- mixture(Y = Y, experts = X, model = "MLewa", loss.type = l, loss.gradient = FALSE, quiet = TRUE)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_lt(abs(sum(X[1, ] * m$coefficients) - X[1, i]), 0.4)
@@ -261,7 +259,7 @@ test_that("Predict method is ok, with and without awake, use_cpp or not", {
   for (model in c("BOA", "MLpol", "MLprod", "MLewa", "FS", "Ridge")) {
     for (possible_loss in c("percentage", "absolute", "square", "pinball")) {
       cur_loss <- list("name" = possible_loss)
-      # if (possible_loss == "pinball") {cur_loss$tau <- 0.5}
+      
       if (model == "Ridge") {
         cur_loss <- list("name" = "square")
         awake <- NULL
@@ -429,15 +427,17 @@ test_that("Dimension d>1 is ok",{
         idx = i + 0:(d-1)
         m <- predict(object = m, newY = Y[idx], newexperts = X[idx,], online = FALSE, quiet = TRUE)
       }
-      # theta.star - predict(m,newexperts = X[1:3,], online = FALSE, type = "response")
+      
+      expect_output(summary(m), NA)
+      expect_error(plot(m), NA)
+      expect_output(print(m))
+      
       m$d <- d
       m$T <- m$T / d
       m$prediction <- t(matrix(m$prediction,nrow = d))
       m$Y <- t(matrix(m$Y,nrow = d))
       m$weights <- m$weights[seq(1,n*d,by=d),]
       
-      # summary(m)
-      # plot(m)
       X1 <- seriesToBlock(X, d = d)
       Y1 <- seriesToBlock(Y, d = d)
       m1 <- mixture(Y = Y1, experts= X1, model = algo, loss.type = cur_loss, quiet = TRUE)

@@ -29,7 +29,8 @@
 #' @export
 loss <- function(x, y, pred = NULL, loss.type = list(name = "square"), loss.gradient = FALSE) {
   
-  npred <- length(pred)
+  ny <- length(y)
+  npred <-length(pred)
   nx <- length(x)
   
   args <- list("x" = if (! is.function(loss.gradient) && loss.gradient == FALSE) {x} else {pred},
@@ -45,17 +46,31 @@ loss <- function(x, y, pred = NULL, loss.type = list(name = "square"), loss.grad
   }
   
   l <- tryCatch({
-    if (npred > 1 && nx > 1) {
-      if (! is.function(loss.gradient) && loss.gradient == FALSE) {
-        matrix(rep(do.call(loss.type, args), npred), ncol = npred) 
-      } else {
-        t(matrix(rep(do.call(loss.gradient, args), nx), ncol = nx)) * matrix(rep(x, npred), ncol = npred)
-      }
-    } else {
+    if ((ny <= 1 && npred <= 1) || (ny == length(as.matrix(args$x)))) {
       if (! is.function(loss.gradient) && loss.gradient == FALSE) {
         c(do.call(loss.type, args))
       } else {
         c(do.call(loss.gradient, args)) * x
+      }
+    } else {
+      if (ny > 1 && nx > 1 && !is.null(dim(x)) && dim(x)[2] > 1) {
+        args$y = matrix(rep(y, nx), ncol = nx)
+        args$x = as.matrix(args$x)
+        if (! is.function(loss.gradient) && loss.gradient == FALSE) {
+          matrix(do.call(loss.type, args), ncol = nx, dimnames = list(NULL,names(x)))
+        } else {
+          matrix(do.call(loss.gradient, args), ncol = nx, dimnames = list(NULL,names(x))) * x
+        }
+      } else {
+        if (npred > 1 && ny == 1) {
+          if (! is.function(loss.gradient) && loss.gradient == FALSE) {
+            matrix(rep(do.call(loss.type, args), npred), ncol = npred) 
+          } else {
+            t(matrix(rep(do.call(loss.gradient, args), nx), ncol = nx)) * matrix(rep(x, npred), ncol = npred)
+          }
+        } else {
+          stop("Error")
+        }
       }
     }
   }, 

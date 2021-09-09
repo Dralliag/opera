@@ -740,7 +740,7 @@ plot_dyn_avg_loss <- function(data,
   }
   
   pred.experts <- data.frame(data$experts * data$awake + data$prediction * (1-data$awake))
-  cumul.losses <- apply(sapply(loss(x = pred.experts, y = data$Y, loss.type = data$loss.type), "["), 2, cumsum)[seq(data$d, data$T*data$d, by = data$d), ] / 1:data$T
+  cumul.losses <- apply(loss(x = pred.experts, y = data$Y, loss.type = data$loss.type), 2, cumsum)[seq(data$d, data$T*data$d, by = data$d), ] / 1:data$T
   cumul.exploss <- cumsum(loss(x = data$prediction, y = data$Y, loss.type = data$loss.type))[seq(data$d, data$T*data$d, by = data$d)] / 1:data$T
   
   data_loss <- data.frame(cbind(cumul.losses, cumul.exploss))
@@ -864,7 +864,7 @@ plot_avg_loss <- function(data,
                           round = 3) {
   K <- ncol(data$experts)
   pred.experts <- data.frame(data$experts * data$awake + data$prediction * (1-data$awake))
-  data$loss.experts <- colMeans(sapply(loss(x = pred.experts, y = data$Y, loss.type = data$loss.type),  "["))
+  data$loss.experts <- colMeans(loss(x = pred.experts, y = data$Y, loss.type = data$loss.type))
   err.unif <- lossConv(rep(1/K, K), data$Y, data$experts, awake = data$awake, loss.type = data$loss.type)
   err.mixt <- data$loss
   
@@ -940,7 +940,7 @@ plot_contrib <- function(data,
   time<-c(1:nrow(X))
   active.experts<-which(colMeans(W)>0)
   W<-W[,active.experts]  
-  X<-X[, names(W)][,active.experts]
+  X<-X[, names(W)]
   
   K <- ncol(X)
   
