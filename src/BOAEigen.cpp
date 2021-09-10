@@ -8,7 +8,7 @@ using namespace Rcpp;
 struct EtaBOAFunctor{
   double logN_;
   EtaBOAFunctor(size_t N):logN_(std::log(N)){};
-  inline double operator() (double a, double b) const {return std::min(std::min(1/(2*a),sqrt(logN_/b)),std::exp(350.));}
+  inline double operator() (double a, double b) const {return std::min(std::min(1/a,sqrt(logN_/b)),std::exp(0.));} // ******* should replace logN_ with log(1/w0) *******
 };
 
 
@@ -64,18 +64,13 @@ void BOAEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> et
     B = B.binaryExpr(r,AbsMax());
     V += r*r;
     eta.row(t+1).array() = B.binaryExpr(V,EtaBOAFunctor(N));
-    if (eta.row(t+1).maxCoeff() > std::exp(300.)) {
-      reg = r;
-    }
-    else{
-      // if some losses still have not been observed
-      reg = r - eta.row(t+1).array() * r*r;
-    }
+    
     // Update the regret and the regularized regret used by BOA
+    reg = 1/2 * (r - eta.row(t+1).array() * r*r) ; // ******* B * (eta.row(t+1).array() * r > 1/2) should be added *******
     R+=r;
     Reg+=reg;
     
-    w = (w0.log()+eta.row(t+1).array()*Reg).exp().unaryExpr(std::ptr_fun(truncate1));
+    w = (eta.row(t+1).array().log()+w0.log()+eta.row(t+1).array()*Reg).exp().unaryExpr(std::ptr_fun(truncate1));
   }
   // end progress
   if (! quiet) end_progress_cpp();

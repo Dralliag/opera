@@ -22,7 +22,7 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
   w <- w0[]
   weights <- matrix(0, ncol = N, nrow = T)
   prediction <- rep(0, T)
-  eta <- matrix(exp(350), ncol = N, nrow = T + 1)
+  eta <- matrix(1, ncol = N, nrow = T + 1)
   V <- rep(0, N)
   B <- rep(0, N)
   
@@ -50,12 +50,12 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
       if (! quiet) update_progress(t, steps)
       
       idx <- awake[t,] > 0
-      R.aux <- log(w0) + eta[t, ] * R.reg
+      R.aux <- log(eta[t,]) + log(w0) + eta[t, ] * R.reg
       R.max <- max(R.aux[idx])
       w <- numeric(N)
       w[idx] <- exp(R.aux[idx] - R.max)
       
-      p <- awake[t, ] * w/sum(awake[t, ] * w) # * eta[t,] (/!\ dims) + facteur 1/2
+      p <- awake[t, ]  * w /sum(awake[t, ] * w) 
       pred <- experts[t, ] %*% p
       
       weights[t, ] <- p
@@ -70,25 +70,19 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
       # Update the learning rates
       B <- pmax(B, abs(r))
       V <- V + r^2
-      eta[t + 1, ] <- pmin(pmin(1/(2 * B), sqrt(log(N)/V)),exp(350))
-      
-      if (max(eta[t+1, ]) > exp(300)) {
-        # if some losses still have not been observed
-        r.reg <- r
-      } else {
-        r.reg <- r - eta[t+1, ] * r^2
-      }
+      eta[t + 1, ] <- pmin(pmin(1/B, sqrt(log(1/w0)/V)),1)
       
       # Update the regret and the regularized regret used by BOA
+      r.reg <- 1/2 * (r - eta[t+1, ] * r^2 + B * (eta[t+1,] * r > 1/2))
       R <- R + r
       R.reg <- R.reg + r.reg
     }
     if (! quiet) end_progress()
   }
   
-  R.aux <- log(w0) + eta[T + 1, ] * R.reg
+  R.aux <- log(eta[T+1,]) + log(w0) + eta[T + 1, ] * R.reg
   R.max <- max(R.aux)
-  w <- exp(R.aux - R.max)
+  w <-  exp(R.aux - R.max) 
   
   object <- list(model = "BOA", loss.type = loss.type, loss.gradient = loss.gradient, 
                  coefficients = w/sum(w))
