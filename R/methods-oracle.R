@@ -3,8 +3,9 @@ print.oracle <- function(x, ...) {
   cat("Call:\n")
   print(x$call)
   
-  if (x$d > 1) {
+  if (length(dim(x$experts)) > 2) {
     x$experts <- blockToSeries(x$experts)
+    x$Y <- blockToSeries(x$Y)
   }
   if (x$model != "shifting") {
     cat("\nCoefficients:\n")
@@ -22,7 +23,7 @@ print.oracle <- function(x, ...) {
 #' @export
 summary.oracle <- function(object, ...) {
   
-  if (object$d > 1) {
+  if (length(dim(object$experts)) > 2) {
     object$experts <- blockToSeries(object$experts)
     object$Y <- blockToSeries(object$Y)
   }

@@ -133,15 +133,16 @@ test_that("Dimension d>1 is ok",{
     }
     Y <- rep(theta.star, n)
     
-    cat(model, l, "\n")
+    # cat(model, l, "\n")
     m <- suppressWarnings({oracle(Y = Y,experts = X, model = model, loss.type = l)})
     m$d <- d
     m$prediction <- seriesToBlock(m$prediction,d)
     m$Y <- seriesToBlock(m$Y,d)
     m$residuals <- seriesToBlock(m$residuals,d)
     m$experts <- seriesToBlock(m$experts,d)
-    # summary(m)
-    # plot(m)
+    expect_output(summary(m), NA)
+    expect_error(plot(m), NA)
+    expect_output(print(m))
     
     X <- seriesToBlock(X, d = d)
     Y <- seriesToBlock(Y, d = d)
