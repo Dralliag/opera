@@ -38,7 +38,7 @@ bestConvex <- function(y, experts, awake = NULL, loss.type = list(name = "square
     res <- NULL
   }
   if (is.null(res)) {
-    warning("The best convex oracle is only approximated (using optim).")
+    # warning("The best convex oracle is only approximated (using optim).")
     if (is.null(awake)) {
       awake <- as.matrix(array(1, dim(experts)))
     }

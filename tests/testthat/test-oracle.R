@@ -38,12 +38,12 @@ test_that("Best convex oracle is ok", {
   expect_true(sum(abs(m$prediction - Y)) < 1e-10)
   expect_equal(m$rmse, 0)
   
-  expect_warning(m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "percentage"))
+  # expect_warning(m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "percentage"))
   expect_true(abs(m$coefficients[1] - 0.6) < 1e-04)
   expect_true(m$loss < 1e-04)
   expect_true(sum(abs(m$prediction - Y)) < 1e-04)
   
-  expect_warning(m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "absolute", awake = awake))
+  m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "absolute", awake = awake)
   expect_true(abs(m$coefficients[1] - 0.6) < 0.1)
   l <- getAnywhere(lossConv)$objs[[1]]
   expect_equal(mean(loss(x = m$prediction, y = Y, loss.type = list(name = "absolute"))), l(m$coefficients, Y, X, 
@@ -81,10 +81,11 @@ test_that("Quantile oracles are ok", {
   expect_equal(m.best_expert$loss, mean(loss(m.best_expert$prediction, Y, loss.type = l)))
   
   # best convex oracle
-  expect_warning(m <- oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
+  # expect_warning(m <- oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
+  m <- oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l)
   expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.1)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_warning(oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
+  # expect_warning(oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
   
   # best linear oracle (with singular matrix)
   expect_warning(m <- oracle(Y = Y, experts = X[, c(1, K)], model = "linear", loss.type = l, niter = 10))
