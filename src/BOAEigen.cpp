@@ -61,7 +61,7 @@ void BOAEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> et
     // Instantaneous regret
     r = awaket * (lpred-lexp);
     // Update the learning rates
-    B = B.binaryExpr(r,AbsMax());
+    B = B.binaryExpr(r,AbsMax()); // ****** Max as a power of 2 ******
     V += r*r;
     eta.row(t+1).array() = B.binaryExpr(V,EtaBOAFunctor(N));
     
