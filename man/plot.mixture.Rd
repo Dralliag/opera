@@ -10,8 +10,7 @@
   col = NULL,
   alpha = 0.01,
   dynamic = T,
-  type = c("all", "plot_weight", "boxplot_weight", "dyn_avg_loss", "cumul_res",
-    "avg_loss", "contrib"),
+  type = "all",
   max_experts = 50,
   col_by_weight = TRUE,
   ...

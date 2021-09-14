@@ -181,7 +181,7 @@ procedure.
 ```{r MLpolFit}
 MLpol <- MLpol0
 for (i in 1:length(Y)) {
-  MLpol <- predict(MLpol, newexperts = X[i, ], newY = Y[i], quiet = TRUE)
+  MLpol <- predict(MLpol, newexperts = X[i, ], newY = Y[i])
 }
 ```
 
@@ -265,7 +265,7 @@ Let's say that in the above example, instead of making a weekly prediction, we n
 
 Note that the outputs $y_1,\dots,y_n$ to be predicted step by step can be $d$-dimensional in `opera`. In this case, the argument `Y` provided to the function `mixture` should be a matrix, where each line corresponds to the output observed at time $t$; the argument `experts` must be an array of dimension $T \times d \times K$ such that `experts[t,:,k]` is the prediction made by expert $k$ at iteration $t$. These predictions of dimension $d$ can be used in various situations. For example, we might want to simultaneously predict the electricity consumption of several countries in the example above. 
 
-Another useful application of this feature is block by block prediction. Consider the above exemple of electricity consumption to be predicted every four weeks. This can be easily done by transforming the original time series into a 4 dimensional time series, where each row corresponds to the four weeks to predict after each update. 
+Another useful application of this feature is block by block prediction. Consider the above example of electricity consumption to be predicted every four weeks. This can be easily done by transforming the original time series into a 4 dimensional time series, where each row corresponds to the four weeks to predict after each update. 
 
 ```{r block_transform, eval = TRUE}
 YBlock <- seriesToBlock(X = Y, d = 4)
@@ -294,7 +294,7 @@ d = 4
 n <- length(Y)/d
 for (i in 0:(n-1)) { 
   idx <- 4*i + 1:4 # next four weeks to be predicted
-  MLpolBlock <- predict(MLpolBlock, newexperts = X[idx, ], newY = Y[idx], online = FALSE, quiet = TRUE)
+  MLpolBlock <- predict(MLpolBlock, newexperts = X[idx, ], newY = Y[idx], online = FALSE)
 }
 ```
 

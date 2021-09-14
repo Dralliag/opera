@@ -2,7 +2,7 @@
 % Please edit documentation in R/FTRL.R
 \name{FTRL}
 \alias{FTRL}
-\title{Implementation of FTRL (Follow The Regulaized Leader)}
+\title{Implementation of FTRL (Follow The Regularized Leader)}
 \usage{
 FTRL(
   y,
@@ -75,5 +75,11 @@ which values are ALL ignored when TRUE.}
 object of class mixture.
 }
 \description{
-Implementation of FTRL (Follow The Regulaized Leader)
+FTRL \insertCite{shalev2007primal}{opera} and Chap. 5 of \insertCite{hazan2019introduction}{opera} is the online counterpart of empirical risk minimization. 
+ It is a family of aggregation rules (including OGD) that uses at any time the empirical risk
+ minimizer so far with an additional regularization. The online optimization can be performed
+ on any bounded convex set that can be expressed with equality or inequality constraints.
+}
+\references{
+\insertAllCited{}
 }

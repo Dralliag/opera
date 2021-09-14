@@ -1,5 +1,10 @@
-#' Implementation of FTRL (Follow The Regulaized Leader)
+#' Implementation of FTRL (Follow The Regularized Leader)
 #'
+#'  FTRL \insertCite{shalev2007primal}{opera} and Chap. 5 of \insertCite{hazan2019introduction}{opera} is the online counterpart of empirical risk minimization. 
+#'  It is a family of aggregation rules (including OGD) that uses at any time the empirical risk
+#'  minimizer so far with an additional regularization. The online optimization can be performed
+#'  on any bounded convex set that can be expressed with equality or inequality constraints. 
+#'  
 #' @param y \code{vector}. Real observations.
 #' @param experts \code{matrix}. Matrix of experts previsions.
 #' @param eta \code{numeric}. Regularization parameter.
@@ -32,8 +37,12 @@
 #'
 #' @return object of class mixture.
 #'
+#' @references
+#'   \insertAllCited{}
+#'
 #' @import alabama
-#' 
+#' @export FTRL
+#'  
 FTRL <- function(y, 
                  experts, 
                  eta, 
@@ -47,7 +56,7 @@ FTRL <- function(y,
                  obj_tol = 1e-2,
                  training = NULL, 
                  default = FALSE,
-                 quiet = FALSE) {
+                 quiet = TRUE) {
   
   # retrieve training values
   if (! is.null(training)) {

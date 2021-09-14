@@ -37,15 +37,15 @@ In the case of real prediction (i.e., \eqn{d = 1}), \code{experts} is a matrix w
 \item{model}{A character string specifying the aggregation rule to use. 
 Currently available aggregation rules are:
 \describe{
-   \item{'EWA'}{Exponentially weighted average aggregation rule. A positive learning rate \strong{eta} 
+   \item{'EWA'}{Exponentially weighted average aggregation rules \insertCite{cesa2006prediction}{opera}. A positive learning rate \strong{eta} 
 can be chosen by the user. The
 bigger it is the faster the aggregation rule will learn from observations
 and experts performances. However, too high values lead to unstable weight
 vectors and thus unstable predictions. If it is not specified, the learning rate is calibrated online. 
 A finite grid of potential learning rates to be optimized online can be specified with \strong{grid.eta}.}
-   \item{'FS'}{Fixed-share aggregation rule. As for \code{ewa}, a learning rate \strong{eta} 
+   \item{'FS'}{Fixed-share aggregation rule \insertCite{cesa2006prediction}{opera}. As for \code{ewa}, a learning rate \strong{eta} 
 can be chosen by the user or calibrated online. The main difference with \code{ewa} aggregation
-rule rely in the mixing rate \strong{alpha}\eqn{\in [0,1]} wich considers at
+rule rely in the mixing rate \strong{alpha}\eqn{\in [0,1]} which considers at
 each instance a small probability \code{alpha} to have a rupture in the
 sequence and that the best expert may change. Fixed-share aggregation rule
 can thus compete with the best sequence of experts that can change a few
@@ -53,36 +53,40 @@ times (see \code{\link{oracle}}), while \code{ewa} can only
 compete with the best fixed expert. The mixing rate \strong{alpha} is either chosen by the user either calibrated online.
 Finite grids of learning rates and mixing rates to be optimized can be specified with 
 parameters \strong{grid.eta} and \strong{grid.alpha}.}
-   \item{'Ridge'}{Ridge regression. It minimizes at
+   \item{'Ridge'}{Online Ridge regression \insertCite{cesa2006prediction}{opera}. It minimizes at
 each instance a penalized criterion.  It forms at each instance linear
 combination of the experts' forecasts and can assign negative weights that
 not necessarily sum to one.  It is useful if the experts are biased or
 correlated. It cannot be used with specialized experts. A positive regularization coefficient \strong{lambda} 
 can either be chosen by the user or calibrated online. 
 A finite grid of coefficient to be optimized can be specified with a parameter \strong{grid.lambda}.}
-   \item{'MLpol'}{Polynomial Potential aggregation rule
-with different learning rates for each expert.  The learning rates are
-calibrated using theoretical values. There are similar aggregation rules 
-like 'BOA' (Bernstein online Aggregation see \href{http://pierre.gaillard.me/}{Wintenberger, 2014} 
-<doi:10.1007/s10994-016-5592-6>, 'MLewa', and 'MLprod' (see \href{}{Gaillard, Erven, and Stoltz, 2014})} 
- \item{'OGD'}{Online Gradient descent (see Zinkevich, 2003). The optimization is performed with a time-varying learning rate. 
+   \item{'MLpol', 'MLewa', 'MLprod'}{Aggregation rules with multiple learning rates that are
+theoretically calibrated \insertCite{GaillardStoltzEtAl2014}{opera}. }
+   \item{'BOA'}{Bernstein online Aggregation \insertCite{wintenberger2017optimal}{opera}. 
+The learning rates are automatically calibrated.}
+\item{'OGD'}{Online Gradient descent \insertCite{zinkevich2003online}{opera}. See also \insertCite{hazan2019introduction}{opera}. The optimization is performed with a time-varying learning rate. 
  At time step \eqn{t \geq 1}, the learning rate is chosen to be \eqn{t^{-\alpha}}, where \eqn{\alpha} is provided by alpha in the parameters argument.
  The algorithm may or not perform a projection step into the simplex space (non-negative weights that sum to one) according to
  the value of the parameter 'simplex' provided by the user.}
- \item{'FTRL'}{Follow The Regularized Leader (see \href{http://pierre.gaillard.me/}{McMahan, H Brendan 2017}). description to be added... The user must provide (in the \strong{parameters}'s list):
+ \item{'FTRL'}{Follow The Regularized Leader \insertCite{shalev2007primal}{opera}. See also Chap. 5 of \insertCite{hazan2019introduction}{opera}.   
+ \code{\link{FTRL}} is the online counterpart of empirical risk minimization. It is a family of aggregation rules (including OGD) that uses at any time the empirical risk
+ minimizer so far with an additional regularization. The online optimization can be performed
+ on any bounded convex set that can be expressed with equality or inequality constraints.  
+ 
+ The user must provide (in the \strong{parameters}'s list):
    \itemize{
      \item{'eta' }{The learning rate.}
      \item{'fun_reg' }{The regularization function to be applied on the weigths. See \code{\link{auglag}}: fn.}
      \item{'constr_eq' }{The equality constraints (e.g. sum(w) = 1). See \code{\link{auglag}}: heq.}
      \item{'constr_ineq' }{The inequality constraints (e.g. w > 0). See \code{\link{auglag}}: hin.}
-     \item{'fun_reg_grad' }{(optional) The gradient of the regulrization function. See \code{\link{auglag}}: gr.}
-     \item{'constr_eq_jac' }{(optional) The jacobian of the equality constraints. See \code{\link{auglag}}: heq.jac}
-     \item{'constr_ineq_jac' }{(optional) The jacobian of the inequality constraints. See \code{\link{auglag}}: hin.jac}
+     \item{'fun_reg_grad' }{(optional) The gradient of the regularization function. See \code{\link{auglag}}: gr.}
+     \item{'constr_eq_jac' }{(optional) The Jacobian of the equality constraints. See \code{\link{auglag}}: heq.jac}
+     \item{'constr_ineq_jac' }{(optional) The Jacobian of the inequality constraints. See \code{\link{auglag}}: hin.jac}
    } or set \strong{default} to TRUE. Parameters \strong{w0} (weight initialization), and \strong{max_iter} can also be provided.
  }
 }}
 
-\item{loss.type}{\code{character, list or function} ("square").
+\item{loss.type}{\code{character, list, or function} ("square").
 \describe{
      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
      \item{list}{ List with field \code{name} equal to the loss name. If using pinball loss, field \code{tau} equal to the required quantile in [0,1];}
@@ -132,15 +136,14 @@ online. Possible parameters are:
    without any projection step.}
    \item{averaged}{A boolean (default is FALSE). If TRUE the coefficients and the weights 
    returned (and used to form the predictions) are averaged over the past. It leads to more stability on the time evolution of the weights but needs
-   more regularity assumption on the underlying process genearting the data (i.i.d. for instance). }
+   more regularity assumption on the underlying process generating the data (i.i.d. for instance). }
 }}
 
 \item{use_cpp}{\code{boolean}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
-with the use of custom loss function.}
+with the use of custom loss function. Note that cpp implementation corresponds to an earlier version of the code and may be outdated. 
+Use \code{options(opera_use_cpp = TRUE)} to change the default value.}
 
-\item{quiet}{\code{boolean}. Whether or not to display progress bars.
-
-\insertCite{AA}{opera}}
+\item{quiet}{\code{boolean}. Whether or not to display progress bars.}
 
 \item{x}{An object of class mixture}
 

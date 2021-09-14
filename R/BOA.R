@@ -24,7 +24,7 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
   prediction <- rep(0, T)
   eta <- matrix(1, ncol = N, nrow = T + 1)
   V <- rep(0, N)
-  B <- rep(0, N)
+  B <- rep(2^{-20}, N)
   
   if (!is.null(training)) {
     w0 <- training$w0
@@ -69,11 +69,12 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
       
       # Update the learning rates
       B <- pmax(B, abs(r))
+      B2 <- 2^ceiling(log(B,2))
       V <- V + r^2
-      eta[t + 1, ] <- pmin(pmin(1/B, sqrt(log(1/w0)/V)),1)
+      eta[t + 1, ] <- pmin(1/B2, sqrt(log(1/w0)/V))
       
       # Update the regret and the regularized regret used by BOA
-      r.reg <- 1/2 * (r - eta[t+1, ] * r^2 + B * (eta[t+1,] * r > 1/2))
+      r.reg <- 1/2 * (r - eta[t+1, ] * r^2 + B2 * (eta[t+1,] * r > 1/2))
       R <- R + r
       R.reg <- R.reg + r.reg
     }
