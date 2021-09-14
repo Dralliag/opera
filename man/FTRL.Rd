@@ -21,7 +21,7 @@ FTRL(
   obj_tol = 0.01,
   training = NULL,
   default = FALSE,
-  quiet = FALSE
+  quiet = TRUE
 )
 }
 \arguments{

@@ -1,6 +1,6 @@
 
 ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
-                  use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE) {
+                  use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = FALSE) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)

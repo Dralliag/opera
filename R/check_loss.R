@@ -25,7 +25,7 @@ check_loss <- function(loss.type,
                        loss.gradient,
                        Y = NULL,
                        model = NULL,
-                       use_cpp = getOption("opera_use_cpp", default = TRUE)) {
+                       use_cpp = getOption("opera_use_cpp", default = FALSE)) {
   
   if (! is.function(loss.type)) {
     if (! is.logical(loss.gradient)) {

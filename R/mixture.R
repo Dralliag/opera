@@ -163,13 +163,13 @@
 #' 
 mixture <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square", 
                     loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list(),
-                    use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = TRUE) UseMethod("mixture")
+                    use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = TRUE) UseMethod("mixture")
 
 
 #' @export 
 mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square", 
                             loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list(),
-                            use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = TRUE) {
+                            use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = TRUE) {
   
   # checks
   experts <- check_matrix(experts, "experts")

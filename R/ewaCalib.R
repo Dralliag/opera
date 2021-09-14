@@ -1,7 +1,7 @@
 
 ewaCalib <- function(y, experts, grid.eta = NULL, awake = NULL, loss.type = "square", 
   loss.gradient = TRUE, w0 = NULL, gamma = 2, training = NULL,
-  use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE) {
+  use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = FALSE) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts

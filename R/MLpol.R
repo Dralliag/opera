@@ -1,5 +1,5 @@
 MLpol <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-  training = NULL, use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = FALSE) {
+  training = NULL, use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = FALSE) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)

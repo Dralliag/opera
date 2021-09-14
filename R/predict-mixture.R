@@ -52,7 +52,7 @@
 #' @export 
 predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL, 
                             online = TRUE, type = c("model", "response", "weights", "all"),
-                            use_cpp = getOption("opera_use_cpp", default = TRUE), quiet = TRUE, ...) {
+                            use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = TRUE, ...) {
   
   # checks
   newexperts <- check_matrix(newexperts, "newexperts")

@@ -12,7 +12,7 @@
   online = TRUE,
   type = c("model", "response", "weights", "all"),
   use_cpp = getOption("opera_use_cpp", default = TRUE),
-  quiet = FALSE,
+  quiet = TRUE,
   ...
 )
 }
