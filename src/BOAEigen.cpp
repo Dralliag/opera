@@ -70,7 +70,8 @@ void BOAEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> et
     R+=r;
     Reg+=reg;
     
-    w = (eta.row(t+1).array().log()+w0.log()+eta.row(t+1).array()*Reg).exp().unaryExpr(std::ptr_fun(truncate1));
+    //w = (eta.row(t+1).array().log()+w0.log()+eta.row(t+1).array()*Reg).exp().unaryExpr(std::ptr_fun(truncate1));
+    w = (eta.row(t+1).array().log()+w0.log()+eta.row(t+1).array()*Reg).exp().unaryExpr([](double c) {return truncate1(c);});
   }
   // end progress
   if (! quiet) end_progress_cpp();

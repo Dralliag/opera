@@ -55,7 +55,8 @@ size_t ewaCalib( size_t tp1,double dbesteta,
   
  
   for (size_t k=0 ; k < N ; k++){
-    weta.row(k)=(grideta.array().transpose() * w0.row(k).array()).array().exp().unaryExpr(std::ptr_fun(truncate1));
+    //weta.row(k)=(grideta.array().transpose() * w0.row(k).array()).array().exp().unaryExpr(std::ptr_fun(truncate1));
+    weta.row(k)=(grideta.array().transpose() * w0.row(k).array()).array().exp().unaryExpr([](double c) {return truncate1(c);});
   }
   return besteta+1;
 }

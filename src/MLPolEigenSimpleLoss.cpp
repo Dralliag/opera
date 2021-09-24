@@ -162,8 +162,9 @@ double computeMLPolEigenSimpleLoss( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Ma
     
     auto awaket = awake.row(t).array();
     if ((awaket*R).maxCoeff()>0){
-      w = eta.row(t).array() * R.unaryExpr(std::ptr_fun(ramp));
-   //   w /= w.sum();
+      //w = eta.row(t).array() * R.unaryExpr(std::ptr_fun(ramp));
+      w = eta.row(t).array() * R.unaryExpr([](double c) {return ramp(c);});
+      //w /= w.sum();
     }
     else{
       w = 1.0;
@@ -194,7 +195,8 @@ double computeMLPolEigenSimpleLoss( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Ma
   if (! quiet) end_progress_cpp();
   
   if (R.maxCoeff()>0){
-    w = eta.row(T).array() * R.unaryExpr(std::ptr_fun(ramp));
+    //w = eta.row(T).array() * R.unaryExpr(std::ptr_fun(ramp));
+    w = eta.row(T).array() * R.unaryExpr([](double c) {return ramp(c);});
     w /= w.sum();
   }
   else{

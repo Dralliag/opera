@@ -36,7 +36,8 @@ double MLPolEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd
     
     // We check if there is at least one expert with positive weight
     if ((awaket*R).maxCoeff()>0){
-      w = eta.row(t).array() * R.unaryExpr(std::ptr_fun(ramp));
+      //w = eta.row(t).array() * R.unaryExpr(std::ptr_fun(ramp));
+      w = eta.row(t).array() * R.unaryExpr([](double c) {return ramp(c);});
      // w /= w.sum(); // Necessary ?
     }
     else{
@@ -70,7 +71,8 @@ double MLPolEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd
   if (! quiet) end_progress_cpp();
   
   if (R.maxCoeff()>0){
-    w = eta.row(T).array() * R.unaryExpr(std::ptr_fun(ramp));
+    //w = eta.row(T).array() * R.unaryExpr(std::ptr_fun(ramp));
+    w = eta.row(T).array() * R.unaryExpr([](double c) {return ramp(c);});
     w /= w.sum();
   }
   else{
