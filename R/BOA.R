@@ -30,7 +30,7 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
     w0 <- training$w0
     R <- training$R
     R.reg <- training$R.reg
-    R.aux <- log(w0) + training$eta * R.reg
+    R.aux <- log(w0) + log(training$eta) + training$eta * R.reg
     w <- exp(R.aux - max(R.aux))
     eta[1, ] <- training$eta
     B <- training$B

@@ -2,6 +2,7 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 #include <string>
+#include <cmath>
 
 struct SquL;
 struct AbsL;
@@ -16,6 +17,14 @@ inline double sign(double x) {
 }
 
 inline double truncate1(double x){return std::min(std::max(x,std::exp(-700.0)),std::exp(700));}
+
+inline double sq_log2(double x){return pow(2, ceil(log2(x)));}
+
+inline double sup_half(double x){
+  if (x > 0.5) return 1.0;
+  if (x <= 0.5) return 0.0;
+}
+
 inline double ramp(double x){return x>0.0 ? x : 0.0;}
 
 template <class L, bool G>
