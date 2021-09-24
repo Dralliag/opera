@@ -13,7 +13,7 @@ License: LGPL
 URL: http://pierre.gaillard.me/opera.html
 BugReports: https://github.com/dralliag/opera/issues
 Depends:
-    R (>= 3.1.0)
+    R (>= 3.5.0)
 LinkingTo: 
     Rcpp,
     RcppEigen
@@ -38,7 +38,8 @@ Suggests:
     survival,
     knitr,
     gbm,
-    rmarkdown
+    rmarkdown,
+    magrittr
 RdMacros: Rdpack
 LazyData: true
 VignetteBuilder: knitr

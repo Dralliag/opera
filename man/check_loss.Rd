@@ -9,7 +9,7 @@ check_loss(
   loss.gradient,
   Y = NULL,
   model = NULL,
-  use_cpp = getOption("opera_use_cpp", default = TRUE)
+  use_cpp = getOption("opera_use_cpp", default = FALSE)
 )
 }
 \arguments{

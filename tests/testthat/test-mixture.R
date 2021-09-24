@@ -256,7 +256,7 @@ test_that("Quantile mixture are ok", {
 
 # test of predict function
 test_that("Predict method is ok, with and without awake, use_cpp or not", {
-  for (model in c("BOA", "MLpol", "MLprod", "MLewa", "FS", "Ridge")) {
+  for (model in c("MLpol", "MLprod", "MLewa", "FS", "Ridge", "BOA")) {
     for (possible_loss in c("percentage", "absolute", "square", "pinball")) {
       cur_loss <- list("name" = possible_loss)
       
@@ -284,7 +284,8 @@ test_that("Predict method is ok, with and without awake, use_cpp or not", {
                       awake = awake[t, ], quiet = TRUE, use_cpp = FALSE)
       }
       expect_equal(m1_r, m2_r)
-      # expect_equal(m1_r, m1_cpp) ********* the two version diverged *******
+      
+      expect_equal(m1_r, m1_cpp) 
       
       # batch prediction is ok
       m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, awake = awake, quiet = TRUE, use_cpp = TRUE)
@@ -312,7 +313,7 @@ test_that("Predict method is ok, with and without awake, use_cpp or not", {
       }
       expect_equal(m1_r, m2_r)
       
-      # expect_equal(m1_r, m1_cpp) ******** the two versions diverged *********
+      expect_equal(m1_r, m1_cpp) 
       
       # batch prediction is ok
       m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, awake = NULL, quiet = TRUE, use_cpp = TRUE)

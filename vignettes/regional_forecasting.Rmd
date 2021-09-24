@@ -1,9 +1,13 @@
 ---
 title: "Hierarchical Forecasting with Opera"
-output:
-  html_document:
-    toc: true
-    toc_float: true
+author: "Yannig Goude"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{"Hierarchical Forecasting with `opera`}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 # Data presentation
@@ -17,11 +21,11 @@ rm(list=objects())
 library(magrittr)
 library(opera)
 
-Data <- readRDS("../data/regional_load.RDS")
+regional_load <- readRDS(system.file("extdata", "regional_load.RDS", package = "opera", mustWork = TRUE))
 
 n0 <- c(1:2011)
-Data0 <- Data[n0,]
-Data1 <- Data[-n0,]
+Data0 <- regional_load[n0,]
+Data1 <- regional_load[-n0,]
 
 
 name_reg <- c("Nouvelle_A", "Auvergne_R", "Bourgogne", "Occitanie", "Hauts_de_F", "Normandie", "Bretagne", 
@@ -155,8 +159,8 @@ Here we describe the different aggregation approaches that can be performed in t
 ## Full desagregated
 
 ```{r}
-experts <- readRDS("../data/regional_experts.RDS")
-experts_raw <- readRDS("../data/regional_experts_raw.RDS")
+experts <- readRDS(system.file("extdata", "regional_experts.RDS", package = "opera", mustWork = TRUE))
+experts_raw <- readRDS(system.file("extdata", "regional_experts_raw.RDS", package = "opera", mustWork = TRUE))
 
 dim(experts)
 agg <- opera::mixture(Y=as.numeric(Data1$Load), experts=experts)

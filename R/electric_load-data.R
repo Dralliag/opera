@@ -23,7 +23,4 @@
 #'  plot(Load, Load1, pch = 16, cex = 0.5)
 #'  acf(Load, lag.max = 20)
 #'  detach(electric_load)
-
-
-
 "electric_load" 

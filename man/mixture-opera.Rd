@@ -16,7 +16,7 @@ mixture(
   coefficients = "Uniform",
   awake = NULL,
   parameters = list(),
-  use_cpp = getOption("opera_use_cpp", default = TRUE),
+  use_cpp = getOption("opera_use_cpp", default = FALSE),
   quiet = TRUE
 )
 

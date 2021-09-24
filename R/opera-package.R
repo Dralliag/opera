@@ -34,8 +34,4 @@
 #' 
 #' @keywords package
 #' @example examples/example.R
-
-# set options
-.onLoad <- function(libname, pkgname) {
-  options(opera_use_cpp = FALSE)
-}
+NULL

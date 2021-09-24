@@ -3,12 +3,8 @@
 \docType{package}
 \name{opera-package}
 \alias{opera-package}
-\alias{.onLoad}
 \alias{opera}
 \title{Online Prediction by ExpeRt Aggregation}
-\usage{
-.onLoad(libname, pkgname)
-}
 \description{
 The package \code{opera} performs, for regression-oriented time-series,
 predictions by combining a finite set of forecasts provided by the user.

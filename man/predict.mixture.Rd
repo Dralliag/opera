@@ -11,7 +11,7 @@
   awake = NULL,
   online = TRUE,
   type = c("model", "response", "weights", "all"),
-  use_cpp = getOption("opera_use_cpp", default = TRUE),
+  use_cpp = getOption("opera_use_cpp", default = FALSE),
   quiet = TRUE,
   ...
 )
