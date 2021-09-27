@@ -23,6 +23,7 @@ inline double sq_log2(double x){return pow(2, ceil(log2(x)));}
 inline double sup_half(double x){
   if (x > 0.5) return 1.0;
   if (x <= 0.5) return 0.0;
+  return x;
 }
 
 inline double ramp(double x){return x>0.0 ? x : 0.0;}
