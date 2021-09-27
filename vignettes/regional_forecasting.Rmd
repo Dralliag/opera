@@ -10,6 +10,36 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r echo=FALSE}
+suppressPackageStartupMessages({
+  suppressMessages({
+    suppressWarnings({
+      library("knitr")
+      library("htmltools")
+    })
+  })
+})
+
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 7.1,
+  fig.height = 5.5,
+  fig.path = "../inst/img/",
+  cache.path = "../inst/cache/"
+)
+knitr::knit_hooks$set(imgcenter = function(before, options, envir){
+  if (before) {
+    HTML("<p align='center'>")
+  } else {
+    HTML("</p>")
+  }
+})
+```
+
 # Data presentation
 
 The data are from [RTE open data](https://opendata.reseaux-energies.fr/) and [Météo-France ](https://donneespubliques.meteofrance.fr/). The  problems adress in this notebook are related to forecasting when breaks occur in the the data generative process and  how to deal with it with statistical machine learning tools like GAMs, RF and online aggregation of experts in a hierarchical context. The target $y_t$, the electricity load at time $t$, is observed sequentially each day, the experts and the aggregation are thus updates at the same frequency.

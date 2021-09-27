@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
   fig.width = 4.5,
   fig.height = 3,
   fig.path = "../inst/img/",
-  out.width = 300,
+  out.width = 450,
   cache.path = "../inst/cache/"
 )
 knitr::knit_hooks$set(imgcenter = function(before, options, envir){
