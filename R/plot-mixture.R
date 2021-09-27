@@ -282,7 +282,7 @@ plot.mixture <- function(x,
   if (type == "all" || type == "dyn_avg_loss") {
     if (! dynamic) {
       pred.experts <- data.frame(x$experts * x$awake + x$prediction * (1-x$awake))
-      cumul.losses <- apply(sapply(loss(x = pred.experts, y = x$Y, loss.type = x$loss.type), "["), 2, cumsum)[seq(d,T*d,by=d),] / 1:T
+      cumul.losses <- apply(loss(x = pred.experts, y = x$Y, loss.type = x$loss.type), 2, cumsum)[seq(d,T*d,by=d),] / 1:T
       cumul.exploss <- cumsum(loss(x = x$prediction, y = x$Y, loss.type = x$loss.type))[seq(d,T*d,by=d)] / 1:T
       
       if (ncol(x$weights) > max_experts + 2) {
