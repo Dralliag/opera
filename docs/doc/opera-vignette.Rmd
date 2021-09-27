@@ -1,0 +1,46 @@
+---
+title: "`opera` package"
+author: "Pierre Gaillard"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{`opera` package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r echo=FALSE}
+suppressPackageStartupMessages({
+  suppressMessages({
+    suppressWarnings({
+      library("knitr")
+      library("htmltools")
+    })
+  })
+})
+
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 4.5,
+  fig.height = 3,
+  fig.path = "../inst/img/",
+  out.width = 300,
+  cache.path = "../inst/cache/"
+)
+knitr::knit_hooks$set(imgcenter = function(before, options, envir){
+  if (before) {
+    HTML("<p align='center'>")
+  } else {
+    HTML("</p>")
+  }
+})
+```
+
+```{r child = "../inst/rmd/example.Rmd"}
+```
