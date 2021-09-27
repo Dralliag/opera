@@ -188,8 +188,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // computeEWACalib
-size_t computeEWACalib(size_t tp1, double dbesteta, Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::MatrixXd> weta, Eigen::Map<Eigen::MatrixXd> w0, Eigen::Map<Eigen::MatrixXd> grideta, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> eta, Eigen::Map<Eigen::VectorXd> cumulativeloss, Eigen::Map<Eigen::VectorXd> prediction, String loss_name, double loss_tau, bool loss_gradient);
-RcppExport SEXP _opera_computeEWACalib(SEXP tp1SEXP, SEXP dbestetaSEXP, SEXP awakeSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP wetaSEXP, SEXP w0SEXP, SEXP gridetaSEXP, SEXP ySEXP, SEXP etaSEXP, SEXP cumulativelossSEXP, SEXP predictionSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP) {
+size_t computeEWACalib(size_t tp1, double dbesteta, Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> experts, Eigen::Map<Eigen::MatrixXd> weights, Eigen::Map<Eigen::MatrixXd> weta, Eigen::Map<Eigen::MatrixXd> w0, Eigen::Map<Eigen::MatrixXd> grideta, Eigen::Map<Eigen::VectorXd> y, Eigen::Map<Eigen::VectorXd> eta, Eigen::Map<Eigen::VectorXd> cumulativeloss, Eigen::Map<Eigen::VectorXd> prediction, String loss_name, double loss_tau, bool loss_gradient, bool init_grid_eta);
+RcppExport SEXP _opera_computeEWACalib(SEXP tp1SEXP, SEXP dbestetaSEXP, SEXP awakeSEXP, SEXP expertsSEXP, SEXP weightsSEXP, SEXP wetaSEXP, SEXP w0SEXP, SEXP gridetaSEXP, SEXP ySEXP, SEXP etaSEXP, SEXP cumulativelossSEXP, SEXP predictionSEXP, SEXP loss_nameSEXP, SEXP loss_tauSEXP, SEXP loss_gradientSEXP, SEXP init_grid_etaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -208,7 +208,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< String >::type loss_name(loss_nameSEXP);
     Rcpp::traits::input_parameter< double >::type loss_tau(loss_tauSEXP);
     Rcpp::traits::input_parameter< bool >::type loss_gradient(loss_gradientSEXP);
-    rcpp_result_gen = Rcpp::wrap(computeEWACalib(tp1, dbesteta, awake, experts, weights, weta, w0, grideta, y, eta, cumulativeloss, prediction, loss_name, loss_tau, loss_gradient));
+    Rcpp::traits::input_parameter< bool >::type init_grid_eta(init_grid_etaSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeEWACalib(tp1, dbesteta, awake, experts, weights, weta, w0, grideta, y, eta, cumulativeloss, prediction, loss_name, loss_tau, loss_gradient, init_grid_eta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -265,7 +266,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_opera_computeMLProdEigen", (DL_FUNC) &_opera_computeMLProdEigen, 13},
     {"_opera_RidgeCalibStep1", (DL_FUNC) &_opera_RidgeCalibStep1, 12},
     {"_opera_computeRidgeCPP", (DL_FUNC) &_opera_computeRidgeCPP, 6},
-    {"_opera_computeEWACalib", (DL_FUNC) &_opera_computeEWACalib, 15},
+    {"_opera_computeEWACalib", (DL_FUNC) &_opera_computeEWACalib, 16},
     {"_opera_count_in", (DL_FUNC) &_opera_count_in, 2},
     {"_opera_init_progress_cpp", (DL_FUNC) &_opera_init_progress_cpp, 1},
     {"_opera_update_progress_cpp", (DL_FUNC) &_opera_update_progress_cpp, 2},
