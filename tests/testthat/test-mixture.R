@@ -71,7 +71,7 @@ test_that("EWA is ok", {
     expect_failure(expect_warning(
       m1 <- mixture(Y = Y[1:10], experts = X[1:10, ], model = "EWA", parameters = list(grid.eta = grid.eta),
                     awake = awake[1:10, ], quiet = TRUE)))
-    m1 <- predict(object = m1, newexperts = X[-c(1:10), ], newY = Y[-c(1:10)], awake = awake[-c(1:10),], online = TRUE, type = "model", quiet = TRUE)
+      m1 <- predict(object = m1, newexperts = X[-c(1:10), ], newY = Y[-c(1:10)], awake = awake[-c(1:10),], online = TRUE, type = "model", quiet = TRUE)
     expect_equal(m, m1)
   }
 })
@@ -256,7 +256,7 @@ test_that("Quantile mixture are ok", {
 
 # test of predict function
 test_that("Predict method is ok, with and without awake, use_cpp or not", {
-  for (model in c("MLpol", "MLprod", "MLewa", "FS", "Ridge", "BOA")) {
+  for (model in c("MLpol", "MLprod", "MLewa", "FS", "Ridge", "BOA", "EWA")) {
     for (possible_loss in c("percentage", "absolute", "square", "pinball")) {
       cur_loss <- list("name" = possible_loss)
       

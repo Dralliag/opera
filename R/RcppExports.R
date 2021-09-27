@@ -33,8 +33,8 @@ computeRidgeCPP <- function(experts, w, At, bt, y, quiet) {
     .Call('_opera_computeRidgeCPP', PACKAGE = 'opera', experts, w, At, bt, y, quiet)
 }
 
-computeEWACalib <- function(tp1, dbesteta, awake, experts, weights, weta, w0, grideta, y, eta, cumulativeloss, prediction, loss_name, loss_tau, loss_gradient) {
-    .Call('_opera_computeEWACalib', PACKAGE = 'opera', tp1, dbesteta, awake, experts, weights, weta, w0, grideta, y, eta, cumulativeloss, prediction, loss_name, loss_tau, loss_gradient)
+computeEWACalib <- function(tp1, dbesteta, awake, experts, weights, weta, w0, grideta, y, eta, cumulativeloss, prediction, loss_name, loss_tau, loss_gradient, init_grid_eta) {
+    .Call('_opera_computeEWACalib', PACKAGE = 'opera', tp1, dbesteta, awake, experts, weights, weta, w0, grideta, y, eta, cumulativeloss, prediction, loss_name, loss_tau, loss_gradient, init_grid_eta)
 }
 
 count_in <- function(x, y) {

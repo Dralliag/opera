@@ -64,8 +64,9 @@ ewaCalib <- function(y, experts, grid.eta = NULL, awake = NULL, loss.type = "squ
     if (use_cpp){
       loss_tau <- ifelse(! is.null(loss.type$tau), loss.type$tau, 0)
       loss_name <- loss.type$name
-      besteta<-computeEWACalib(t,besteta,awake,experts,weights,weta,
-                               R.w0,grid.eta,y,eta,cumulativeLoss,prediction,loss_name,loss_tau,loss.gradient);
+      besteta<-computeEWACalib(t,besteta, awake, experts, weights, weta,
+                               R.w0, grid.eta, y, eta, cumulativeLoss, prediction,
+                               loss_name, loss_tau, loss.gradient, init_grid_eta);
     } else{
       # Weights, prediction formed by EWA(eta[t]) where eta[t] is the learning rate
       # calibrated online
@@ -142,6 +143,8 @@ ewaCalib <- function(y, experts, grid.eta = NULL, awake = NULL, loss.type = "squ
       R.max <- apply(R.aux, 2, max)
       weta.aux <- exp(t(t(R.aux) - R.max))
       weta <- t(t(weta.aux) / colSums(weta.aux))
+    } else {
+      weta <- t(t(weta) / colSums(weta))
     }
   }#end of time loop
   if (! quiet) end_progress()
