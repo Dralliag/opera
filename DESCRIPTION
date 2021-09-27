@@ -1,7 +1,7 @@
 Package: opera
 Type: Package
 Title: Online Prediction by Expert Aggregation
-Version: 1.1.1
+Version: 1.2.0
 Author: Pierre Gaillard [cre, aut],
   Yannig Goude [aut]
 Maintainer: Pierre Gaillard <pierre@gaillard.me>
