@@ -1,7 +1,0 @@
-pandoc: 2.7.3
-pkgdown: 1.6.1
-pkgdown_sha: ~
-articles:
-  opera-vignette: opera-vignette.html
-last_built: 2021-09-27T13:20Z
-
