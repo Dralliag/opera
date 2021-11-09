@@ -591,6 +591,7 @@ plot_ridge_weights <- function(data,
   
   
   data <- data$weights
+  K <- ncol(data$experts)
   if (is.null(colors)) {
     colors <- rev(RColorBrewer::brewer.pal(n = max(min(ncol(data),11),4),name = "Spectral"))[1:min(K,11)]
   }
