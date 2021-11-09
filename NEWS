@@ -1,3 +1,12 @@
+Changes in version 1.2.0
+
+* add possibility to use "c++" version rather than R version
+* custom loss function (R version only)
+* new algorithm FTRL
+* add dynamic graphics
+* add progress bar
+
+
 Changes in version 1.1.1
 
 * Fixed tests for r-devel

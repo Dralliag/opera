@@ -4,13 +4,13 @@
 using namespace Rcpp;
 // [[Rcpp::depends(RcppEigen)]]
 
-
-struct EtaBOAFunctor{
-  double logN_;
-  EtaBOAFunctor(size_t N):logN_(std::log(N)){};
-  inline double operator() (double a, double b) const {return std::min(std::min(1/a,sqrt(logN_/b)),std::exp(0.));} // ******* should replace logN_ with log(1/w0) *******
+struct EtaBOAFunctor1{
+  inline double operator() (double a, double b) const {return sqrt(std::log(1/a)/b);} 
 };
 
+struct EtaBOAFunctor2{
+  inline double operator() (double a, double b) const {return std::min(1/a,b);}
+};
 
 template <class LT, bool G>
 void BOAEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> eta, 
@@ -61,16 +61,18 @@ void BOAEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd> et
     // Instantaneous regret
     r = awaket * (lpred-lexp);
     // Update the learning rates
-    B = B.binaryExpr(r,AbsMax()); // ****** Max as a power of 2 ******
+    B = B.binaryExpr(r,AbsMax());
+
     V += r*r;
-    eta.row(t+1).array() = B.binaryExpr(V,EtaBOAFunctor(N));
-    
+    eta.row(t+1).array() = (B.unaryExpr([](double c) {return sq_log2(c);})).binaryExpr(w0.binaryExpr(V, EtaBOAFunctor1()), EtaBOAFunctor2());
     // Update the regret and the regularized regret used by BOA
-    reg = 1/2 * (r - eta.row(t+1).array() * r*r) ; // ******* B * (eta.row(t+1).array() * r > 1/2) should be added *******
+    reg = 0.5 * (r - eta.row(t+1).array() * r*r + (B.unaryExpr([](double c) {return sq_log2(c);})) * (eta.row(t+1).array() * r).unaryExpr([](double c) {return sup_half(c);}));
+    
     R+=r;
     Reg+=reg;
+    //w = (eta.row(t+1).array().log()+w0.log()+eta.row(t+1).array()*Reg).exp().unaryExpr(std::ptr_fun(truncate1));
+    w = (eta.row(t+1).array().log()+w0.log()+eta.row(t+1).array()*Reg).exp().unaryExpr([](double c) {return truncate1(c);});
     
-    w = (eta.row(t+1).array().log()+w0.log()+eta.row(t+1).array()*Reg).exp().unaryExpr(std::ptr_fun(truncate1));
   }
   // end progress
   if (! quiet) end_progress_cpp();

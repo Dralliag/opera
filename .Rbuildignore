@@ -14,3 +14,4 @@ tests/examples
 #src/*
 ^\.github$
 ^pkgdown$
+^examples$

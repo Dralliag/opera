@@ -34,7 +34,8 @@ double EWAEigen( Eigen::Map<Eigen::MatrixXd> awake,
     if (! quiet) update_progress_cpp(t+1, steps);
     
     const auto awaket = awake.row(t).array();
-    w = ((eta * w0).exp() * awaket).unaryExpr(std::ptr_fun(truncate1));
+    //w = ((eta * w0).exp() * awaket).unaryExpr(std::ptr_fun(truncate1));
+    w = ((eta * w0).exp() * awaket).unaryExpr([](double c) {return truncate1(c);});
     w /=w.sum();
     weights.row(t).array() = w;
 

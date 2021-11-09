@@ -47,7 +47,8 @@ void MLProdEigen( Eigen::Map<Eigen::MatrixXd> awake, Eigen::Map<Eigen::MatrixXd>
     
     const auto awaket = awake.row(t).array();
     
-    w = R.exp().unaryExpr(std::ptr_fun(truncate1)) * awaket;
+    //w = R.exp().unaryExpr(std::ptr_fun(truncate1)) * awaket;
+    w = R.exp().unaryExpr([](double c) {return truncate1(c);}) * awaket;
     w *= eta.row(t).array() ;
 
     w /= w.sum();
