@@ -15,8 +15,6 @@ size_t RidgeCalibStep1(size_t tp1,double dbestlambda,
   const size_t t=tp1-1;
   size_t bestlambda=std::floor(dbestlambda)-1;
   
-  const size_t T=experts.rows();
-  const size_t N=experts.cols();
   const size_t nlambda=wlambda.cols();
   
   weights.row(t).array() = wlambda.col(bestlambda);
