@@ -7,7 +7,7 @@ output:
     toc_depth: 2
     pandoc_args: --webtex
 header-includes:
-    <img src="inst/img/opera-logo.jpg" align="right" width="200">
+    <img src="man/figures/opera-logo.jpg" align="right" width="200">
 ---
 
 <!-- badges: start -->
@@ -32,7 +32,7 @@ knitr::opts_chunk$set(
   fig.height = 4,
   fig.show='hold',
   out.width="40%", 
-  fig.path = "inst/img/",
+  fig.path = "man/figures/",
   fig.align = "center",
   cache.path = "inst/cache/"
 )

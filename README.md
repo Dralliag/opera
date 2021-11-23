@@ -2,7 +2,7 @@ OPERA
 ================
 Pierre Gaillard, Yannig Goude
 
-<img src="inst/img/opera-logo.jpg" align="right" width="200">
+<img src="man/figures/opera-logo.jpg" align="right" width="200">
 
 -   [Setting: when is the package `opera`
     useful?](#setting-when-is-the-package-opera-useful)
@@ -133,7 +133,7 @@ plot(Load, type = "l", main = "The electric Load")
 ```
 
 <p align="center">
-<img src="inst/img/Load-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/Load-1.png" width="50%" style="display: block; margin: auto;" />
 </p>
 
 ``` r
@@ -141,7 +141,7 @@ plot(Temp, Load, pch = 16, cex = 0.5, main = "Temperature vs Load")
 ```
 
 <p align="center">
-<img src="inst/img/Temp-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/Temp-1.png" width="50%" style="display: block; margin: auto;" />
 </p>
 
 ``` r
@@ -149,7 +149,7 @@ plot(NumWeek, Load, pch = 16, cex = 0.5, main = "Annual seasonality")
 ```
 
 <p align="center">
-<img src="inst/img/NumWeek-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/NumWeek-1.png" width="50%" style="display: block; margin: auto;" />
 </p>
 
 ### First: build the expert forecasts
@@ -202,7 +202,7 @@ matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load",
 ```
 
 <p align="center">
-<img src="inst/img/loadAndForecasts-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/loadAndForecasts-1.png" width="50%" style="display: block; margin: auto;" />
 </p>
 
 ### How good are the experts? Look at the oracles
@@ -231,7 +231,7 @@ plot(oracle.convex)
     #> Uniform combination:  1560 0.0198
     #> Best convex oracle:   1440 0.0193
 
-<img src="inst/img/oracle-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/oracle-1.png" width="50%" style="display: block; margin: auto;" />
 </p>
 
 The parameter `loss.type` defines the evaluation criterion. It can be
@@ -290,7 +290,12 @@ summary(MLpol)
 plot(MLpol)
 ```
 
-<img src="inst/img/MLpol-1.png" width="50%" style="display: block; margin: auto;" /><img src="inst/img/MLpol-2.png" width="50%" style="display: block; margin: auto;" /><img src="inst/img/MLpol-3.png" width="50%" style="display: block; margin: auto;" /><img src="inst/img/MLpol-4.png" width="50%" style="display: block; margin: auto;" /><img src="inst/img/MLpol-5.png" width="50%" style="display: block; margin: auto;" /><img src="inst/img/MLpol-6.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/MLpol-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/MLpol-2.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/MLpol-3.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/MLpol-4.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/MLpol-5.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/MLpol-6.png" width="50%" style="display: block; margin: auto;" />
 
 The same results can be obtained more directly:
 
