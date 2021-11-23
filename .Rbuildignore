@@ -11,7 +11,6 @@ tests/examples
 ^codecov\.yml$
 ^doc$
 ^Meta$
-#src/*
 ^\.github$
 ^pkgdown$
 ^examples$
