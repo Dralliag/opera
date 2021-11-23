@@ -15,3 +15,5 @@ tests/examples
 ^\.github$
 ^pkgdown$
 ^examples$
+^README.html
+^inst\example.html
