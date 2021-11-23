@@ -331,11 +331,6 @@ test_that("Predict FTRL is ok, use_cpp or not", {
   
   for (possible_loss in c("percentage", "absolute", "square", "pinball")) {
     cur_loss <- list("name" = possible_loss)
-    # if (possible_loss == "pinball") {cur_loss$tau <- 0.5}
-    if (model == "Ridge") {
-      cur_loss <- list("name" = "square")
-      awake <- NULL
-    }
     m <- mixture(model = model, loss.type = cur_loss, quiet = TRUE)
     expect_warning(predict(m, quiet = TRUE))
     
@@ -374,6 +369,14 @@ test_that("Predict FTRL is ok, use_cpp or not", {
     
     expect_warning(m2 <- predict(m, newexperts = X, type = "r", online = FALSE, quiet = TRUE, use_cpp = TRUE))
     expect_equal(m1$prediction, m2)
+    
+    # constraint is ok
+    fun_reg <- function(x) 1/2 * sum(x**2)
+    fun_reg_grad <- function(x) x 
+    
+    m <- mixture(Y = Y, experts = X, model = model, loss.type = cur_loss, parameters = list(fun_reg = fun_reg, fun_reg_grad= fun_reg_grad))
+    m <- mixture(Y = Y, experts = X, model = model, loss.type = cur_loss)
+    
   }
 })
 
