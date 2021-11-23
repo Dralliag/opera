@@ -53,10 +53,11 @@
 #'  At time step \eqn{t \geq 1}, the learning rate is chosen to be \eqn{t^{-\alpha}}, where \eqn{\alpha} is provided by alpha in the parameters argument.
 #'  The algorithm may or not perform a projection step into the simplex space (non-negative weights that sum to one) according to
 #'  the value of the parameter 'simplex' provided by the user.}
-#'  \item{'FTRL'}{Follow The Regularized Leader \insertCite{shalev2007primal}{opera}. See also Chap. 5 of \insertCite{hazan2019introduction}{opera}.   
+#'  \item{'FTRL'}{Follow The Regularized Leader \insertCite{shalev2007primal}{opera}. 
+#'  Note that here, the linearized version of FTRL is implemented  (see Chap. 5 of \insertCite{hazan2019introduction}{opera}).
 #'  \code{\link{FTRL}} is the online counterpart of empirical risk minimization. It is a family of aggregation rules (including OGD) that uses at any time the empirical risk
 #'  minimizer so far with an additional regularization. The online optimization can be performed
-#'  on any bounded convex set that can be expressed with equality or inequality constraints.  
+#'  on any bounded convex set that can be expressed with equality or inequality constraints.  Note that this method is still under development and a beta version.
 #'  
 #'  The user must provide (in the \strong{parameters}'s list):
 #'    \itemize{
@@ -67,7 +68,9 @@
 #'      \item{'fun_reg_grad' }{(optional) The gradient of the regularization function. See \code{\link{auglag}}: gr.}
 #'      \item{'constr_eq_jac' }{(optional) The Jacobian of the equality constraints. See \code{\link{auglag}}: heq.jac}
 #'      \item{'constr_ineq_jac' }{(optional) The Jacobian of the inequality constraints. See \code{\link{auglag}}: hin.jac}
-#'    } or set \strong{default} to TRUE. Parameters \strong{w0} (weight initialization), and \strong{max_iter} can also be provided.
+#'    } or set \strong{default} to TRUE. In the latter, \link{FTRL} is performed with Kullback regularization (\code{fun_reg(x) = sum(x log (x/w0))}
+#'    on the simplex (\code{constr_eq(w) = sum(w) - 1} and \code{constr_ineq(w) = w}). 
+#'    Parameters \strong{w0} (weight initialization), and \strong{max_iter} can also be provided.
 #'  }
 #' }
 #' 
@@ -75,15 +78,18 @@
 #' \describe{
 #'      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
 #'      \item{list}{ List with field \code{name} equal to the loss name. If using pinball loss, field \code{tau} equal to the required quantile in [0,1];}
-#'      \item{function}{ A custom loss as a function of two parameters.}
+#'      \item{function}{ A custom loss as a function of two parameters (prediction, observation). 
+#'      For example, $f(x,y) = abs(x-y)/y$ for the Mean absolute percentage error or $f(x,y) = (x-y)^2$ for the squared loss.}
 #' }
 #' 
 #' @param loss.gradient \code{boolean, function} (TRUE). 
 #' \describe{
 #'      \item{boolean}{ If TRUE, the aggregation rule will not be directly applied to the loss function at hand,
 #'      but to a gradient version of it. The aggregation rule is then similar to gradient descent aggregation rule. }
-#'      \item{function}{ If loss.type is a function, the derivative should be provided to be used (it is not automatically 
-#'      computed).}
+#'      \item{function}{Can be provided if loss.type is a function. It should then be
+#'      a sub-derivative of the loss in its first component (i.e., in the prediction).
+#'      For instance, $g(x) = (x-y)$ for the squared loss. 
+#'      }
 #' }
 #' 
 #' @param coefficients A probability vector of length K containing the prior weights of the experts
@@ -146,7 +152,7 @@
 #' \item{parameters}{The learning parameters chosen by the aggregation rule or by the user.}
 #' \item{training}{A list that contains useful temporary information of the 
 #' aggregation rule to be updated and to perform predictions.}
-#' @author Pierre Gaillard <pierre@@gaillard.me>
+#' @author Pierre Gaillard <pierre@@gaillard.me> Yannig Goude <yannig.goude@@edf.fr>
 #' @keywords ~models ~ts
 #' @seealso See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.
 #'  
@@ -174,6 +180,7 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
   # checks
   experts <- check_matrix(experts, "experts")
   awake <- check_matrix(awake, "awake")
+  
   loss.type <- check_loss(loss.type = loss.type, loss.gradient = loss.gradient, use_cpp = use_cpp)
   
   
