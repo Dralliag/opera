@@ -142,7 +142,7 @@
   <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html">lines</a></span><span class="op">(</span><span class="va">Data1</span><span class="op">$</span><span class="va">Date</span>, <span class="va">Data1</span><span class="op">[</span>,<span class="va">name_reg</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>, col <span class="op">=</span> <span class="va">col</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, type <span class="op">=</span> <span class="st">'l'</span>, lty <span class="op">=</span> <span class="st">'dashed'</span><span class="op">)</span>
 <span class="op">}</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">Data1</span><span class="op">$</span><span class="va">Date</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, lty <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span></code></pre></div>
-<p><img src="man/figures/unnamed-chunk-2-1.png" width="681.6"></p>
+<p><img src="regional_forecasting_files/figure-html/unnamed-chunk-2-1.png" width="681.6"></p>
 <p><strong>Meteo Data</strong> have been aggregated by region, we computed weighted means of meteo stations data with weights proportional to <span class="math inline">\(\exp(-h d^2)\)</span> where <span class="math inline">\(d\)</span> is the euclidian distance between the position of the station and the centroid of each regions, temperature data are denoted <code>T_</code> followed by the name of the region. We compute the exponential smoothing of these temperatures with coefficients <span class="math inline">\(\alpha=0.95\)</span> and <span class="math inline">\(0.99\)</span>. E.g. for <span class="math inline">\(\alpha=0.95\)</span> at a given instant <span class="math inline">\(i\)</span>, <span class="math inline">\(\text{T_s95}=\alpha \text{T_s95}_{i-1} + (1-\alpha) \text{Temp}_i\)</span>, these covariates are denoted with the subscript <code>_s95</code> or <code>_s99</code>. Finally we compute the minimal and maximal value of these smooth temperatures for each days and denote it with the subscript <code>_min</code> and <code>_max</code>.</p>
 <p><strong>Calendar Data</strong> are also included: Date, day of the week (“WeekDays”), daylight savings (“DLS”) an indicator of winter/summer hour, an indicator for summer holidays(“Summer_break”), an indicator for winter holidays(“Christmas_break”), the time of year (“toy”) whose value grows linearly from 0 on the 1 of January 00h00 to 1 on the 31 of December 23h30.</p>
 <p>We split the data in 2, the learning set (when we learn the experts) contains the data from January 2013 to december 2019. The test set (when we forecast online) contains the data from January 2020 to april 2021.</p>
@@ -155,7 +155,7 @@
 <span class="fu"><a href="https://rdrr.io/r/graphics/legend.html">legend</a></span><span class="op">(</span><span class="st">"topleft"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"learning set"</span>, <span class="st">"test set"</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"red"</span><span class="op">)</span>, 
        lty <span class="op">=</span> <span class="fl">1</span>, bty <span class="op">=</span> <span class="st">'n'</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">Data1</span><span class="op">$</span><span class="va">Date</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, lty <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span></code></pre></div>
-<p><img src="man/figures/unnamed-chunk-3-1.png" width="681.6"></p>
+<p><img src="regional_forecasting_files/figure-html/unnamed-chunk-3-1.png" width="681.6"></p>
 </div>
 <div id="expert-generation" class="section level1">
 <h1 class="hasAnchor">
@@ -313,7 +313,7 @@
 <span class="va">agg_vector</span><span class="op">&lt;-</span> <span class="fu">opera</span><span class="fu">::</span><span class="fu"><a href="../reference/mixture.html">mixture</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, experts <span class="op">=</span> <span class="va">experts2</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">agg_vector</span>, dynamic <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<p><img src="man/figures/unnamed-chunk-8-1.png" width="681.6"></p>
+<p><img src="regional_forecasting_files/figure-html/unnamed-chunk-8-1.png" width="681.6"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot(agg_vector)</span>
 
@@ -358,7 +358,7 @@
   <span class="va">map_horizon</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">map_horizon</span>, <span class="fu">mape</span><span class="op">(</span>y <span class="op">=</span> <span class="va">Y</span>, ychap <span class="op">=</span> <span class="va">agg_horizon</span><span class="op">$</span><span class="va">prediction</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">map_horizon</span>, type<span class="op">=</span><span class="st">'l'</span><span class="op">)</span></code></pre></div>
-<p><img src="man/figures/unnamed-chunk-9-1.png" width="681.6"></p>
+<p><img src="regional_forecasting_files/figure-html/unnamed-chunk-9-1.png" width="681.6"></p>
 </div>
   </div>
 

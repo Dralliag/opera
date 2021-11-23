@@ -156,21 +156,21 @@ You can also install the development version of opera with the package devtools:
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">Load</span>, type <span class="op">=</span> <span class="st">"l"</span>, main <span class="op">=</span> <span class="st">"The electric Load"</span><span class="op">)</span></code></pre></div>
 
 <p align="center">
-<img src="man/figures/Load-1.png" width="50%"></p>
+<img src="opera-vignette_files/figure-html/Load-1.png" width="50%"></p>
 <p align="center">
 </p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">Temp</span>, <span class="va">Load</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, main <span class="op">=</span> <span class="st">"Temperature vs Load"</span><span class="op">)</span></code></pre></div>
 
 <p align="center">
-<img src="man/figures/Temp-1.png" width="50%"></p>
+<img src="opera-vignette_files/figure-html/Temp-1.png" width="50%"></p>
 <p align="center">
 </p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">NumWeek</span>, <span class="va">Load</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, main <span class="op">=</span> <span class="st">"Annual seasonality"</span><span class="op">)</span></code></pre></div>
 
 <p align="center">
-<img src="man/figures/NumWeek-1.png" width="50%"></p>
+<img src="opera-vignette_files/figure-html/NumWeek-1.png" width="50%"></p>
 </div>
 <div id="first-build-the-expert-forecasts" class="section level3">
 <h3 class="hasAnchor">
@@ -225,7 +225,7 @@ You can also install the development version of opera with the package devtools:
         xlab <span class="op">=</span> <span class="st">"Week"</span>, main <span class="op">=</span> <span class="st">"Expert forecasts and observations"</span><span class="op">)</span></code></pre></div>
 
 <p align="center">
-<img src="man/figures/loadAndForecasts-1.png" width="50%"></p>
+<img src="opera-vignette_files/figure-html/loadAndForecasts-1.png" width="50%"></p>
 <p align="center">
 </p>
 </div>
@@ -255,7 +255,7 @@ You can also install the development version of opera with the package devtools:
 #&gt; Best expert oracle:   1480 0.0202
 #&gt; Uniform combination:  1560 0.0198
 #&gt; Best convex oracle:   1440 0.0193</code></pre>
-<img src="man/figures/oracle-1.png" width="50%"><p>The parameter <code>loss.type</code> defines the evaluation criterion. It can be either the square loss, the percentage loss, the absolute loss, or the pinball loss to perform quantile regression.</p>
+<img src="opera-vignette_files/figure-html/oracle-1.png" width="50%"><p>The parameter <code>loss.type</code> defines the evaluation criterion. It can be either the square loss, the percentage loss, the absolute loss, or the pinball loss to perform quantile regression.</p>
 <p>The parameter <code>model</code> defines the oracle to be calculated. Here, we computed the best fixed convex combination of expert (i.e., with non-negative weights that sum to one).</p>
 </div>
 <div id="aggregate-the-experts-online-using-one-of-the-possible-aggregation-procedures" class="section level3">
@@ -304,7 +304,7 @@ You can also install the development version of opera with the package devtools:
 <p align="center">
 </p>
 <p align="center">
-<img src="man/figures/MLpol-1.png" width="50%"><img src="man/figures/MLpol-2.png" width="50%"><img src="man/figures/MLpol-3.png" width="50%"><img src="man/figures/MLpol-4.png" width="50%"><img src="man/figures/MLpol-5.png" width="50%"><img src="man/figures/MLpol-6.png" width="50%"></p>
+<img src="opera-vignette_files/figure-html/MLpol-1.png" width="50%"><img src="opera-vignette_files/figure-html/MLpol-2.png" width="50%"><img src="opera-vignette_files/figure-html/MLpol-3.png" width="50%"><img src="opera-vignette_files/figure-html/MLpol-4.png" width="50%"><img src="opera-vignette_files/figure-html/MLpol-5.png" width="50%"><img src="opera-vignette_files/figure-html/MLpol-6.png" width="50%"></p>
 <p>The same results can be obtained more directly:</p>
 <ul>
 <li>by giving the whole time series to <code>predict</code> specifying <code>online = TRUE</code> to perform online prediction.</li>
