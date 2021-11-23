@@ -4,6 +4,7 @@
 #'  It is a family of aggregation rules (including OGD) that uses at any time the empirical risk
 #'  minimizer so far with an additional regularization. The online optimization can be performed
 #'  on any bounded convex set that can be expressed with equality or inequality constraints. 
+#'  Note that this method is still under development and a beta version. 
 #'  
 #' @param y \code{vector}. Real observations.
 #' @param experts \code{matrix}. Matrix of experts previsions.
@@ -18,13 +19,13 @@
 #' \describe{
 #'      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
 #'      \item{list}{ List with field \code{name} equal to the loss name. If using pinball loss, field \code{tau} equal to the required quantile in [0,1];}
-#'      \item{function}{ A custom loss as a function of two parameters.}
+#'      \item{function}{ A custom loss as a function of two parameters (prediction, label).}
 #' }
 #' @param loss.gradient \code{boolean, function} (TRUE). 
 #' \describe{
 #'      \item{boolean}{ If TRUE, the aggregation rule will not be directly applied to the loss function at hand,
 #'      but to a gradient version of it. The aggregation rule is then similar to gradient descent aggregation rule. }
-#'      \item{function}{ If loss.type is a function, the derivative should be provided to be used (it is not automatically 
+#'      \item{function}{ If loss.type is a function, the derivative of the loss in its first component should be provided to be used (it is not automatically 
 #'      computed).}
 #' }
 #' @param w0 \code{numeric} (NULL). Vector of initialization for the weights.
@@ -45,11 +46,11 @@
 #'  
 FTRL <- function(y, 
                  experts, 
-                 eta, 
+                 eta = NULL, 
                  fun_reg = NULL, fun_reg_grad = NULL,
                  constr_eq = NULL, constr_eq_jac = NULL,
                  constr_ineq = NULL, constr_ineq_jac = NULL,
-                 loss.type = "square",
+                 loss.type = list(name = "square"),
                  loss.gradient = TRUE, 
                  w0 = NULL,
                  max_iter = 50,
@@ -85,7 +86,7 @@ FTRL <- function(y,
     default_eta <- FALSE
   }
   if (default == FALSE && (is.null(fun_reg) || ! is.function(fun_reg))) {
-    stop("fun_reg must cannot be missing when other optimization parameters are provided (see ?auglag... fn).")
+    stop("fun_reg cannot be missing when other optimization parameters are provided (see ?auglag... fn).")
   }
   if (! is.null(fun_reg_grad) && ! is.function(fun_reg_grad)) {
     stop("fun_reg_grad must be a function (the gradient of the fun_reg function).")
@@ -120,13 +121,19 @@ FTRL <- function(y,
   T <- nrow(experts)  # Number of instants
   
   if (default) {
-    fun_reg <- function(x) sqrt(sum(x**2))
-    fun_reg_grad <- function(x) x / sqrt(sum(x**2))
-    constr_eq <- function(x) sum(x) - 1
+    if (is.null(w0)){
+      w0 = rep(1/N, N)
+    }
+    
+    fun_reg <- function(x) {sum(x * log(x/w0))}
+    fun_reg_grad <- function(x) {log(x/w0) + 1}
+    constr_eq <- function(x) {sum(x) - 1}
     constr_eq_jac <- function(x) matrix(1, ncol = N)
     constr_ineq <- function(x) x
     constr_ineq_jac <- function(x) diag(N)
   }
+  
+  parms = list()
   
   # inits
   if (is.null(training) && (is.function(loss.gradient) || loss.gradient)) {
@@ -134,12 +141,24 @@ FTRL <- function(y,
   }
   weights <- matrix(0, nrow = T, ncol = N)
   prediction <- rep(0, T)
-  if (is.null(w0)) {
-    result <- alabama::auglag(par = rep(1/N, N), 
-                              fn = fun_reg, 
-                              heq = constr_eq, 
-                              hin = constr_ineq, 
-                              control.outer = list(kkt2.check = FALSE, itmax = max_iter, eps = obj_tol))
+  if (is.null(w0) && is.null(training)) {
+    parms = list(
+      "par" = rep(1/N, N),
+      "fn" = fun_reg, 
+      "heq" = constr_eq, 
+      "hin" = constr_ineq,
+      "control.outer" = list(trace=FALSE, kkt2.check = FALSE, itmax = max_iter, eps = obj_tol)
+    )
+    parms <- parms[! sapply(parms, is.null)]
+    
+    # if no constraints: use optim instead of alabama
+    if (is.null(parms$heq) && is.null(parms$hin)) {
+      parms <- c(parms[intersect(c("par", "fn", "gr"), names(parms))], "control" = list(list("trace" = 0)))
+      result <- do.call(stats::optim, parms)
+    }
+    else {
+      result <- do.call(alabama::auglag, parms) 
+    }
     weights[1, ] <- result$par
   } else {
     weights[1, ] <- if (is.null(training)) {w0} else {training$last_weights}
@@ -178,12 +197,13 @@ FTRL <- function(y,
       
       parms <- parms[! sapply(parms, is.null)]
       # 
+      
       if (is.null(parms$heq) && is.null(parms$hin)) {
-        parms <- c(parms[intersect(c("par", "fn", "gr"), names(parms))], "control" = list(list("trace" = 0, maxit = max_iter, abstol = obj_tol)))
+        parms <- c(parms[intersect(c("par", "fn", "gr"), names(parms))], "control" = list(list("trace" = 0)))
         res_optim <- do.call(stats::optim, parms)
       }
       else {
-        res_optim <- do.call(alabama::auglag, parms) 
+        res_optim <- suppressWarnings(do.call(alabama::auglag, parms))
       }
       
       # update weights
@@ -192,7 +212,7 @@ FTRL <- function(y,
       } else {
         coeffs <- res_optim$par
       }
-      # check convergency
+      # check convergence
       if (! res_optim$convergence == 0){
         warning(paste0("Optimization didn't converge at step ", t, ". Your decision space might not be compact, 
                        or your regularisation function not convex."))
@@ -201,14 +221,6 @@ FTRL <- function(y,
   }
   if (! quiet) end_progress()
   
-  # round to 0 when coefficients are slightly negative
-  if (all(weights > -1e-5)) {
-    coeffs <- pmax(0, coeffs)
-    coeffs <- coeffs / sum(coeffs) 
-    
-    weights[] <- apply(weights, 2, pmax, 0)
-    weights <- weights / rowSums(weights)
-  }
   
   object <- list(model = "FTRL", loss.type = loss.type, loss.gradient = loss.gradient, 
                  coefficients = coeffs)
@@ -238,24 +250,3 @@ FTRL <- function(y,
   
   return(object)
 }
-
-
-
-# get_custom_loss_grad <- function(loss.type) {
-#   loss_grad <- NULL
-#   
-#   if (loss.type$name == "square") {
-#    loss_grad <- function(x, y) 2*(x-y)
-#   }
-#   else if (loss.type$name == "percentage") {
-#     loss_grad <- function(x, y) sign(x-y)/y
-#   }
-#   else if (loss.type$name == "absolute") {
-#     loss_grad <- function(x, y) sign(x-y)
-#   } 
-#   else if (loss.type$name == "pinball") {
-#     loss_grad <- function(x, y) -loss.type$tau
-#   }
-#   
-#   return(loss_grad)
-# }
