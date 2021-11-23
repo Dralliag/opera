@@ -1,15 +1,14 @@
 ---
 title: "`opera` package"
-author: "Pierre Gaillard"
+author: "Pierre Gaillard and Yannig Goude"
 date: "`r Sys.Date()`"
 output: 
-  rmarkdown::html_vignette
+  rmarkdown::html_document
 vignette: >
   %\VignetteIndexEntry{`opera` package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
 
 ```{r echo=FALSE}
 suppressPackageStartupMessages({
@@ -27,10 +26,13 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   warning = FALSE,
   message = FALSE,
-  fig.width = 4.5,
-  fig.height = 3,
+  imgcenter = TRUE, 
+  fig.width = 6,
+  fig.height = 4,
+  out.width="50%", 
+  dpi = 96, 
+  fig.retina=1,
   fig.path = "../inst/img/",
-  out.width = 450,
   cache.path = "../inst/cache/"
 )
 knitr::knit_hooks$set(imgcenter = function(before, options, envir){
