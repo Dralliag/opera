@@ -17,3 +17,5 @@ src/*.so
 src/*.dll
 /doc/
 /Meta/
+src-i386/*
+src-x64/*
