@@ -88,7 +88,7 @@
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#opera" class="anchor"></a>OPERA</h1></div>
 <p>Pierre Gaillard, Yannig Goude</p>
-<p><img src="inst/img/opera-logo.jpg" align="right" width="200"></p>
+<p><img src="reference/figures/opera-logo.jpg" align="right" width="200"></p>
 <ul>
 <li><a href="#setting-when-is-the-package-opera-useful">Setting: when is the package <code>opera</code> useful?</a></li>
 <li><a href="#installation">Installation</a></li>
@@ -143,15 +143,15 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">Load</span>, type <span class="op">=</span> <span class="st">"l"</span>, main <span class="op">=</span> <span class="st">"The electric Load"</span><span class="op">)</span></code></pre></div>
 <p align="center">
-<img src="inst/img/Load-1.png" width="50%" style="display: block; margin: auto;"></p>
+<img src="reference/figures/Load-1.png" width="50%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">Temp</span>, <span class="va">Load</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, main <span class="op">=</span> <span class="st">"Temperature vs Load"</span><span class="op">)</span></code></pre></div>
 <p align="center">
-<img src="inst/img/Temp-1.png" width="50%" style="display: block; margin: auto;"></p>
+<img src="reference/figures/Temp-1.png" width="50%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">NumWeek</span>, <span class="va">Load</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, main <span class="op">=</span> <span class="st">"Annual seasonality"</span><span class="op">)</span></code></pre></div>
 <p align="center">
-<img src="inst/img/NumWeek-1.png" width="50%" style="display: block; margin: auto;"></p>
+<img src="reference/figures/NumWeek-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 <div id="first-build-the-expert-forecasts" class="section level3">
 <h3 class="hasAnchor">
@@ -194,7 +194,7 @@
 <span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html">matplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">Y</span>, <span class="va">X</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"l"</span>, col <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, ylab <span class="op">=</span> <span class="st">"Weekly load"</span>, 
         xlab <span class="op">=</span> <span class="st">"Week"</span>, main <span class="op">=</span> <span class="st">"Expert forecasts and observations"</span><span class="op">)</span></code></pre></div>
 <p align="center">
-<img src="inst/img/loadAndForecasts-1.png" width="50%" style="display: block; margin: auto;"></p>
+<img src="reference/figures/loadAndForecasts-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 <div id="how-good-are-the-experts-look-at-the-oracles" class="section level3">
 <h3 class="hasAnchor">
@@ -217,7 +217,7 @@
 <span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt; Best expert oracle:   1480 0.0202</span></span>
 <span id="cb13-10"><a href="#cb13-10"></a><span class="co">#&gt; Uniform combination:  1560 0.0198</span></span>
 <span id="cb13-11"><a href="#cb13-11"></a><span class="co">#&gt; Best convex oracle:   1440 0.0193</span></span></code></pre></div>
-<img src="inst/img/oracle-1.png" width="50%" style="display: block; margin: auto;"><p>The parameter <code>loss.type</code> defines the evaluation criterion. It can be either the square loss, the percentage loss, the absolute loss, or the pinball loss to perform quantile regression.</p>
+<img src="reference/figures/oracle-1.png" width="50%" style="display: block; margin: auto;"><p>The parameter <code>loss.type</code> defines the evaluation criterion. It can be either the square loss, the percentage loss, the absolute loss, or the pinball loss to perform quantile regression.</p>
 <p>The parameter <code>model</code> defines the oracle to be calculated. Here, we computed the best fixed convex combination of expert (i.e., with non-negative weights that sum to one).</p>
 </div>
 <div id="aggregate-the-experts-online-using-one-of-the-possible-aggregation-procedures" class="section level3">
@@ -251,7 +251,7 @@
 <span class="co">#&gt; Uniform 1560 0.0198</span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">MLpol</span><span class="op">)</span></code></pre></div>
-<p><img src="inst/img/MLpol-1.png" width="50%" style="display: block; margin: auto;"><img src="inst/img/MLpol-2.png" width="50%" style="display: block; margin: auto;"><img src="inst/img/MLpol-3.png" width="50%" style="display: block; margin: auto;"><img src="inst/img/MLpol-4.png" width="50%" style="display: block; margin: auto;"><img src="inst/img/MLpol-5.png" width="50%" style="display: block; margin: auto;"><img src="inst/img/MLpol-6.png" width="50%" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/MLpol-1.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-2.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-3.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-4.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-5.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-6.png" width="50%" style="display: block; margin: auto;"></p>
 <p>The same results can be obtained more directly:</p>
 <ul>
 <li>by giving the whole time series to <code>predict</code> specifying <code>online = TRUE</code> to perform online prediction.</li>
