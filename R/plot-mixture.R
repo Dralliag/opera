@@ -58,11 +58,16 @@ plot.mixture <- function(x,
   })
   ############# add checks on x$loss
   
+  if(x$T == 0){
+    message("Empty model -- nothing to plot")  
+    return(NULL)
+  }
   
   def.par <- par(no.readonly = TRUE) # save default, for resetting...
   if (pause) par(ask=TRUE)
   K <- ncol(x$experts)
   w.order <- order(colMeans(x$weights),decreasing = FALSE)
+  w.min <- min(x$weights)
   
   if (is.null(col)) {
     if(!requireNamespace("RColorBrewer", quietly = TRUE)) {
@@ -121,7 +126,7 @@ plot.mixture <- function(x,
     par(mar = c(3, 3, 1.6, 0.1), mgp = c(2, 0.5, 0))
   }
   
-  if (x$model == "Ridge" && (type == "all" || type == "plot_weight")) {
+  if (w.min < -0.01 && (type == "all" || type == "plot_weight")) {
     # Linear aggregation rule
     if (! dynamic) {
       if (type == "all") {
@@ -173,12 +178,11 @@ plot.mixture <- function(x,
         tmp_K <- K
       }
       
-      plot(c(1), type = "l", col = 1:8, lwd = 2, axes = F, xlim = c(1, T), 
-           ylim = c(0,1), ylab = "", xlab = "", main = "Weights associated with the experts")
+      w.summed = apply(tmp_weights,1,sum)
+      plot(w.summed, type = "l", col = 1:8, lwd = 2, axes = F, xlim = c(1, T), 
+           ylim = c(0,max(w.summed)), ylab = "", xlab = "", main = "Weights associated with the experts")
       mtext(side = 2, text = "Weights", line = 1.8, cex = 1)
-      # mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)
       x.idx <- c(1, 1:T, T:1)
-      w.summed <- rep(1,T)
       i.remaining = rep(TRUE, tmp_K)
       for (i in 1:tmp_K) {
         y.idx <- c(0, w.summed, rep(0, T))
@@ -465,8 +469,8 @@ plot.mixture <- function(x,
     }
   }
   
+  par(def.par, new = FALSE) 
   if (! dynamic) {
-    par(def.par) 
     return(invisible(NULL))
   } else {
     res <- htmltools::browsable(
@@ -648,9 +652,9 @@ plot_weights <- function(data,
   }
   
   data_weight <- data$weights
-  
-  if (ncol(data_weight) > max_experts + 2) {
-    data_weight <- cbind(rowSums(data_weight[1:(ncol(data_weight) - max_experts)]), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight)])
+  N = ncol(data_weight)
+  if (N > max_experts + 2) {
+    data_weight <- cbind(rowSums(data_weight[1:(N - max_experts)]), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight)])
     names(data_weight)[1] <- "others"
     colors <- colors[-c(2:(ncol(data$weights) - max_experts))]
   }
@@ -658,14 +662,13 @@ plot_weights <- function(data,
   names_weights <- colnames(data_weight)
   data_weight <- data.frame("timestamp" = 1:data$`T`, t(apply(data_weight, 1, cumsum)), round(data_weight, round))
   
-  
-  
+  max_weight = max(data_weight[,N+1])
   plt <- amSerialChart(dataProvider = data_weight,
                        categoryField = c("timestamp"), 
                        creditsPosition = "bottom-right",
                        thousandsSeparator = " ",
                        precision = round) %>>%
-    rAmCharts::addValueAxis(title = "Weights", maximum = 1)
+    rAmCharts::addValueAxis(title = "Weights", maximum = max_weight, minimum = 0)
   
   for (index in 1:length(names_weights)) {
     if (index == 1) {
@@ -940,7 +943,7 @@ plot_contrib <- function(data,
   if (length(colors) < K) colors <- c(rep(colors[1],K-length(colors)),colors)
   
   time<-c(1:nrow(X))
-  active.experts<-which(colMeans(W)>0)
+  active.experts<-which(colMeans(abs(W))>0)
   W<-W[,active.experts]  
   X<-X[, names(W)]
   
