@@ -204,8 +204,6 @@
 <code class="sourceCode R"><span class="va">oracle.convex</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/oracle.html">oracle</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, experts <span class="op">=</span> <span class="va">X</span>, loss.type <span class="op">=</span> <span class="st">"square"</span>, model <span class="op">=</span> <span class="st">"convex"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">oracle.convex</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">oracle.convex</span><span class="op">)</span></code></pre></div>
-<p align="center">
-</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co">#&gt; Call:</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a><span class="co">#&gt; oracle.default(Y = Y, experts = X, model = "convex", loss.type = "square")</span></span>
 <span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt; </span></span>
@@ -217,7 +215,9 @@
 <span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt; Best expert oracle:   1480 0.0202</span></span>
 <span id="cb13-10"><a href="#cb13-10"></a><span class="co">#&gt; Uniform combination:  1560 0.0198</span></span>
 <span id="cb13-11"><a href="#cb13-11"></a><span class="co">#&gt; Best convex oracle:   1440 0.0193</span></span></code></pre></div>
-<img src="reference/figures/oracle-1.png" width="50%" style="display: block; margin: auto;"><p>The parameter <code>loss.type</code> defines the evaluation criterion. It can be either the square loss, the percentage loss, the absolute loss, or the pinball loss to perform quantile regression.</p>
+<p align="center">
+<img src="reference/figures/oracle-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p>The parameter <code>loss.type</code> defines the evaluation criterion. It can be either the square loss, the percentage loss, the absolute loss, or the pinball loss to perform quantile regression.</p>
 <p>The parameter <code>model</code> defines the oracle to be calculated. Here, we computed the best fixed convex combination of expert (i.e., with non-negative weights that sum to one).</p>
 </div>
 <div id="aggregate-the-experts-online-using-one-of-the-possible-aggregation-procedures" class="section level3">
@@ -251,7 +251,8 @@
 <span class="co">#&gt; Uniform 1560 0.0198</span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">MLpol</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/MLpol-1.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-2.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-3.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-4.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-5.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-6.png" width="50%" style="display: block; margin: auto;"></p>
+<p align="center">
+<img src="reference/figures/MLpol-1.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-2.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-3.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-4.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-5.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-6.png" width="50%" style="display: block; margin: auto;"></p>
 <p>The same results can be obtained more directly:</p>
 <ul>
 <li>by giving the whole time series to <code>predict</code> specifying <code>online = TRUE</code> to perform online prediction.</li>
