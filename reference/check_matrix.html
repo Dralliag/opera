@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Predict method for Mixture models — predict.mixture • opera</title>
+<title>Function to check and modify the input class and type — check_matrix • opera</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,8 @@
 
 
 
-<meta property="og:title" content="Predict method for Mixture models — predict.mixture" />
-<meta property="og:description" content="Performs sequential predictions and updates
-of a mixture object based on new observations 
-and expert advice." />
+<meta property="og:title" content="Function to check and modify the input class and type — check_matrix" />
+<meta property="og:description" content="Function to check and modify the input class and type" />
 
 
 
@@ -125,99 +123,33 @@ and expert advice." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Predict method for Mixture models</h1>
-    <small class="dont-index">Source: <a href='https://github.com/dralliag/opera/blob/master/R/predict-mixture.R'><code>R/predict-mixture.R</code></a></small>
-    <div class="hidden name"><code>predict.mixture.Rd</code></div>
+    <h1>Function to check and modify the input class and type</h1>
+    <small class="dont-index">Source: <a href='https://github.com/dralliag/opera/blob/master/R/check_matrix.R'><code>R/check_matrix.R</code></a></small>
+    <div class="hidden name"><code>check_matrix.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Performs sequential predictions and updates
-of a mixture object based on new observations 
-and expert advice.</p>
+    <p>Function to check and modify the input class and type</p>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for mixture</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
-  <span class='va'>object</span>,
-  newexperts <span class='op'>=</span> <span class='cn'>NULL</span>,
-  newY <span class='op'>=</span> <span class='cn'>NULL</span>,
-  awake <span class='op'>=</span> <span class='cn'>NULL</span>,
-  online <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"model"</span>, <span class='st'>"response"</span>, <span class='st'>"weights"</span>, <span class='st'>"all"</span><span class='op'>)</span>,
-  use_cpp <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"opera_use_cpp"</span>, default <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>,
-  quiet <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  <span class='va'>...</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>check_matrix</span><span class='op'>(</span><span class='va'>mat</span>, <span class='va'>name</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>Object of class inheriting from 'mixture'</p></td>
+      <th>mat</th>
+      <td><p><code>data.frame, data.table, tibble</code>. Object to be cast to matrix.</p></td>
     </tr>
     <tr>
-      <th>newexperts</th>
-      <td><p>An optional matrix in which to look for expert advice with which
-predict. If omitted, the past predictions of the object are returned and the
-object is not updated.</p></td>
-    </tr>
-    <tr>
-      <th>newY</th>
-      <td><p>An optional matrix with d columns (or vector if \(d=1\)) of observations to be predicted. If provided, it 
-should have the same number of rows as the number of rows of <code>newexperts</code>.
-If omitted, the object (i.e, the aggregation rule) is not updated.</p></td>
-    </tr>
-    <tr>
-      <th>awake</th>
-      <td><p>An optional array specifying the
-activation coefficients of the experts. It must have the same dimension as experts. Its entries lie in <code>[0,1]</code>.
-Possible if some experts are specialists and do not always form and suggest
-prediction. If the expert number <code>k</code> at instance <code>t</code> does not
-form any prediction of observation <code>Y_t</code>, we can put
-<code>awake[t,k]=0</code> so that the mixture does not consider expert <code>k</code> in
-the mixture to predict <code>Y_t</code>.</p></td>
-    </tr>
-    <tr>
-      <th>online</th>
-      <td><p>A boolean determining if the observations in newY are predicted
-sequentially (by updating the object step by step) or not. If FALSE, 
-the observations are predicting using the object (without using any past 
-information in newY). If TRUE, newY and newexperts should not be null.</p></td>
-    </tr>
-    <tr>
-      <th>type</th>
-      <td><p>Type of prediction. It can be</p><dl>
-   <dt>model</dt><dd><p>return the updated version of object (using newY and newexperts).</p></dd>
-   <dt>response</dt><dd><p>return the forecasts. If type is 'model', forecasts can also 
-   be obtained from the last values of object$prediction.</p></dd>
-   <dt>weights</dt><dd><p>return the weights assigned to the expert advice to 
-   produce the forecasts. If type is 'model', forecasts can also 
-   be obtained from the last rows of object$weights.</p></dd>
-   <dt>all</dt><dd><p>return a list containing 'model', 'response', and 'weights'.</p></dd>
-   
-</dl></td>
-    </tr>
-    <tr>
-      <th>use_cpp</th>
-      <td><p><code>boolean</code>. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
-with the use of custom loss function.</p></td>
-    </tr>
-    <tr>
-      <th>quiet</th>
-      <td><p><code>boolean</code>. Whether or not to display progress bars.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>further arguments are ignored</p></td>
+      <th>name</th>
+      <td><p><code>character</code>. Name of the object to be cast.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>predict.mixture</code> produces a matrix of predictions 
-(type = 'response'), an updated object (type = 'model'), or a matrix of
-weights (type = 'weights').</p>
+    <p>a 3d array if a 3d array is provided, else a matrix.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

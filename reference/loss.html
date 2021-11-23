@@ -74,7 +74,7 @@ by the predictions in x to predict the observation in y." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">opera</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -98,6 +98,9 @@ by the predictions in x to predict the observation in y." />
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/opera-vignette.html">`opera` package</a>
+    </li>
+    <li>
+      <a href="../articles/regional_forecasting.html">Hierarchical Forecasting with Opera</a>
     </li>
   </ul>
 </li>
@@ -133,38 +136,53 @@ function <code>loss</code> computes the sequence of instantaneous losses suffere
 by the predictions in <code>x</code> to predict the observation in <code>y</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>loss</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, loss.type <span class='op'>=</span> <span class='st'>"square"</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>loss</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>y</span>,
+  pred <span class='op'>=</span> <span class='cn'>NULL</span>,
+  loss.type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>name <span class='op'>=</span> <span class='st'>"square"</span><span class='op'>)</span>,
+  loss.gradient <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>A vector of length <code>T</code>
-containing the sequence of prediction to be evaluated.</p></td>
+      <td><p><code>numeric</code>. A vector of length <code>T</code> containing the sequence of prediction to be evaluated.</p></td>
     </tr>
     <tr>
       <th>y</th>
-      <td><p>A vector of length <code>T</code> that
-contains the observations to be predicted.</p></td>
+      <td><p><code>numeric</code>. A vector of length <code>T</code> that contains the observations to be predicted.</p></td>
+    </tr>
+    <tr>
+      <th>pred</th>
+      <td><p><code>numeric</code>. A vector of length <code>T</code> containing the sequence of real values.</p></td>
     </tr>
     <tr>
       <th>loss.type</th>
-      <td><p>A string or a list with a component 'name' specifying
-the loss function considered to evaluate the performance. It can be
-'square', 'absolute', 'percentage', or 'pinball'. In the case of the pinball loss, the quantile 
-can be provided by assigning to loss.type a list of two elements:</p><dl>
-     <dt>name</dt><dd><p>A string defining the name of the loss function (i.e., 'pinball')</p></dd>
-     <dt>tau</dt><dd><p>A number in <code>[0,1]</code> defining the quantile to be predicted. The default value is 0.5 to predict the median.</p></dd>
-
-</dl></td>
+      <td><p><code>character, list or function</code> ("square").</p><ul>
+<li><p>character Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');</p></li>
+<li><p>list List with field <code>name</code> equal to the loss name. If using pinball loss, field <code>tau</code> 
+     equal to the required quantile in [0,1];</p></li>
+<li><p>function A custom loss as a function of two parameters.</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>loss.gradient</th>
+      <td><p><code>boolean, function</code> (TRUE).</p><ul>
+<li><p>boolean If TRUE, the aggregation rule will not be directly applied to the loss function at hand,
+     but to a gradient version of it. The aggregation rule is then similar to gradient descent aggregation rule.</p></li>
+<li><p>function If loss.type is a function, the derivative should be provided to be used (it is not automatically 
+     computed).</p></li>
+</ul></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>A vector of length <code>T</code> containing the sequence of
-instantaneous losses suffered by the prediction <code>x</code>.</p>
+instantaneous losses suffered by the expert previsions (x) or the gradient computed on the aggregated previsions (pred).</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Pierre Gaillard &lt;pierre@gaillard.me&gt;</p>

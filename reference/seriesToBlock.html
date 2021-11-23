@@ -78,7 +78,7 @@ given to the aggregation rule procedure to perform d-dimensional predictions (i.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">opera</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -102,6 +102,9 @@ given to the aggregation rule procedure to perform d-dimensional predictions (i.
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/opera-vignette.html">`opera` package</a>
+    </li>
+    <li>
+      <a href="../articles/regional_forecasting.html">Hierarchical Forecasting with Opera</a>
     </li>
   </ul>
 </li>
@@ -134,10 +137,10 @@ given to the aggregation rule procedure to perform d-dimensional predictions (i.
     <div class="ref-description">
     <p>The functions <code>seriesToBlock</code> and <code>blockToSeries</code> convert 1-dimensional series into series of higher dimension.
 For instance, suppose you have a time-series that consists of \(T = 100\) days of \(d = 24\) hours. 
-The function seriesToBlock converts the time-series X of \(Td = 2400\) observations into a matrix of size <code><a href='https://rdrr.io/r/base/c.html'>c(T=100,d =24)</a></code>, 
+The function seriesToBlock converts the time-series X of \(Td = 2400\) observations into a matrix of size <code>c(T=100,d =24)</code>, 
 where each line corresponds to a specific day. This function is usefull if you need to perform the prediction day by day, instead of hour by hour.
-The function can also be used to convert a matrix of expert prediction of dimension <code><a href='https://rdrr.io/r/base/c.html'>c(dT,K)</a></code> where K is the number of experts,
-into an array of dimension <code><a href='https://rdrr.io/r/base/c.html'>c(T,d,K)</a></code>. The new arrays of observations and of expert predictions can be
+The function can also be used to convert a matrix of expert prediction of dimension <code>c(dT,K)</code> where K is the number of experts,
+into an array of dimension <code>c(T,d,K)</code>. The new arrays of observations and of expert predictions can be
 given to the aggregation rule procedure to perform <code>d</code>-dimensional predictions (i.e., day predictions).</p>
     </div>
 

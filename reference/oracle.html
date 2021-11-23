@@ -77,7 +77,7 @@ that can shift a few times." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">opera</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -101,6 +101,9 @@ that can shift a few times." />
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/opera-vignette.html">`opera` package</a>
+    </li>
+    <li>
+      <a href="../articles/regional_forecasting.html">Hierarchical Forecasting with Opera</a>
     </li>
   </ul>
 </li>
@@ -126,7 +129,7 @@ that can shift a few times." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Compute oracle predictions</h1>
-    <small class="dont-index">Source: <a href='https://github.com/dralliag/opera/blob/master/R/oracle.R'><code>R/oracle.R</code></a>, <a href='https://github.com/dralliag/opera/blob/master/R/plot-oracle.R'><code>R/plot-oracle.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/dralliag/opera/blob/master/R/oracle.R'><code>R/oracle.R</code></a></small>
     <div class="hidden name"><code>oracle.Rd</code></div>
     </div>
 
@@ -148,10 +151,7 @@ that can shift a few times.</p>
   lambda <span class='op'>=</span> <span class='cn'>NULL</span>,
   niter <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>...</span>
-<span class='op'>)</span>
-
-<span class='co'># S3 method for oracle</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span>, sort <span class='op'>=</span> <span class='cn'>TRUE</span>, col <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -182,12 +182,10 @@ best to predict the sequence of observations in <code>Y</code>.</p></dd>
     </tr>
     <tr>
       <th>loss.type</th>
-      <td><p>A string or a list with a component 'name' specifying
-the loss function considered to evaluate the performance. It can be
-'square', 'absolute', 'percentage', or 'pinball'. In the case of the pinball loss, the quantile 
-can be provided by assigning to loss.type a list of two elements:</p><dl>
-     <dt>name</dt><dd><p>A string defining the name of the loss function (i.e., 'pinball')</p></dd>
-     <dt>tau</dt><dd><p>A number in <code>[0,1]</code> defining the quantile to be predicted. The default value is 0.5 to predict the median.</p></dd>
+      <td><p><code>character, list or function</code>.</p><dl>
+     <dt>character</dt><dd><p>Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');</p></dd>
+     <dt>list</dt><dd><p>When using pinball loss: list with field name equal to 'pinball' and field tau equal to the required quantile in [0,1];</p></dd>
+     <dt>function</dt><dd><p>A custom loss as a function of two parameters.</p></dd>
 
 </dl></td>
     </tr>
@@ -222,18 +220,6 @@ order to approximate the oracle (default value is 3).</p></td>
 that are passed to <code><a href='https://rdrr.io/r/stats/optim.html'>optim</a></code> function is order to perform convex optimization 
 (see parameter <code>niter</code>).</p></td>
     </tr>
-    <tr>
-      <th>x</th>
-      <td><p>An object of class <code>oracle</code>.</p></td>
-    </tr>
-    <tr>
-      <th>sort</th>
-      <td><p>if set to TRUE (default), it sorts the experts by performance before the plots.</p></td>
-    </tr>
-    <tr>
-      <th>col</th>
-      <td><p>colors</p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -252,12 +238,6 @@ predictions of the oracle.</p></dd>
 <dt>rmse</dt><dd><p>If loss.type is the square loss (default) only.
 The root mean square error (i.e., it is the square root of <code>loss</code>.</p></dd>
 
-    <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
-
-    
-<ul>
-<li><p><code>oracle</code>: <code>plot</code>. It has one optional arguments.</p></li>
-</ul>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Pierre Gaillard &lt;pierre@gaillard.me&gt;</p>
