@@ -217,7 +217,7 @@ print(oracle.convex)
 plot(oracle.convex)
 ```
 
-<p align="center">
+
 
     #> Call:
     #> oracle.default(Y = Y, experts = X, model = "convex", loss.type = "square")
@@ -231,6 +231,7 @@ plot(oracle.convex)
     #> Uniform combination:  1560 0.0198
     #> Best convex oracle:   1440 0.0193
 
+<p align="center">
 <img src="man/figures/oracle-1.png" width="50%" style="display: block; margin: auto;" />
 </p>
 
@@ -290,12 +291,14 @@ summary(MLpol)
 plot(MLpol)
 ```
 
+<p align="center">
 <img src="man/figures/MLpol-1.png" width="50%" style="display: block; margin: auto;" />
 <img src="man/figures/MLpol-2.png" width="50%" style="display: block; margin: auto;" />
 <img src="man/figures/MLpol-3.png" width="50%" style="display: block; margin: auto;" />
 <img src="man/figures/MLpol-4.png" width="50%" style="display: block; margin: auto;" />
 <img src="man/figures/MLpol-5.png" width="50%" style="display: block; margin: auto;" />
 <img src="man/figures/MLpol-6.png" width="50%" style="display: block; margin: auto;" />
+</p>
 
 The same results can be obtained more directly:
 
