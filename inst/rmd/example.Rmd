@@ -1,6 +1,6 @@
 
 
-`opera` is a R package that provides several algorithms to perform robust online prediction of time series with the help of expert advice. In this vignette, we provide an example of how to use the package. 
+`opera` is an R package that provides several algorithms to perform robust online prediction of time series with the help of expert advice. In this vignette, we provide an example of how to use the package. 
 
 ## Setting: when is the package `opera` useful?
 Consider a sequence of real bounded observations $y_1,\dots,y_n$ to be predicted step by step. Suppose that you have at your disposal a finite set of methods $k =1,\dots,K$ (henceforth referred to as experts) that provide you before each time step $t=1,\dots,n$ predictions $x_{k,t}$ of the next observation $y_t$. You can form your prediction $\widehat y_t$ by using only the knowledge of the past observations $y_1,\dots,y_{t-1}$ and past and current expert forecasts $x_{k,1},\dots,x_{k,t}$ for $k=1,\dots,K$. The package <a href=#>opera</a> implements several algorithms of the online learning literature that form predictions $\widehat y_t$ by combining the expert forecasts according to their past performance. 
@@ -45,12 +45,7 @@ set.seed(1)
 
 First, we load the data and we cut it into two subsets: a training set used to build the experts (base forecasting methods) and a testing set (here the last two years) used to evaluate the performance and to run the combining algorithms. 
 
-```{r, echo=FALSE}
-dynamic <- TRUE
-if(exists("readme") && readme){
-  dynamic <- FALSE
-}
-```
+
 
 ```{r}
 data(electric_load)
@@ -66,19 +61,19 @@ The data is displayed in the following figures.
 ```{r Load, echo = TRUE, eval = FALSE}
 plot(Load, type = "l", main = "The electric Load")
 ```
-```{r Load, echo = FALSE, imgcenter = TRUE}
+```{r Load, echo = FALSE, imgcenter = TRUE, out.width="50%", dpi = 96, fig.retina=1}
 ```
 
 ```{r Temp, echo = TRUE, eval = FALSE}
 plot(Temp, Load, pch = 16, cex = 0.5, main = "Temperature vs Load")
 ```
-```{r Temp, echo = FALSE, imgcenter = TRUE}
+```{r Temp, echo = FALSE, imgcenter = TRUE, out.width="50%", dpi = 96, fig.retina=1}
 ```
 
 ```{r NumWeek, echo = TRUE, eval = FALSE}
 plot(NumWeek, Load, pch = 16, cex = 0.5, main = "Annual seasonality")
 ```
-```{r NumWeek, echo = FALSE, imgcenter = TRUE}
+```{r NumWeek, echo = FALSE, imgcenter = TRUE, out.width="50%", dpi = 96, fig.retina=1}
 ```
 
 ### First: build the expert forecasts
@@ -125,7 +120,7 @@ X <- cbind(gam.forecast, ar.forecast, gbm.forecast)
 matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load", 
         xlab = "Week", main = "Expert forecasts and observations")
 ```
-```{r loadAndForecasts, echo = FALSE, imgcenter = TRUE}
+```{r loadAndForecasts, echo = FALSE, imgcenter = TRUE, out.width="50%", dpi = 96, fig.retina=1}
 ```
 
 ```{r, echo=FALSE}
@@ -150,10 +145,10 @@ plot(oracle.convex)
 ```{r oracle, echo = FALSE, eval = FALSE, warning=FALSE}
 oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "convex")
 print(oracle.convex)
-plot(oracle.convex, dynamic = dynamic)
+plot(oracle.convex, dynamic = FALSE)
 ```
 
-```{r oracle, echo = FALSE, imgcenter = TRUE}
+```{r oracle, echo = FALSE, imgcenter = TRUE, out.width="50%", dpi = 96, fig.retina=1}
 ```
 
 
@@ -192,14 +187,14 @@ summary(MLpol)
 ```
 
 ```{r, echo = TRUE, eval = FALSE}
-plot(MLpol, pause = TRUE)
+plot(MLpol)
 ```
 
 ```{r MLpol, echo = FALSE, eval = FALSE}
-plot(MLpol, dynamic = dynamic, pause = TRUE)
+plot(MLpol, dynamic = FALSE, pause = TRUE)
 ```
 
-```{r MLpol, echo = FALSE, imgcenter = TRUE}
+```{r MLpol, echo = FALSE,  fig.show="hold", out.width="50%"}
 ```
 
 The same results can be obtained more directly:
