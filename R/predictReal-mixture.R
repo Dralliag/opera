@@ -1,17 +1,15 @@
 predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL, 
-                            online = TRUE, type = c("model", "response", "weights", "all"), ...) {
+                        online = TRUE, type = c("model", "response", "weights", "all"),
+                        use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = FALSE, ...) {
   
   type <- match.arg(type)
+  
   
   # Number of instant and number of experts
   if (!is.null(newY)) {
     T <- length(newY)
     if (is.null(object$names.experts)) {
-      if (T == 1) {
-        object$names.experts <- names(newexperts)
-      } else {
-        object$names.experts <- colnames(newexperts)
-      }
+      object$names.experts <- colnames(newexperts)
     }
     newexperts <- matrix(newexperts, nrow = T)
     N <- ncol(newexperts)
@@ -44,24 +42,18 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
   newexperts[idx.na] <- 0
   
   if (is.null(object$training) && (object$coefficients[1] != "Uniform") && (object$model == 
-                                                                         "MLpol")) {
+                                                                            "MLpol")) {
     stop(paste(object$model, "cannot handle non-uniform prior weight vector"))
   }
   
+  init = FALSE
   if (object$coefficients[1] == "Uniform") {
     object$coefficients <- rep(1/N, N)
+    init = TRUE
   }
   
   if (length(object$coefficients) != N) {
     stop("Bad number of experts: (length(object$coefficients) != nrow(newexperts))")
-  }
-  
-  if (!is.null(object$loss.type$tau) && object$loss.type$name != "pinball") {
-    warning("Unused parameter tau (loss.type$name != 'pinball)")
-  }
-  
-  if (object$loss.type$name != "square" && object$model == "Ridge") {
-    stop(paste("Square loss is require for", object$model, "model."))
   }
   
   if (!is.null(awake) && !identical(awake, matrix(1, nrow = T, ncol = N)) && (object$model == 
@@ -84,8 +76,6 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     stop("newY cannot be null to perform online prediction. Provide newY or set online = FALSE")
   }
   
-  newexperts <- matrix(as.numeric(as.matrix(newexperts)), nrow = T)
-  
   # Batch prediction and weights
   if (!online) {
     w <- matrix(object$coefficients, ncol = 1)
@@ -96,12 +86,6 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
   
   # Online prediction and weights if newY is provided
   if (!is.null(newY)) {
-    
-    if (min(newY) <= 0 && object$loss.type$name == "percentage") {
-      stop("Y should be non-negative for percentage loss function")
-    }
-    
-    
     ## If averaged is true, the models do not use coefficient as the next weight
     if (!is.null(object$parameters$averaged) && object$parameters$averaged && !is.null(object$training)) {
       object$coefficients <- object$training$next.weights
@@ -111,17 +95,18 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
       if (is.null(object$parameters$lambda) || !is.null(object$parameters$grid.lambda)) {
         newobject <- ridgeCalib(y = newY, experts = newexperts, w0 = object$coefficients, 
                                 gamma = object$parameters$gamma, grid.lambda = object$parameters$grid.lambda, 
-                                training = object$training)
+                                training = object$training, use_cpp = use_cpp, quiet = quiet)
         newobject$parameters$lambda <- c(object$parameters$lambda, newobject$parameters$lambda)
       } else {
         newobject <- ridge(y = newY, experts = newexperts, lambda = object$parameters$lambda, 
-                           w0 = object$coefficients, training = object$training)
+                           w0 = object$coefficients, training = object$training, use_cpp = use_cpp, quiet = quiet)
       }
+      newobject$loss.gradient = FALSE
     }
     
     if (object$model == "MLpol") {
       newobject <- MLpol(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
-                         loss.gradient = object$loss.gradient, training = object$training)
+                         loss.gradient = object$loss.gradient, training = object$training, use_cpp = use_cpp, quiet = quiet)
       newobject$parameters <- list(eta = rbind(object$parameters$eta, newobject$parameters$eta))
     }
     
@@ -130,56 +115,78 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
       if (is.null(object$parameters$simplex)) {object$parameters$simplex = TRUE}
       newobject <- OGD(y = newY, experts = newexperts, loss.type = object$loss.type, 
                        training = object$training, alpha = object$parameters$alpha, simplex = object$parameters$simplex,
-                       w0 = object$coefficients)
+                       w0 = object$coefficients, quiet = quiet)
     }
     
     if ((object$model == "BOA") || (object$model == "MLewa") || (object$model == 
                                                                  "MLprod")) {
       algo <- eval(parse(text = object$model))
-      newobject <- algo(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
-                        loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training)
+      if (object$model != "MLewa")  {
+        newobject <- algo(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
+                          loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training,
+                          use_cpp = use_cpp, quiet = quiet) 
+      } else {
+        newobject <- algo(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
+                          loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training,
+                          quiet = quiet)
+      }
       newobject$parameters <- list(eta = rbind(object$parameters$eta, newobject$parameters$eta))
     }
     
     if (object$model == "EWA") {
       if (is.null(object$parameters$eta) || !is.null(object$parameters$grid.eta)) {
-        if (is.null(object$parameters$grid.eta)) {
-          object$parameters$grid.eta <- 1
-        }
-        
         newobject <- ewaCalib(y = newY, experts = newexperts, awake = awake, 
                               loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
                               w0 = object$coefficients, gamma = object$parameters$gamma, grid.eta = sort(object$parameters$grid.eta), 
-                              training = object$training)
+                              training = object$training, use_cpp = use_cpp, quiet = quiet)
         newobject$parameters$eta <- c(object$parameters$eta, newobject$parameters$eta)
       } else {
         newobject <- ewa(y = newY, experts = newexperts, eta = object$parameters$eta, 
                          awake = awake, loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
-                         w0 = object$coefficients, training = object$training)
+                         w0 = object$coefficients, training = object$training, use_cpp = use_cpp, quiet = quiet)
       }
     }
     
     if (object$model == "FS") {
       if (is.null(object$parameters$eta) || is.null(object$parameters$alpha) || 
           !is.null(object$parameters$grid.eta) || !is.null(object$parameters$grid.alpha)) {
-        if (is.null(object$parameters$grid.eta)) {
-          object$parameters$grid.eta <- 1
-        }
         if (is.null(object$parameters$grid.alpha)) {
           object$parameters$grid.alpha <- 10^(-4:-1)
         }
         newobject <- fixedshareCalib(y = newY, experts = newexperts, awake = awake, 
                                      loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
                                      w0 = object$coefficients, gamma = object$parameters$gamma, grid.eta = object$parameters$grid.eta, 
-                                     grid.alpha = object$parameters$grid.alpha, training = object$training)
+                                     grid.alpha = object$parameters$grid.alpha, training = object$training, quiet = quiet)
         newobject$parameters$eta <- c(object$parameters$eta, newobject$parameters$eta)
         newobject$parameters$alpha <- c(object$parameters$alpha, newobject$parameters$alpha)
       } else {
         newobject <- fixedshare(y = newY, experts = newexperts, eta = object$parameters$eta, 
                                 alpha = object$parameters$alpha, awake = awake, loss.type = object$loss.type, 
                                 loss.gradient = object$loss.gradient, w0 = object$coefficients, 
-                                training = object$training)
+                                training = object$training, quiet = quiet)
       }
+    }
+    
+    if (object$model == "FTRL") {
+      if (is.null(object$training) && ! any(c("fun_reg", "constr_ineq", "constr_eq") %in% names(object$parameters))) {
+        default <- TRUE
+      } else {
+        default <- FALSE
+      }
+      if (init) {
+        object$coefficients = NULL
+      }
+      newobject <- FTRL("y" = newY, "experts" = newexperts, 
+                        "eta" = object$parameters$eta,
+                        "fun_reg" = object$parameters$fun_reg, "fun_reg_grad" = object$parameters$fun_reg_grad, 
+                        "constr_eq" = object$parameters$constr_eq, "constr_eq_jac" = object$parameters$constr_eq_jac, 
+                        "constr_ineq" = object$parameters$constr_ineq, "constr_ineq_jac" = object$parameters$constr_ineq_jac, 
+                        "max_iter" = object$parameters$max_iter,
+                        "obj_tol" = object$parameters$obj_tol,
+                        "loss.type" = object$loss.type, "loss.gradient" = object$loss.gradient, 
+                        "w0" = object$coefficients,
+                        "training" = object$training,
+                        "default" =  default, "quiet" = quiet)
     }
     
     
@@ -191,7 +198,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
         newobject$names.experts <- colnames(newexperts)
       } else {
         if (!is.null(names(newexperts))) {
-          newobject$names.experts <- names(newexperts)
+          newobject$names.experts <- colnames(newexperts)
         } else {
           newobject$names.experts <- paste("X",1:N,sep="")
         }
@@ -228,17 +235,17 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     if (online) {
       if (newobject$parameters$averaged) {
         newweights <- newweights.avg
-        newpred <- apply(newweights.avg * newexperts,1,sum)
+        newpred <- rowSums(newweights.avg * newexperts)
       } else {
         newweights <- newobject$weights
         newpred <- newobject$prediction
       }
     }
-  
+    
     newobject$prediction <- rbind(object$prediction, matrix(newpred, ncol = object$d))
     newobject$weights <- rbind(object$weights, newweights)
     rownames(newobject$weights) <- NULL
-    newobject$loss <- mean(loss(c(newobject$prediction), c(newobject$Y), loss.type = newobject$loss.type))
+    newobject$loss <- mean(loss(x = c(newobject$prediction), y = c(newobject$Y), loss.type = newobject$loss.type)) 
     newobject$T <- object$T + T/object$d
     newobject$d <- object$d
   } else {

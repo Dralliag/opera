@@ -8,8 +8,12 @@ opera.html
 tests/examples
 ^appveyor\.yml$
 ^\.travis\.yml$
-^_pkgdown\.yml$
 ^codecov\.yml$
-src/*
+^doc$
+^Meta$
+#src/*
 ^\.github$
 ^pkgdown$
+^examples$
+^README.html
+^inst\example.html

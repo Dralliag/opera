@@ -6,21 +6,20 @@ bestLinear <- function(y, experts, lambda = 0, loss.type = list(name = "square")
   N <- ncol(experts)
   
   coefficients <- NULL
-  if (loss.type$name == "square") {
-    coefficients <- 
-      tryCatch(
-        solve(lambda * diag(1, ncol(experts)) + t(experts) %*% experts, t(experts) %*% y),
-        error = function(err){
-          lambda = 1e-14
-          solve(lambda * diag(1, ncol(experts)) + t(experts) %*% experts, t(experts) %*% y)
-          warning("Ill conditioned problem. Regularized with lambda = 1e-14.")
-        })
+  
+  if (! class(loss.type) == "function") {
+    if (loss.type$name == "square") {
+      coefficients <- 
+        tryCatch(
+          solve(lambda * diag(1, ncol(experts)) + t(experts) %*% experts, t(experts) %*% y),
+          error = function(err){
+            lambda = 1e-14
+            solve(lambda * diag(1, ncol(experts)) + t(experts) %*% experts, t(experts) %*% y)
+            warning("Ill conditioned problem. Regularized with lambda = 1e-14.")
+          })
       
-  } else if (loss.type$name == "pinball") {
-    if (is.null(loss.type$tau)) {
-      loss.type$tau <- 0.5
-    }
-    if (!requireNamespace("quantreg", quietly = TRUE)) {
+    } else if (loss.type$name == "pinball") {
+      if (!requireNamespace("quantreg", quietly = TRUE)) {
         warning("The quantreg package must be installed to use this functionality")
         #Either exit or do something without quantreg
         return(NULL)
@@ -31,7 +30,9 @@ bestLinear <- function(y, experts, lambda = 0, loss.type = list(name = "square")
           NULL
         })
       }
+    }
   }
+ 
   if (is.null(coefficients)) {
     warning("The best linear oracle is only approximated (using optim).")
     lossu <- function(u) {

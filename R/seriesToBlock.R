@@ -30,6 +30,9 @@ seriesToBlock <- function(X, d) {
       stop("dim(X)[1] should be a multiple of d")
     }
     M <- array(apply(X,2,f),dim = c(n/d,d,K))
+    if(!is.null(colnames(X))){
+      dimnames(M)[[3]]<- colnames(X)
+    }
     return(M)
   }
 }

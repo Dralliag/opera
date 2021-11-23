@@ -1,5 +1,5 @@
 MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-  w0 = NULL, training = NULL) {
+                   w0 = NULL, training = NULL, use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = FALSE) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -19,7 +19,7 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
   R <- log(w0)
   
   L <- rep(1, N)
-  maxloss <- 0
+  maxloss <- rep(0, N)
   
   eta <- matrix(exp(700), ncol = N, nrow = T + 1)
   prediction <- rep(0, T)
@@ -31,40 +31,57 @@ MLprod <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient
     maxloss <- training$maxloss
   }
   
-  for (t in 1:T) {
+  if (use_cpp){
+    loss_tau <- ifelse(! is.null(loss.type$tau), loss.type$tau, 0)
+    loss_name <- loss.type$name
+    B <- computeMLProdEigen(awake,eta,experts,weights,y,prediction,
+                            R,L,maxloss,loss_name,loss_tau,loss.gradient, quiet = quiet);
+  }
+  else{
+    if (! quiet) steps <- init_progress(T)
     
-    # Update weights
-    w <- truncate1(exp(R))
-    w <- eta[t, ] * w/sum(eta[t, ] * w)
-    p <- awake[t, ] * w/sum(awake[t, ] * w)
-    pred <- experts[t, ] %*% p  # Predict
-    
-    weights[t, ] <- p
-    prediction[t] <- pred
-    
-    # Observe losses
-    lpred <- lossPred(pred, y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
-    lexp <- lossPred(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
-    
-    r <- awake[t, ] * (c(c(lpred) - lexp))
-    L <- L + r^2
-    maxloss <- pmax(maxloss, abs(r))
-    neweta <- pmin(1/(2 * maxloss), sqrt(log(N)/L))
-    
-    # Update regret and learning parameter
-    R <- neweta/eta[t, ] * R + log(1 + awake[t, ] * neweta * (c(c(lpred) - lexp)))
-    eta[t + 1, ] <- neweta
-    
-    if (is.na(sum(R))) {
-      browser("Nan in R")
+    for (t in 1:T) {
+      if (! quiet) update_progress(t, steps)
+      
+      # Update weights
+      idx <- awake[t,] > 0
+      R.max <- max(R[idx])
+      w <- numeric(N)
+      w[idx] <- exp(R[idx]-R.max)
+      w[idx] <- eta[t, idx] * w[idx]/sum(eta[t, idx] * w[idx])
+      
+      p <- awake[t, ] * w/sum(awake[t, ] * w)
+      pred <- experts[t, ] %*% p  # Predict
+      
+      weights[t, ] <- p
+      prediction[t] <- pred
+      
+      # Observe losses
+      lpred <- loss(pred, y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
+      lexp <- loss(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
+      
+      r <- awake[t, ] * (c(c(lpred) - lexp))
+      L <- L + r^2
+      maxloss <- pmax(maxloss, abs(r))
+      neweta <- pmin(1/(2 * maxloss), sqrt(log(N)/L))
+      
+      # Update regret and learning parameter
+      R <- neweta/eta[t, ] * R + log(1 + awake[t, ] * neweta * (c(c(lpred) - lexp)))
+      eta[t + 1, ] <- neweta
+      
+      if (is.na(sum(R))) {
+        browser("Nan in R")
+      }
     }
+    if (! quiet) end_progress()
   }
   
-  w <- truncate1(exp(R))
+  R.max <- max(R)
+  w <- exp(R-R.max)
   w <- eta[T + 1, ] * w/sum(eta[T + 1, ] * w)
   
   object <- list(model = "MLprod", loss.type = loss.type, loss.gradient = loss.gradient, 
-    coefficients = w)
+                 coefficients = w)
   
   object$parameters <- list(eta = eta[1:T, ])
   object$weights <- weights

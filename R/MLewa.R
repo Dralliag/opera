@@ -1,6 +1,6 @@
 
 MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-  w0 = NULL, training = NULL) {
+                  w0 = NULL, training = NULL, quiet = FALSE) {
   experts <- as.matrix(experts)
   N <- ncol(experts)
   T <- nrow(experts)
@@ -30,11 +30,22 @@ MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     eta[1, ] <- training$eta
     R <- training$R
     # Update weights
-    w <- truncate1(exp(log(w0) + eta[1, ] * R))
-    w <- w/sum(w)
+    R.aux <- log(w0) + eta[1, ] * R
+    R.max <- max(R.aux)
+    w <- exp(R.aux - R.max)
   }
   
+  if (! quiet) steps <- init_progress(T)
+  
   for (t in 1:T) {
+    if (! quiet) update_progress(t, steps)
+    
+    idx <- awake[t,] > 0
+    R.aux <- log(w0) + eta[t, ] * R
+    R.max <- max(R.aux[idx])
+    w <- numeric(N)
+    w[idx] <- exp(R.aux[idx] - R.max)
+    
     # form the each-instant updated mixture and prediction
     p <- awake[t, ] * w/sum(awake[t, ] * w)
     pred <- experts[t, ] %*% p
@@ -44,19 +55,24 @@ MLewa <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient 
     prediction[t] <- pred
     
     # observe losses
-    lpred <- lossPred(pred, y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
-    lexp <- lossPred(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
+    lpred <- loss(pred, y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
+    lexp <- loss(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
     
     # update regret and weights
     r <- awake[t, ] * (c(c(lpred) - lexp))
     R <- R + r
     eta[t + 1, ] <- sqrt(log(N)/(log(N)/eta[t, ]^2 + r^2))
-    w <- truncate1(exp(log(w0) + eta[t + 1, ] * R))
+    idx <- awake[t,] > 0
+    R.aux <- log(w0) + eta[t + 1, ] * R
+    R.max <- max(R.aux[idx])
+    w[idx] <- exp(R.aux[idx] - R.max)
   }
+  if (! quiet) end_progress()
+  
   w <- w/sum(w)
   
   object <- list(model = "MLewa", loss.type = loss.type, loss.gradient = loss.gradient, 
-    coefficients = w/sum(w))
+                 coefficients = w/sum(w))
   
   object$parameters <- list(eta = eta[1:T, ])
   object$weights <- weights

@@ -14,7 +14,7 @@ awake <- cbind(rep(c(0, 1), n/2), 1)
 
 # Test of loss functions
 test_that("loss functions return correct values", {
-  expect_that(dim(loss(X, Y, loss.type = "square"))[1], equals(n))
+  expect_that(dim(apply(X, 2, function(x) loss(x, Y, loss.type = list(name = "square"))))[1], equals(n))
 })
 
 # Test of oracle functions
@@ -38,17 +38,17 @@ test_that("Best convex oracle is ok", {
   expect_true(sum(abs(m$prediction - Y)) < 1e-10)
   expect_equal(m$rmse, 0)
   
-  expect_warning(m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "percentage"))
+  # expect_warning(m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "percentage"))
   expect_true(abs(m$coefficients[1] - 0.6) < 1e-04)
   expect_true(m$loss < 1e-04)
   expect_true(sum(abs(m$prediction - Y)) < 1e-04)
   
-  expect_warning(m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "absolute", awake = awake))
+  m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "absolute", awake = awake)
   expect_true(abs(m$coefficients[1] - 0.6) < 0.1)
   l <- getAnywhere(lossConv)$objs[[1]]
-  expect_equal(mean(loss(m$prediction, Y, "absolute")), l(m$coefficients, Y, X, 
-    awake, "absolute"))
-  expect_equal(m$loss, mean(loss(m$prediction, Y, "absolute")))
+  expect_equal(mean(loss(x = m$prediction, y = Y, loss.type = list(name = "absolute"))), l(m$coefficients, Y, X, 
+    awake, list(name = "absolute")))
+  expect_equal(m$loss, mean(loss(x = m$prediction, y = Y, loss.type = list(name = "absolute"))))
 })
 
 test_that("Best linear oracle is ok", {
@@ -61,7 +61,7 @@ test_that("Best linear oracle is ok", {
   expect_error(oracle(Y = Y, experts = X, model = "linear", awake = awake), "Sleeping or missing values not allowed")
   
   expect_warning(m <- oracle(Y = Y, experts = X, model = "linear", loss.type = "percentage"))
-  expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = "percentage")))
+  expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = list("name" = "percentage"))))
 })
 
 test_that("Quantile oracles are ok", {
@@ -81,10 +81,11 @@ test_that("Quantile oracles are ok", {
   expect_equal(m.best_expert$loss, mean(loss(m.best_expert$prediction, Y, loss.type = l)))
   
   # best convex oracle
-  expect_warning(m <- oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
+  # expect_warning(m <- oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
+  m <- oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l)
   expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.1)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
-  expect_warning(oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
+  # expect_warning(oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
   
   # best linear oracle (with singular matrix)
   expect_warning(m <- oracle(Y = Y, experts = X[, c(1, K)], model = "linear", loss.type = l, niter = 10))
@@ -133,15 +134,16 @@ test_that("Dimension d>1 is ok",{
     }
     Y <- rep(theta.star, n)
     
-    cat(model, l, "\n")
+    # cat(model, l, "\n")
     m <- suppressWarnings({oracle(Y = Y,experts = X, model = model, loss.type = l)})
     m$d <- d
     m$prediction <- seriesToBlock(m$prediction,d)
     m$Y <- seriesToBlock(m$Y,d)
     m$residuals <- seriesToBlock(m$residuals,d)
     m$experts <- seriesToBlock(m$experts,d)
-    # summary(m)
-    # plot(m)
+    expect_output(summary(m), NA)
+    expect_error(plot(m), NA)
+    expect_output(print(m))
     
     X <- seriesToBlock(X, d = d)
     Y <- seriesToBlock(Y, d = d)
@@ -151,4 +153,3 @@ test_that("Dimension d>1 is ok",{
     }
   }
 })
-

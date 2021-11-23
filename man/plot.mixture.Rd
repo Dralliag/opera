@@ -4,7 +4,17 @@
 \alias{plot.mixture}
 \title{Plot an object of class mixture}
 \usage{
-\method{plot}{mixture}(x, pause = FALSE, col = NULL, ...)
+\method{plot}{mixture}(
+  x,
+  pause = FALSE,
+  col = NULL,
+  alpha = 0.01,
+  dynamic = T,
+  type = "all",
+  max_experts = 50,
+  col_by_weight = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class mixture. If awake is provided (i.e., some experts are unactive), 
@@ -13,6 +23,20 @@ their residuals and cumulative losses are computed by using the predictions of t
 \item{pause}{if set to TRUE (default) displays the plots separately, otherwise on a single page}
 
 \item{col}{the color to use to represent each experts, if set to NULL (default) use R\code{RColorBrewer::brewer.pal(...,"Spectral"}}
+
+\item{alpha}{\code{numeric}. Smoothing parameter for contribution plot (parameter 'f' of function \code{\link[stats]{lowess}}).}
+
+\item{dynamic}{\code{boolean}. If TRUE, graphs are generated with \code{rAmCharts}, else with base R.}
+
+\item{type}{\code{char}.
+\itemize{
+     \item{'all'}{ Display all the graphs ;}
+     \item{'plot_weight', 'boxplot_weight', 'dyn_avg_loss', 'cumul_res', 'avg_loss', 'contrib'}{ Display the selected graph alone.}
+}}
+
+\item{max_experts}{\code{integer}. Maximum number of experts to be displayed (only the more influencial).}
+
+\item{col_by_weight}{\code{boolean}. If TRUE (default), colors are ordered by weights of each expert, else by column}
 
 \item{...}{additional plotting parameters}
 }

@@ -1,6 +1,6 @@
-fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), awake = NULL, 
-  loss.type = "square", loss.gradient = TRUE, w0 = NULL, trace = F, gamma = 2, 
-  training = NULL) {
+fixedshareCalib <- function(y, experts, grid.eta = NULL, grid.alpha = 10^(-4:-1), awake = NULL, 
+  loss.type = "square", loss.gradient = TRUE, w0 = NULL, gamma = 2, 
+  training = NULL, quiet = FALSE) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -21,6 +21,14 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
   experts[idx.na] <- 0
   
   T0 <- 0  # number of observations in previous runs
+  
+  # if grid.eta == NULL, init during first computation of the loss as 1 / mean(abs(R.w0))
+  if (is.null(grid.eta)) {
+    init_grid_eta <- TRUE
+    grid.eta <- 1
+  } else {
+    init_grid_eta <- FALSE
+  }
   neta <- length(grid.eta)  # Number of learning rates in the grid
   nalpha <- length(grid.alpha)  # Number of mixing rates in the grid
   bestpar <- c(floor(neta)/2, floor(nalpha)/2) + 1  # We start with the parameters in the middle of the grids
@@ -42,41 +50,49 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
     T0 <- training$T
   }
   
+  if (! quiet) steps <- init_progress(T)
+  
   for (t in 1:T) {
-    # Display the state of progress of the algorithm
-    if (!(t%%floor(T/10)) && trace) 
-      cat(floor(10 * t/T) * 10, "% -- ")
+    if (! quiet) update_progress(t, steps)
     
     # Weights, prediction forme by FixedShare(eta[t],alpha[t]) where par[t,] =
     # c(eta[t],alpha[t]) are the parameters calibrated online
     weights[t, ] <- wpar[, bestpar[1], bestpar[2]] * awake[t, ]/sum(wpar[, bestpar[1], 
       bestpar[2]] * awake[t, ])
     prediction[t] <- experts[t, ] %*% weights[t, ]
-    par <- rbind(par, data.frame(eta = grid.eta[bestpar[1]], alpha = grid.alpha[bestpar[2]]))
+    par <- rbind(par, data.frame(eta = ifelse(t == 1 && init_grid_eta, NA, grid.eta[bestpar[1]]), alpha = grid.alpha[bestpar[2]]))
     
     # Loop over the mixing rates alpha in the grid 'grid.alpha'
     for (k in 1:nalpha) {
       
       # Weights, prediction, and losses formed by FixedShare(eta,alpha) for (eta,alpha)
       # in the grid
-      waux <- t(t(wpar[, , k] * awake[t, ])/apply(as.matrix(wpar[, , k] * awake[t, 
-        ]), 2, sum))
+      waux <- t(t(wpar[, , k] * awake[t, ])/colSums(as.matrix(wpar[, , k] * awake[t, 
+        ])))
       pred <- experts[t, ] %*% waux
       
-      cumulativeLoss[, k] <- cumulativeLoss[, k] + loss(pred, y[t], loss.type)  # Non gradient cumulative losses
+      cumulativeLoss[, k] <- cumulativeLoss[, k] + loss(x = pred, y = y[t], loss.type = loss.type)  # Non gradient cumulative losses
+      
       if (neta == 1){
-        lpred <- lossPred(pred, y[t], pred, loss.type, loss.gradient)
+        lpred <- loss(pred, y[t], pred, loss.type, loss.gradient)
       } else {
-        lpred <- diag(lossPred(pred, y[t], pred, loss.type, loss.gradient))  # gradient loss suffered by each eta on the grid
+        lpred <- diag(loss(pred, y[t], pred, loss.type, loss.gradient))  # gradient loss suffered by each eta on the grid
       }
-      lexp <- lossPred(experts[t, ], y[t], pred, loss.type, loss.gradient)
+      lexp <- loss(experts[t, ], y[t], pred, loss.type, loss.gradient)
       
       # Regret update
       R <- t(t(log(wpar[, , k]))/grid.eta) + awake[t, ] * t(c(lpred) - t(lexp))
       
+      # init value of grid.eta if NULL at first step
+      if (t == 1 && init_grid_eta) {
+        grid.eta <- 1 / mean(abs(R))
+      }
+      
       # Weight update
-      v <- truncate1(exp(t(t(matrix(R, ncol = neta)) * grid.eta)))
-      v <- t(t(v)/apply(v, 2, sum))  # Renormalization of each column
+      R.aux <- t(t(matrix(R, ncol = neta)) * grid.eta)
+      R.max <- apply(R.aux, 2, max)
+      v.aux <- t(exp(t(R.aux) - R.max))
+      v <- t(t(v.aux) / colSums(v.aux))  # Renormalization of each column
       wpar[, , k] <- grid.alpha[k]/N + (1 - grid.alpha[k]) * v
     }
     
@@ -87,8 +103,6 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
     # Expand the grid if the best parameter lies on an extremity (only for the first
     # component)
     if (bestpar[1] == neta) {
-      if (trace) 
-        cat(" + ")
       neweta <- grid.eta[neta] * gamma^(1:3)
       grid.eta <- c(grid.eta, neweta)
       neta <- neta + length(neweta)
@@ -101,15 +115,13 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
           perfnewpar <- fixedshare(c(training$oldY, y[1:t]), rbind(training$oldexperts, 
           matrix(experts[1:t, ], ncol = N)), neweta[j], grid.alpha[k], 
           awake = rbind(training$oldawake, matrix(awake[1:t, ], ncol = N)), 
-          loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0)
+          loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0, quiet = TRUE)
           cumulativeLoss[bestpar[1] + j, k] <- perfnewpar$training$cumulativeLoss
           wpar[, bestpar[1] + j, k] <- perfnewpar$coefficients
         }
       }
     }
     if (bestpar[1] == 1) {
-      if (trace) 
-        cat(" - ")
       neweta <- grid.eta[1]/gamma^(1:3)
       neta <- neta + length(neweta)
       bestpar[1] <- bestpar[1] + length(neweta)
@@ -123,13 +135,14 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
           perfnewpar <- fixedshare(c(training$oldY, y[1:t]), rbind(training$oldexperts, 
           matrix(experts[1:t, ], ncol = N)), neweta[j], grid.alpha[k], 
           awake = rbind(training$oldawake, matrix(awake[1:t, ], ncol = N)), 
-          loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0)
+          loss.type = loss.type, loss.gradient = loss.gradient, w0 = w0, quiet = TRUE)
           cumulativeLoss[1, k] <- perfnewpar$training$cumulativeLoss
           wpar[, bestpar[1] - j, k] <- perfnewpar$coefficients
         }
       }
     }
   }
+  if (! quiet) end_progress()
   
   # Next weights
   w <- wpar[, bestpar[1], bestpar[2]]/sum(wpar[, bestpar[1], bestpar[2]])
@@ -153,7 +166,5 @@ fixedshareCalib <- function(y, experts, grid.eta = 1, grid.alpha = 10^(-4:-1), a
   colnames(object$training$grid.loss) <- grid.alpha
   class(object) <- "mixture"
   
-  if (trace) 
-    cat("\n")
   return(object)
 } 

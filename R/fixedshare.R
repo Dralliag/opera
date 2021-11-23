@@ -1,6 +1,6 @@
 
 fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square", 
-  loss.gradient = TRUE, w0 = NULL, training = NULL) {
+  loss.gradient = TRUE, w0 = NULL, training = NULL, quiet = FALSE) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -26,27 +26,40 @@ fixedshare <- function(y, experts, eta, alpha, awake = NULL, loss.type = "square
     cumulativeLoss <- training$cumulativeLoss
   }
   
+  if (! quiet) steps <- init_progress(T)
+  
   for (t in 1:T) {
+    if (! quiet) update_progress(t, steps)
+    
     # Weight update
-    weights[t, ] <- t(truncate1(exp(eta * R)) * t(awake[t, ]))
-    weights[t, ] <- weights[t, ]/sum(weights[t, ])
+    idx <- awake[t,] > 0
+    R.aux<- eta * R
+    R.max <- max(R.aux[idx])
+    weights[t, idx] <- t(exp(R.aux[idx]-R.max)) * t(awake[t, idx])
+    weights[t, idx] <- weights[t, idx]/sum(weights[t, idx])
     
     # Prediction and loss
     pred[t] <- experts[t, ] %*% weights[t, ]
-    cumulativeLoss <- cumulativeLoss + loss(pred[t], y[t], loss.type)
-    lpred <- lossPred(pred[t], y[t], pred[t], loss.type, loss.gradient)
-    lexp <- lossPred(experts[t, ], y[t], pred[t], loss.type, loss.gradient)
+    cumulativeLoss <- cumulativeLoss + loss(x = pred[t], y = y[t], loss.type = loss.type)
+    lpred <- loss(pred[t], y[t], pred[t], loss.type, loss.gradient)
+    lexp <- loss(experts[t, ], y[t], pred[t], loss.type, loss.gradient)
     
     # Regret and weight update
     R <- R + awake[t, ] * (c(c(lpred) - lexp))
-    v <- truncate1(exp(eta * R))/sum(truncate1(exp(eta * R)))
+    R.aux <- eta * R
+    R.max <- max(R.aux)
+    v <- exp(R.aux - R.max)/sum(exp(R.aux - R.max))
     R <- log(alpha/N + (1 - alpha) * v)/eta
   }
-  w <- t(truncate1(exp(eta * R)))
+  if (! quiet) end_progress()
+  
+  R.aux <- eta * R
+  R.max <- max(R.aux)
+  w <- t(exp(R.aux - R.max))
   w <- w/sum(w)
   
   object <- list(model = "FS", loss.type = loss.type, loss.gradient = loss.gradient, 
-    coefficients = w)
+                 coefficients = w)
   
   object$parameters <- list(eta = eta, alpha = alpha)
   object$weights <- weights

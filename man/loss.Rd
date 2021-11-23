@@ -4,27 +4,40 @@
 \alias{loss}
 \title{Errors suffered by a sequence of predictions}
 \usage{
-loss(x, y, loss.type = "square")
+loss(
+  x,
+  y,
+  pred = NULL,
+  loss.type = list(name = "square"),
+  loss.gradient = FALSE
+)
 }
 \arguments{
-\item{x}{A vector of length \code{T}
-containing the sequence of prediction to be evaluated.}
+\item{x}{\code{numeric}. A vector of length \code{T} containing the sequence of prediction to be evaluated.}
 
-\item{y}{A vector of length \code{T} that
-contains the observations to be predicted.}
+\item{y}{\code{numeric}. A vector of length \code{T} that contains the observations to be predicted.}
 
-\item{loss.type}{A string or a list with a component 'name' specifying
-the loss function considered to evaluate the performance. It can be
-'square', 'absolute', 'percentage', or 'pinball'. In the case of the pinball loss, the quantile 
-can be provided by assigning to loss.type a list of two elements: 
-\describe{
-     \item{name}{A string defining the name of the loss function (i.e., 'pinball')}
-     \item{tau}{ A number in \code{[0,1]} defining the quantile to be predicted. The default value is 0.5 to predict the median.}
+\item{pred}{\code{numeric}. A vector of length \code{T} containing the sequence of real values.}
+
+\item{loss.type}{\code{character, list or function} ("square").
+\itemize{
+     \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
+     \item{list}{ List with field \code{name} equal to the loss name. If using pinball loss, field \code{tau} 
+     equal to the required quantile in [0,1];}
+     \item{function}{ A custom loss as a function of two parameters.}
+}}
+
+\item{loss.gradient}{\code{boolean, function} (TRUE). 
+\itemize{
+     \item{boolean}{ If TRUE, the aggregation rule will not be directly applied to the loss function at hand,
+     but to a gradient version of it. The aggregation rule is then similar to gradient descent aggregation rule. }
+     \item{function}{ If loss.type is a function, the derivative should be provided to be used (it is not automatically 
+     computed).}
 }}
 }
 \value{
 A vector of length \code{T} containing the sequence of
-instantaneous losses suffered by the prediction \code{x}.
+instantaneous losses suffered by the expert previsions (x) or the gradient computed on the aggregated previsions (pred).
 }
 \description{
 The

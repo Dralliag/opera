@@ -1,6 +1,6 @@
 
 
-`opera` is a R package that provides several algorithms to perform robust online prediction of time series with the help of expert advice. In this vignette, we provide an example of how to use the package. 
+`opera` is an R package that provides several algorithms to perform robust online prediction of time series with the help of expert advice. In this vignette, we provide an example of how to use the package. 
 
 ## Setting: when is the package `opera` useful?
 Consider a sequence of real bounded observations $y_1,\dots,y_n$ to be predicted step by step. Suppose that you have at your disposal a finite set of methods $k =1,\dots,K$ (henceforth referred to as experts) that provide you before each time step $t=1,\dots,n$ predictions $x_{k,t}$ of the next observation $y_t$. You can form your prediction $\widehat y_t$ by using only the knowledge of the past observations $y_1,\dots,y_{t-1}$ and past and current expert forecasts $x_{k,1},\dots,x_{k,t}$ for $k=1,\dots,K$. The package <a href=#>opera</a> implements several algorithms of the online learning literature that form predictions $\widehat y_t$ by combining the expert forecasts according to their past performance. 
@@ -36,14 +36,16 @@ with several covariates: the temperature, calendar information,
 and industrial production indexes. The data set is provided by 
 the French [National Institute of Statistics and Economic Studies (Insee)][Insee].
 
+```{r, echo=TRUE}
+library(opera)
+set.seed(1)
+```
+
 ### The data set
 
 First, we load the data and we cut it into two subsets: a training set used to build the experts (base forecasting methods) and a testing set (here the last two years) used to evaluate the performance and to run the combining algorithms. 
 
-```{r, echo=FALSE}
-library(opera)
-set.seed(1)
-```
+
 
 ```{r}
 data(electric_load)
@@ -51,6 +53,7 @@ attach(electric_load)
 idx_data_test <- 620:nrow(electric_load)
 data_train <- electric_load[-idx_data_test, ] 
 data_test <- electric_load[idx_data_test, ]  
+
 ```
 
 The data is displayed in the following figures.
@@ -58,19 +61,19 @@ The data is displayed in the following figures.
 ```{r Load, echo = TRUE, eval = FALSE}
 plot(Load, type = "l", main = "The electric Load")
 ```
-```{r Load, echo = FALSE, imgcenter = TRUE}
+```{r Load, echo = FALSE, imgcenter = TRUE, out.width="50%", dpi = 96, fig.retina=1}
 ```
 
 ```{r Temp, echo = TRUE, eval = FALSE}
 plot(Temp, Load, pch = 16, cex = 0.5, main = "Temperature vs Load")
 ```
-```{r Temp, echo = FALSE, imgcenter = TRUE}
+```{r Temp, echo = FALSE, imgcenter = TRUE, out.width="50%", dpi = 96, fig.retina=1}
 ```
 
 ```{r NumWeek, echo = TRUE, eval = FALSE}
 plot(NumWeek, Load, pch = 16, cex = 0.5, main = "Annual seasonality")
 ```
-```{r NumWeek, echo = FALSE, imgcenter = TRUE}
+```{r NumWeek, echo = FALSE, imgcenter = TRUE, out.width="50%", dpi = 96, fig.retina=1}
 ```
 
 ### First: build the expert forecasts
@@ -117,7 +120,7 @@ X <- cbind(gam.forecast, ar.forecast, gbm.forecast)
 matplot(cbind(Y, X), type = "l", col = 1:6, ylab = "Weekly load", 
         xlab = "Week", main = "Expert forecasts and observations")
 ```
-```{r loadAndForecasts, echo = FALSE, imgcenter = TRUE}
+```{r loadAndForecasts, echo = FALSE, imgcenter = TRUE, out.width="50%", dpi = 96, fig.retina=1}
 ```
 
 ```{r, echo=FALSE}
@@ -131,13 +134,23 @@ colnames(X) <- c("gam", "ar", "gbm")
 To evaluate the performance of the experts and see if the aggregation rules may
 perform well, you can look at the oracles (rules that are used only for analysis and cannot be design online).
 
-```{r oracle, echo = TRUE, eval = FALSE, warning=FALSE}
+
+```{r, echo = TRUE, eval = FALSE, warning=FALSE}
 oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "convex")
 print(oracle.convex)
 plot(oracle.convex)
 ```
-```{r oracle, echo = FALSE, imgcenter = TRUE, warning=FALSE}
+
+
+```{r oracle, echo = FALSE, eval = FALSE, warning=FALSE}
+oracle.convex <- oracle(Y = Y, experts = X, loss.type = "square", model = "convex")
+print(oracle.convex)
+plot(oracle.convex, dynamic = FALSE)
 ```
+
+```{r oracle, echo = FALSE, imgcenter = TRUE, out.width="50%", dpi = 96, fig.retina=1}
+```
+
 
 The parameter `loss.type` defines the evaluation criterion. It can be
 either the square loss, the percentage loss, the absolute loss, or the pinball 
@@ -172,10 +185,16 @@ The results can be displayed with method `summary` and `plot`.
 ```{r MLpolsummary}
 summary(MLpol)
 ```
-```{r MLpol, echo = TRUE, eval = FALSE}
-plot(MLpol, pause = TRUE)
+
+```{r, echo = TRUE, eval = FALSE}
+plot(MLpol)
 ```
-```{r MLpol, echo = FALSE, imgcenter = TRUE}
+
+```{r MLpol, echo = FALSE, eval = FALSE}
+plot(MLpol, dynamic = FALSE, pause = TRUE)
+```
+
+```{r MLpol, echo = FALSE,  fig.show="hold", out.width="50%"}
 ```
 
 The same results can be obtained more directly:
@@ -241,7 +260,7 @@ Let's say that in the above example, instead of making a weekly prediction, we n
 
 Note that the outputs $y_1,\dots,y_n$ to be predicted step by step can be $d$-dimensional in `opera`. In this case, the argument `Y` provided to the function `mixture` should be a matrix, where each line corresponds to the output observed at time $t$; the argument `experts` must be an array of dimension $T \times d \times K$ such that `experts[t,:,k]` is the prediction made by expert $k$ at iteration $t$. These predictions of dimension $d$ can be used in various situations. For example, we might want to simultaneously predict the electricity consumption of several countries in the example above. 
 
-Another useful application of this feature is block by block prediction. Consider the above exemple of electricity consumption to be predicted every four weeks. This can be easily done by transforming the original time series into a 4 dimensional time series, where each row corresponds to the four weeks to predict after each update. 
+Another useful application of this feature is block by block prediction. Consider the above example of electricity consumption to be predicted every four weeks. This can be easily done by transforming the original time series into a 4 dimensional time series, where each row corresponds to the four weeks to predict after each update. 
 
 ```{r block_transform, eval = TRUE}
 YBlock <- seriesToBlock(X = Y, d = 4)

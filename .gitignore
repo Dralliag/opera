@@ -12,3 +12,8 @@ R/nBOA.r
 opera.html
 vignettes/.build.timestamp
 tests/examples
+src/*.o
+src/*.so
+src/*.dll
+/doc/
+/Meta/
