@@ -7,14 +7,14 @@
 FTRL(
   y,
   experts,
-  eta,
+  eta = NULL,
   fun_reg = NULL,
   fun_reg_grad = NULL,
   constr_eq = NULL,
   constr_eq_jac = NULL,
   constr_ineq = NULL,
   constr_ineq_jac = NULL,
-  loss.type = "square",
+  loss.type = list(name = "square"),
   loss.gradient = TRUE,
   w0 = NULL,
   max_iter = 50,
@@ -47,14 +47,14 @@ FTRL(
 \describe{
      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
      \item{list}{ List with field \code{name} equal to the loss name. If using pinball loss, field \code{tau} equal to the required quantile in [0,1];}
-     \item{function}{ A custom loss as a function of two parameters.}
+     \item{function}{ A custom loss as a function of two parameters (prediction, label).}
 }}
 
 \item{loss.gradient}{\code{boolean, function} (TRUE). 
 \describe{
      \item{boolean}{ If TRUE, the aggregation rule will not be directly applied to the loss function at hand,
      but to a gradient version of it. The aggregation rule is then similar to gradient descent aggregation rule. }
-     \item{function}{ If loss.type is a function, the derivative should be provided to be used (it is not automatically 
+     \item{function}{ If loss.type is a function, the derivative of the loss in its first component should be provided to be used (it is not automatically 
      computed).}
 }}
 
@@ -78,7 +78,8 @@ object of class mixture.
 FTRL \insertCite{shalev2007primal}{opera} and Chap. 5 of \insertCite{hazan2019introduction}{opera} is the online counterpart of empirical risk minimization. 
  It is a family of aggregation rules (including OGD) that uses at any time the empirical risk
  minimizer so far with an additional regularization. The online optimization can be performed
- on any bounded convex set that can be expressed with equality or inequality constraints.
+ on any bounded convex set that can be expressed with equality or inequality constraints. 
+ Note that this method is still under development and a beta version.
 }
 \references{
 \insertAllCited{}
