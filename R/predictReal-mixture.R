@@ -4,6 +4,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
   
   type <- match.arg(type)
   
+  
   # Number of instant and number of experts
   if (!is.null(newY)) {
     T <- length(newY)
@@ -45,8 +46,10 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     stop(paste(object$model, "cannot handle non-uniform prior weight vector"))
   }
   
+  init = FALSE
   if (object$coefficients[1] == "Uniform") {
     object$coefficients <- rep(1/N, N)
+    init = TRUE
   }
   
   if (length(object$coefficients) != N) {
@@ -169,6 +172,9 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
         default <- TRUE
       } else {
         default <- FALSE
+      }
+      if (init) {
+        object$coefficients = NULL
       }
       newobject <- FTRL("y" = newY, "experts" = newexperts, 
                         "eta" = object$parameters$eta,
