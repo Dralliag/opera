@@ -1,13 +1,22 @@
 
 
-`opera` is an R package that provides several algorithms to perform robust online prediction of time series with the help of expert advice. In this vignette, we provide an example of how to use the package. 
+`opera` is a R package that provides several algorithms to perform robust online prediction of time series with the help of expert advice. In this vignette, we provide an example of how to use the package. 
 
 ## Setting: when is the package `opera` useful?
-Consider a sequence of real bounded observations $y_1,\dots,y_n$ to be predicted step by step. Suppose that you have at your disposal a finite set of methods $k =1,\dots,K$ (henceforth referred to as experts) that provide you before each time step $t=1,\dots,n$ predictions $x_{k,t}$ of the next observation $y_t$. You can form your prediction $\widehat y_t$ by using only the knowledge of the past observations $y_1,\dots,y_{t-1}$ and past and current expert forecasts $x_{k,1},\dots,x_{k,t}$ for $k=1,\dots,K$. The package <a href=#>opera</a> implements several algorithms of the online learning literature that form predictions $\widehat y_t$ by combining the expert forecasts according to their past performance. 
-That is, 
-\[
-  \widehat y_t = \sum_{k=1}^K p_{k,t} x_{k,t} \,.
-\] 
+Consider a sequence of real bounded observations $y_1,\dots,y_n$ to be predicted step by step. Suppose that you have at your disposal a finite set of methods $k =1,\dots,K$ (henceforth referred to as experts) that provide you before each time step $t=1,\dots,n$ predictions $x_{k,t}$ of the next observation $y_t$. You can form your prediction $\widehat y_t$ by using only the knowledge of the past observations $y_1,\dots,y_{t-1}$ and past and current expert forecasts $x_{k,1},\dots,x_{k,t}$ for $k=1,\dots,K$. The package <a href=#>opera</a> implements several algorithms of the online learning literature that form predictions $\widehat y_t$ by combining the expert forecasts according to their past performance. That is,
+
+```{asis, echo = readme}
+<p align="center">
+<img src="man/figures/formula.png" width="20%" style="display: block; margin: auto;" />
+</p>
+```
+
+```{asis, echo = !readme}
+<p align="center">
+<img src="../man/figures/formula.png" width="20%" style="display: block; margin: auto;" />
+</p>
+```
+
 These algorithms come with finite time worst-case guarantees. The monograph of [Cesa-Bianchi and Lugisi (2006)][Cesa-BianchiLugosi2006] gives a complete introduction to the setting of prediction of arbitrary sequences with the help of expert advice.
 
 

@@ -5,7 +5,7 @@ output:
   github_document:
     toc: true
     toc_depth: 2
-    pandoc_args: --webtex
+    pandoc_args: --mathjax
 header-includes:
     <img src="man/figures/opera-logo.jpg" align="right" width="200">
 ---
@@ -20,8 +20,13 @@ header-includes:
     
 
 ```{r echo=FALSE}
-library("knitr")
-library(htmltools)
+suppressWarnings({
+  suppressPackageStartupMessages({
+    library("knitr")
+    library(htmltools)
+  })
+})
+
 
 knitr::opts_chunk$set(
   comment = "#>",
