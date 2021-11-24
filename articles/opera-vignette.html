@@ -86,7 +86,7 @@
 <code>opera</code> package</h1>
                         <h4 class="author">Pierre Gaillard and Yannig Goude</h4>
             
-            <h4 class="date">2021-11-23</h4>
+            <h4 class="date">2021-11-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/dralliag/opera/blob/master/vignettes/opera-vignette.Rmd"><code>vignettes/opera-vignette.Rmd</code></a></small>
       <div class="hidden name"><code>opera-vignette.Rmd</code></div>
@@ -95,13 +95,19 @@
 
     
     
-<p><code>opera</code> is an R package that provides several algorithms to perform robust online prediction of time series with the help of expert advice. In this vignette, we provide an example of how to use the package.</p>
+<p><code>opera</code> is a R package that provides several algorithms to perform robust online prediction of time series with the help of expert advice. In this vignette, we provide an example of how to use the package.</p>
 <div id="setting-when-is-the-package-opera-useful" class="section level2">
 <h2 class="hasAnchor">
 <a href="#setting-when-is-the-package-opera-useful" class="anchor"></a>Setting: when is the package <code>opera</code> useful?</h2>
-<p>Consider a sequence of real bounded observations <span class="math inline">\(y_1,\dots,y_n\)</span> to be predicted step by step. Suppose that you have at your disposal a finite set of methods <span class="math inline">\(k =1,\dots,K\)</span> (henceforth referred to as experts) that provide you before each time step <span class="math inline">\(t=1,\dots,n\)</span> predictions <span class="math inline">\(x_{k,t}\)</span> of the next observation <span class="math inline">\(y_t\)</span>. You can form your prediction <span class="math inline">\(\widehat y_t\)</span> by using only the knowledge of the past observations <span class="math inline">\(y_1,\dots,y_{t-1}\)</span> and past and current expert forecasts <span class="math inline">\(x_{k,1},\dots,x_{k,t}\)</span> for <span class="math inline">\(k=1,\dots,K\)</span>. The package <a href="#">opera</a> implements several algorithms of the online learning literature that form predictions <span class="math inline">\(\widehat y_t\)</span> by combining the expert forecasts according to their past performance. That is, <span class="math display">\[
-  \widehat y_t = \sum_{k=1}^K p_{k,t} x_{k,t} \,.
-\]</span> These algorithms come with finite time worst-case guarantees. The monograph of <a href="https://ii.uni.wroc.pl/~lukstafi/pmwiki/uploads/AGT/Prediction_Learning_and_Games.pdf">Cesa-Bianchi and Lugisi (2006)</a> gives a complete introduction to the setting of prediction of arbitrary sequences with the help of expert advice.</p>
+<p>Consider a sequence of real bounded observations <span class="math inline">\(y_1,\dots,y_n\)</span> to be predicted step by step. Suppose that you have at your disposal a finite set of methods <span class="math inline">\(k =1,\dots,K\)</span> (henceforth referred to as experts) that provide you before each time step <span class="math inline">\(t=1,\dots,n\)</span> predictions <span class="math inline">\(x_{k,t}\)</span> of the next observation <span class="math inline">\(y_t\)</span>. You can form your prediction <span class="math inline">\(\widehat y_t\)</span> by using only the knowledge of the past observations <span class="math inline">\(y_1,\dots,y_{t-1}\)</span> and past and current expert forecasts <span class="math inline">\(x_{k,1},\dots,x_{k,t}\)</span> for <span class="math inline">\(k=1,\dots,K\)</span>. The package <a href="#">opera</a> implements several algorithms of the online learning literature that form predictions <span class="math inline">\(\widehat y_t\)</span> by combining the expert forecasts according to their past performance. That is,</p>
+<p align="center">
+</p>
+<p align="center">
+</p>
+<p align="center">
+<img src="../man/figures/formula.png" width="20%" style="display: block; margin: auto;"></p>
+
+<p>These algorithms come with finite time worst-case guarantees. The monograph of <a href="https://ii.uni.wroc.pl/~lukstafi/pmwiki/uploads/AGT/Prediction_Learning_and_Games.pdf">Cesa-Bianchi and Lugisi (2006)</a> gives a complete introduction to the setting of prediction of arbitrary sequences with the help of expert advice.</p>
 <div id="what-are-the-most-important-functions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#what-are-the-most-important-functions" class="anchor"></a>What are the most important functions?</h3>
