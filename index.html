@@ -21,6 +21,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -33,18 +35,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">opera</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -66,7 +62,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/dralliag/opera/">
+  <a href="https://github.com/dralliag/opera/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -84,9 +80,9 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<div id="opera" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#opera" class="anchor"></a>OPERA</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="opera">OPERA<a class="anchor" aria-label="anchor" href="#opera"></a>
+</h1></div>
 <p>Pierre Gaillard, Yannig Goude</p>
 <p><img src="reference/figures/opera-logo.jpg" align="right" width="200"></p>
 <ul>
@@ -95,115 +91,115 @@
 <li><a href="#example-predict-the-weekly-electricity-consumption">Example: predict the weekly electricity consumption.</a></li>
 <li><a href="#meta">Meta</a></li>
 </ul>
-<!-- badges: start --><p><a href="https://CRAN.R-project.org/package=opera"><img src="https://www.r-pkg.org/badges/version/opera" alt="version"></a> <a href="https://CRAN.R-project.org/package=opera"><img src="https://cranlogs.r-pkg.org/badges/opera" alt="cranlogs"></a> <a href="https://cranchecks.info/pkgs/opera"><img src="https://cranchecks.info/badges/worst/opera" alt="cran checks"></a> <a href="https://codecov.io/github/Dralliag/opera?branch=master"><img src="https://img.shields.io/codecov/c/github/Dralliag/opera/master.svg" alt="Coverage Status"></a> <a href="https://github.com/Dralliag/opera/actions"><img src="https://github.com/Dralliag/opera/workflows/R-CMD-check/badge.svg" alt="R build status"></a> <!-- badges: end --></p>
+<!-- badges: start -->
 <p><code>opera</code> is a R package that provides several algorithms to perform robust online prediction of time series with the help of expert advice. In this vignette, we provide an example of how to use the package.</p>
-<div id="setting-when-is-the-package-opera-useful" class="section level2">
-<h2 class="hasAnchor">
-<a href="#setting-when-is-the-package-opera-useful" class="anchor"></a>Setting: when is the package <code>opera</code> useful?</h2>
+<div class="section level2">
+<h2 id="setting-when-is-the-package-opera-useful">Setting: when is the package <code>opera</code> useful?<a class="anchor" aria-label="anchor" href="#setting-when-is-the-package-opera-useful"></a>
+</h2>
 <p>Consider a sequence of real bounded observations <em>y</em><sub>1</sub>, …, <em>y</em><sub><em>n</em></sub> to be predicted step by step. Suppose that you have at your disposal a finite set of methods <em>k</em> = 1, …, <em>K</em> (henceforth referred to as experts) that provide you before each time step <em>t</em> = 1, …, <em>n</em> predictions <em>x</em><sub><em>k</em>, <em>t</em></sub> of the next observation <em>y</em><sub><em>t</em></sub>. You can form your prediction <em>ŷ</em><sub><em>t</em></sub> by using only the knowledge of the past observations <em>y</em><sub>1</sub>, …, <em>y</em><sub><em>t</em> − 1</sub> and past and current expert forecasts <em>x</em><sub><em>k</em>, 1</sub>, …, <em>x</em><sub><em>k</em>, <em>t</em></sub> for <em>k</em> = 1, …, <em>K</em>. The package <a href="#">opera</a> implements several algorithms of the online learning literature that form predictions <em>ŷ</em><sub><em>t</em></sub> by combining the expert forecasts according to their past performance. That is,</p>
 <p align="center">
 <img src="reference/figures/formula.png" width="20%" style="display: block; margin: auto;"></p>
-<p>These algorithms come with finite time worst-case guarantees. The monograph of <a href="https://ii.uni.wroc.pl/~lukstafi/pmwiki/uploads/AGT/Prediction_Learning_and_Games.pdf">Cesa-Bianchi and Lugisi (2006)</a> gives a complete introduction to the setting of prediction of arbitrary sequences with the help of expert advice.</p>
-<div id="what-are-the-most-important-functions" class="section level3">
-<h3 class="hasAnchor">
-<a href="#what-are-the-most-important-functions" class="anchor"></a>What are the most important functions?</h3>
+<p>These algorithms come with finite time worst-case guarantees. The monograph of <a href="https://ii.uni.wroc.pl/~lukstafi/pmwiki/uploads/AGT/Prediction_Learning_and_Games.pdf" class="external-link">Cesa-Bianchi and Lugisi (2006)</a> gives a complete introduction to the setting of prediction of arbitrary sequences with the help of expert advice.</p>
+<div class="section level3">
+<h3 id="what-are-the-most-important-functions">What are the most important functions?<a class="anchor" aria-label="anchor" href="#what-are-the-most-important-functions"></a>
+</h3>
 <p>The package <code>opera</code> provides three important functions: <code>mixture</code> to build the algorithm object, <code>predict</code> to make a prediction by using the algorithm, and <code>oracle</code> to evaluate the performance of the experts and compare the performance of the combining algorithm.</p>
 </div>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>opera is now available on CRAN, so you can install it with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"opera"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"opera"</span><span class="op">)</span></code></pre></div>
 <p>You can also install the development version of opera with the package devtools:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"dralliag/opera"</span><span class="op">)</span></code></pre></div>
 <p>You may be asked to install additional necessary packages. You can install the package vignette by setting the option: build_vignettes = TRUE.</p>
 </div>
-<div id="example-predict-the-weekly-electricity-consumption" class="section level2">
-<h2 class="hasAnchor">
-<a href="#example-predict-the-weekly-electricity-consumption" class="anchor"></a>Example: predict the weekly electricity consumption.</h2>
-<p>Here, we provide a concrete example on how to use the package. To do so, we consider an electricity forecasting data set that includes weekly observations of the French electric load together with several covariates: the temperature, calendar information, and industrial production indexes. The data set is provided by the French <a href="https://www.insee.fr/fr/accueil">National Institute of Statistics and Economic Studies (Insee)</a>.</p>
+<div class="section level2">
+<h2 id="example-predict-the-weekly-electricity-consumption">Example: predict the weekly electricity consumption.<a class="anchor" aria-label="anchor" href="#example-predict-the-weekly-electricity-consumption"></a>
+</h2>
+<p>Here, we provide a concrete example on how to use the package. To do so, we consider an electricity forecasting data set that includes weekly observations of the French electric load together with several covariates: the temperature, calendar information, and industrial production indexes. The data set is provided by the French <a href="https://www.insee.fr/fr/accueil" class="external-link">National Institute of Statistics and Economic Studies (Insee)</a>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://pierre.gaillard.me/opera.html">opera</a></span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></code></pre></div>
-<div id="the-data-set" class="section level3">
-<h3 class="hasAnchor">
-<a href="#the-data-set" class="anchor"></a>The data set</h3>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://pierre.gaillard.me/opera.html" class="external-link">opera</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></code></pre></div>
+<div class="section level3">
+<h3 id="the-data-set">The data set<a class="anchor" aria-label="anchor" href="#the-data-set"></a>
+</h3>
 <p>First, we load the data and we cut it into two subsets: a training set used to build the experts (base forecasting methods) and a testing set (here the last two years) used to evaluate the performance and to run the combining algorithms.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/attach.html">attach</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">)</span>
-<span class="va">idx_data_test</span> <span class="op">&lt;-</span> <span class="fl">620</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/attach.html" class="external-link">attach</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">)</span>
+<span class="va">idx_data_test</span> <span class="op">&lt;-</span> <span class="fl">620</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">)</span>
 <span class="va">data_train</span> <span class="op">&lt;-</span> <span class="va">electric_load</span><span class="op">[</span><span class="op">-</span><span class="va">idx_data_test</span>, <span class="op">]</span> 
 <span class="va">data_test</span> <span class="op">&lt;-</span> <span class="va">electric_load</span><span class="op">[</span><span class="va">idx_data_test</span>, <span class="op">]</span>  </code></pre></div>
 <p>The data is displayed in the following figures.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">Load</span>, type <span class="op">=</span> <span class="st">"l"</span>, main <span class="op">=</span> <span class="st">"The electric Load"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">Load</span>, type <span class="op">=</span> <span class="st">"l"</span>, main <span class="op">=</span> <span class="st">"The electric Load"</span><span class="op">)</span></code></pre></div>
 <p align="center">
 <img src="reference/figures/Load-1.png" width="50%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">Temp</span>, <span class="va">Load</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, main <span class="op">=</span> <span class="st">"Temperature vs Load"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">Temp</span>, <span class="va">Load</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, main <span class="op">=</span> <span class="st">"Temperature vs Load"</span><span class="op">)</span></code></pre></div>
 <p align="center">
 <img src="reference/figures/Temp-1.png" width="50%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">NumWeek</span>, <span class="va">Load</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, main <span class="op">=</span> <span class="st">"Annual seasonality"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">NumWeek</span>, <span class="va">Load</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, main <span class="op">=</span> <span class="st">"Annual seasonality"</span><span class="op">)</span></code></pre></div>
 <p align="center">
 <img src="reference/figures/NumWeek-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
-<div id="first-build-the-expert-forecasts" class="section level3">
-<h3 class="hasAnchor">
-<a href="#first-build-the-expert-forecasts" class="anchor"></a>First: build the expert forecasts</h3>
+<div class="section level3">
+<h3 id="first-build-the-expert-forecasts">First: build the expert forecasts<a class="anchor" aria-label="anchor" href="#first-build-the-expert-forecasts"></a>
+</h3>
 <p>Here, we build three base forecasting methods to be combined later.</p>
 <ul>
 <li>A generalized additive model using the <code>mgcv</code> package:</li>
 </ul>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">mgcv</span><span class="op">)</span>
-<span class="va">gam.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html">gam</a></span><span class="op">(</span><span class="va">Load</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html">s</a></span><span class="op">(</span><span class="va">IPI</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html">s</a></span><span class="op">(</span><span class="va">Temp</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html">s</a></span><span class="op">(</span><span class="va">Time</span>, k<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="op">+</span> 
-                 <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html">s</a></span><span class="op">(</span><span class="va">Load1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">NumWeek</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data_train</span><span class="op">)</span>
-<span class="va">gam.forecast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">gam.fit</span>, newdata <span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">mgcv</span><span class="op">)</span>
+<span class="va">gam.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">Load</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">IPI</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Temp</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Time</span>, k<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="op">+</span> 
+                 <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Load1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">NumWeek</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data_train</span><span class="op">)</span>
+<span class="va">gam.forecast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">gam.fit</span>, newdata <span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></code></pre></div>
 <ul>
 <li>A medium term generalized additive model followed by an autoregressive short-term correction.</li>
 </ul>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># medium term model</span>
-<span class="va">medium.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html">gam</a></span><span class="op">(</span><span class="va">Load</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html">s</a></span><span class="op">(</span><span class="va">Time</span>,k<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html">s</a></span><span class="op">(</span><span class="va">NumWeek</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html">s</a></span><span class="op">(</span><span class="va">Temp</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html">s</a></span><span class="op">(</span><span class="va">IPI</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data_train</span><span class="op">)</span>
-<span class="va">electric_load</span><span class="op">$</span><span class="va">Medium</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">medium.fit</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">medium.fit</span>, newdata <span class="op">=</span> <span class="va">data_test</span><span class="op">)</span><span class="op">)</span>
+<span class="va">medium.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">Load</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Time</span>,k<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">NumWeek</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Temp</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">IPI</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data_train</span><span class="op">)</span>
+<span class="va">electric_load</span><span class="op">$</span><span class="va">Medium</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">medium.fit</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">medium.fit</span>, newdata <span class="op">=</span> <span class="va">data_test</span><span class="op">)</span><span class="op">)</span>
 <span class="va">electric_load</span><span class="op">$</span><span class="va">Residuals</span> <span class="op">&lt;-</span> <span class="va">electric_load</span><span class="op">$</span><span class="va">Load</span> <span class="op">-</span> <span class="va">electric_load</span><span class="op">$</span><span class="va">Medium</span>
 
 <span class="co"># autoregressive correction</span>
-<span class="va">ar.forecast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">idx_data_test</span><span class="op">)</span><span class="op">)</span>
-<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="va">idx_data_test</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">ar.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/ar.html">ar</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">$</span><span class="va">Residuals</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">idx_data_test</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
-  <span class="va">ar.forecast</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">ar.fit</span><span class="op">)</span><span class="op">$</span><span class="va">pred</span><span class="op">)</span> <span class="op">+</span> <span class="va">electric_load</span><span class="op">$</span><span class="va">Medium</span><span class="op">[</span><span class="va">idx_data_test</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>
+<span class="va">ar.forecast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">idx_data_test</span><span class="op">)</span><span class="op">)</span>
+<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="va">idx_data_test</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">ar.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/ar.html" class="external-link">ar</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">$</span><span class="va">Residuals</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">idx_data_test</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
+  <span class="va">ar.forecast</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">ar.fit</span><span class="op">)</span><span class="op">$</span><span class="va">pred</span><span class="op">)</span> <span class="op">+</span> <span class="va">electric_load</span><span class="op">$</span><span class="va">Medium</span><span class="op">[</span><span class="va">idx_data_test</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span>
 <span class="op">}</span></code></pre></div>
 <ul>
 <li>A gradient boosting model using <code>caret</code> package</li>
 </ul>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/">caret</a></span><span class="op">)</span>
-<span class="va">gbm.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html">train</a></span><span class="op">(</span><span class="va">Load</span> <span class="op">~</span> <span class="va">IPI</span> <span class="op">+</span> <span class="va">IPI_CVS</span> <span class="op">+</span> <span class="va">Temp</span> <span class="op">+</span> <span class="va">Temp1</span> <span class="op">+</span> <span class="va">Time</span> <span class="op">+</span> <span class="va">Load1</span> <span class="op">+</span> <span class="va">NumWeek</span>, data <span class="op">=</span> <span class="va">data_train</span>, method <span class="op">=</span> <span class="st">"gbm"</span><span class="op">)</span>
-<span class="va">gbm.forecast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">gbm.fit</span>, newdata <span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/" class="external-link">caret</a></span><span class="op">)</span>
+<span class="va">gbm.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html" class="external-link">train</a></span><span class="op">(</span><span class="va">Load</span> <span class="op">~</span> <span class="va">IPI</span> <span class="op">+</span> <span class="va">IPI_CVS</span> <span class="op">+</span> <span class="va">Temp</span> <span class="op">+</span> <span class="va">Temp1</span> <span class="op">+</span> <span class="va">Time</span> <span class="op">+</span> <span class="va">Load1</span> <span class="op">+</span> <span class="va">NumWeek</span>, data <span class="op">=</span> <span class="va">data_train</span>, method <span class="op">=</span> <span class="st">"gbm"</span><span class="op">)</span>
+<span class="va">gbm.forecast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">gbm.fit</span>, newdata <span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></code></pre></div>
 <p>Once the expert forecasts have been created (note that they can also be formed online), we build the matrix of expert and the time series to be predicted online</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Y</span> <span class="op">&lt;-</span> <span class="va">data_test</span><span class="op">$</span><span class="va">Load</span>
-<span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">gam.forecast</span>, <span class="va">ar.forecast</span>, <span class="va">gbm.forecast</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html">matplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">Y</span>, <span class="va">X</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"l"</span>, col <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, ylab <span class="op">=</span> <span class="st">"Weekly load"</span>, 
+<span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">gam.forecast</span>, <span class="va">ar.forecast</span>, <span class="va">gbm.forecast</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">Y</span>, <span class="va">X</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"l"</span>, col <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, ylab <span class="op">=</span> <span class="st">"Weekly load"</span>, 
         xlab <span class="op">=</span> <span class="st">"Week"</span>, main <span class="op">=</span> <span class="st">"Expert forecasts and observations"</span><span class="op">)</span></code></pre></div>
 <p align="center">
 <img src="reference/figures/loadAndForecasts-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
-<div id="how-good-are-the-experts-look-at-the-oracles" class="section level3">
-<h3 class="hasAnchor">
-<a href="#how-good-are-the-experts-look-at-the-oracles" class="anchor"></a>How good are the experts? Look at the oracles</h3>
+<div class="section level3">
+<h3 id="how-good-are-the-experts-look-at-the-oracles">How good are the experts? Look at the oracles<a class="anchor" aria-label="anchor" href="#how-good-are-the-experts-look-at-the-oracles"></a>
+</h3>
 <p>To evaluate the performance of the experts and see if the aggregation rules may perform well, you can look at the oracles (rules that are used only for analysis and cannot be design online).</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">oracle.convex</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/oracle.html">oracle</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, experts <span class="op">=</span> <span class="va">X</span>, loss.type <span class="op">=</span> <span class="st">"square"</span>, model <span class="op">=</span> <span class="st">"convex"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">oracle.convex</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">oracle.convex</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">oracle.convex</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">oracle.convex</span><span class="op">)</span></code></pre></div>
 <p align="center">
 </p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co">#&gt; Call:</span></span>
@@ -220,21 +216,21 @@
 <img src="reference/figures/oracle-1.png" width="50%" style="display: block; margin: auto;"><p>The parameter <code>loss.type</code> defines the evaluation criterion. It can be either the square loss, the percentage loss, the absolute loss, or the pinball loss to perform quantile regression.</p>
 <p>The parameter <code>model</code> defines the oracle to be calculated. Here, we computed the best fixed convex combination of expert (i.e., with non-negative weights that sum to one).</p>
 </div>
-<div id="aggregate-the-experts-online-using-one-of-the-possible-aggregation-procedures" class="section level3">
-<h3 class="hasAnchor">
-<a href="#aggregate-the-experts-online-using-one-of-the-possible-aggregation-procedures" class="anchor"></a>Aggregate the experts online using one of the possible aggregation procedures</h3>
+<div class="section level3">
+<h3 id="aggregate-the-experts-online-using-one-of-the-possible-aggregation-procedures">Aggregate the experts online using one of the possible aggregation procedures<a class="anchor" aria-label="anchor" href="#aggregate-the-experts-online-using-one-of-the-possible-aggregation-procedures"></a>
+</h3>
 <p>The first step consists in initializing the algorithm by defining the type of algorithm (Ridge regression, exponentially weighted average forecaster,…), the possible parameters, and the evaluation criterion. If no parameter is defined by the user, all parameters will be calibrated online by the algorithm. Bellow, we define the ML-Poly algorithm, evaluated by the square loss.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">MLpol0</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mixture.html">mixture</a></span><span class="op">(</span>model <span class="op">=</span> <span class="st">"MLpol"</span>, loss.type <span class="op">=</span> <span class="st">"square"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">MLpol0</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mixture-opera.html">mixture</a></span><span class="op">(</span>model <span class="op">=</span> <span class="st">"MLpol"</span>, loss.type <span class="op">=</span> <span class="st">"square"</span><span class="op">)</span></code></pre></div>
 <p>Then, you can perform online predictions by using the <code>predict</code> method. At each time, step the aggregation rule forms a new prediction and update the procedure.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">MLpol</span> <span class="op">&lt;-</span> <span class="va">MLpol0</span>
-<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">MLpol</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">MLpol</span>, newexperts <span class="op">=</span> <span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span>, newY <span class="op">=</span> <span class="va">Y</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>
+<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">MLpol</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">MLpol</span>, newexperts <span class="op">=</span> <span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span>, newY <span class="op">=</span> <span class="va">Y</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 <p>The results can be displayed with method <code>summary</code> and <code>plot</code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">MLpol</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">MLpol</span><span class="op">)</span>
 <span class="co">#&gt; Aggregation rule: MLpol </span>
 <span class="co">#&gt; Loss function:  squareloss </span>
 <span class="co">#&gt; Gradient trick:  TRUE </span>
@@ -250,23 +246,23 @@
 <span class="co">#&gt; MLpol   1460 0.0192</span>
 <span class="co">#&gt; Uniform 1560 0.0198</span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">MLpol</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">MLpol</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/MLpol-1.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-2.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-3.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-4.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-5.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-6.png" width="50%" style="display: block; margin: auto;"></p>
 <p>The same results can be obtained more directly:</p>
 <ul>
 <li>by giving the whole time series to <code>predict</code> specifying <code>online = TRUE</code> to perform online prediction.</li>
 </ul>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">MLpol</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">MLpol0</span>, newexpert <span class="op">=</span> <span class="va">X</span>, newY <span class="op">=</span> <span class="va">Y</span>, online <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">MLpol</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">MLpol0</span>, newexpert <span class="op">=</span> <span class="va">X</span>, newY <span class="op">=</span> <span class="va">Y</span>, online <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <ul>
 <li>or directly to the function mixture, when building the aggregation rule</li>
 </ul>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">MLpol</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mixture.html">mixture</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, experts <span class="op">=</span> <span class="va">X</span>, model <span class="op">=</span> <span class="st">"MLpol"</span>, loss.type <span class="op">=</span> <span class="st">"square"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">MLpol</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mixture-opera.html">mixture</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, experts <span class="op">=</span> <span class="va">X</span>, model <span class="op">=</span> <span class="st">"MLpol"</span>, loss.type <span class="op">=</span> <span class="st">"square"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="about-the-predictions" class="section level3">
-<h3 class="hasAnchor">
-<a href="#about-the-predictions" class="anchor"></a>About the predictions</h3>
+<div class="section level3">
+<h3 id="about-the-predictions">About the predictions<a class="anchor" aria-label="anchor" href="#about-the-predictions"></a>
+</h3>
 <p>The vector of predictions formed by the mixture can be obtained through the output prediction.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">predictions</span> <span class="op">&lt;-</span> <span class="va">MLpol</span><span class="op">$</span><span class="va">prediction</span></code></pre></div>
@@ -275,21 +271,21 @@
 <p>Using the <code>predict</code> method with the arguments * <code>online = FALSE</code>: the model coefficients are not updated during the prediction. * <code>type = response</code>: the predictions are returned and not an updated model.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">newexperts</span> <span class="op">&lt;-</span> <span class="va">X</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="op">]</span> <span class="co"># Experts forecasts to predict 3 new points  </span>
-<span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">MLpol</span>, newexperts <span class="op">=</span> <span class="va">newexperts</span>, online <span class="op">=</span> <span class="cn">FALSE</span>, type <span class="op">=</span> <span class="st">'response'</span><span class="op">)</span></code></pre></div>
+<span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">MLpol</span>, newexperts <span class="op">=</span> <span class="va">newexperts</span>, online <span class="op">=</span> <span class="cn">FALSE</span>, type <span class="op">=</span> <span class="st">'response'</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb22"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="co">#&gt; [1] 64397.10 61317.41 63571.59</span></span></code></pre></div>
 <p>The same result can be easily obtained by using the last model coefficients to perform the weighted average of the expert advice.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pred</span> <span class="op">=</span> <span class="va">newexperts</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html">%*%</a></span> <span class="va">MLpol</span><span class="op">$</span><span class="va">coefficients</span></code></pre></div>
+<code class="sourceCode R"><span class="va">pred</span> <span class="op">=</span> <span class="va">newexperts</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">MLpol</span><span class="op">$</span><span class="va">coefficients</span></code></pre></div>
 <div class="sourceCode" id="cb24"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="co">#&gt; [1] 64397.10 61317.41 63571.59</span></span></code></pre></div>
 </div>
-<div id="block-by-block-predictions" class="section level3">
-<h3 class="hasAnchor">
-<a href="#block-by-block-predictions" class="anchor"></a>Block by block predictions</h3>
+<div class="section level3">
+<h3 id="block-by-block-predictions">Block by block predictions<a class="anchor" aria-label="anchor" href="#block-by-block-predictions"></a>
+</h3>
 <p>In some situations, the aggregation model cannot be updated at each step due to an operational constraint. One must predict the time-series <em>y</em><sub>1</sub>, …, <em>y</em><sub><em>n</em></sub> block by block. For example, a weather website might want to make a daily forecast of the next day’s temperature at hourly intervals. This corresponds to block by block predictions of 24 observations.</p>
 <p>Let’s say that in the above example, instead of making a weekly prediction, we need to predict every four weeks, the consumption of the next four weeks. Below we show two different ways to use the <code>opera</code> package to do this.</p>
-<div id="using-d-dimensional-time-series" class="section level4">
-<h4 class="hasAnchor">
-<a href="#using-d-dimensional-time-series" class="anchor"></a>Using d-dimensional time-series</h4>
+<div class="section level4">
+<h4 id="using-d-dimensional-time-series">Using d-dimensional time-series<a class="anchor" aria-label="anchor" href="#using-d-dimensional-time-series"></a>
+</h4>
 <p>Note that the outputs <em>y</em><sub>1</sub>, …, <em>y</em><sub><em>n</em></sub> to be predicted step by step can be <em>d</em>-dimensional in <code>opera</code>. In this case, the argument <code>Y</code> provided to the function <code>mixture</code> should be a matrix, where each line corresponds to the output observed at time <em>t</em>; the argument <code>experts</code> must be an array of dimension <em>T</em> × <em>d</em> × <em>K</em> such that <code>experts[t,:,k]</code> is the prediction made by expert <em>k</em> at iteration <em>t</em>. These predictions of dimension <em>d</em> can be used in various situations. For example, we might want to simultaneously predict the electricity consumption of several countries in the example above.</p>
 <p>Another useful application of this feature is block by block prediction. Consider the above example of electricity consumption to be predicted every four weeks. This can be easily done by transforming the original time series into a 4 dimensional time series, where each row corresponds to the four weeks to predict after each update.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
@@ -297,22 +293,22 @@
 <span class="va">XBlock</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/seriesToBlock.html">seriesToBlock</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">X</span>, d <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></code></pre></div>
 <p>The four-week-by-four-week predictions can then be obtained by directly using the <code>mixture</code> function as we did earlier.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">MLpolBlock</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mixture.html">mixture</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">YBlock</span>, experts <span class="op">=</span> <span class="va">XBlock</span>, model <span class="op">=</span> <span class="st">"MLpol"</span>, loss.type <span class="op">=</span> <span class="st">"square"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">MLpolBlock</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mixture-opera.html">mixture</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">YBlock</span>, experts <span class="op">=</span> <span class="va">XBlock</span>, model <span class="op">=</span> <span class="st">"MLpol"</span>, loss.type <span class="op">=</span> <span class="st">"square"</span><span class="op">)</span></code></pre></div>
 <p>The predictions can finally be transformed back to a regular one dimensional time-series by using the function <code>blockToSeries</code>.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">prediction</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/seriesToBlock.html">blockToSeries</a></span><span class="op">(</span><span class="va">MLpolBlock</span><span class="op">$</span><span class="va">prediction</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="using-the-online--false-option" class="section level4">
-<h4 class="hasAnchor">
-<a href="#using-the-online--false-option" class="anchor"></a>Using the <code>online = FALSE</code> option</h4>
+<div class="section level4">
+<h4 id="using-the-online--false-option">Using the <code>online = FALSE</code> option<a class="anchor" aria-label="anchor" href="#using-the-online--false-option"></a>
+</h4>
 <p>Another equivalent solution is to use the <code>online = FALSE</code> option in the predict function. The latter ensures that the model coefficients are not updated between the next four weeks to forecast.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">MLpolBlock</span> <span class="op">&lt;-</span> <span class="va">MLpol0</span>
 <span class="va">d</span> <span class="op">=</span> <span class="fl">4</span>
-<span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">/</span><span class="va">d</span>
+<span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">/</span><span class="va">d</span>
 <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">0</span><span class="op">:</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span> 
   <span class="va">idx</span> <span class="op">&lt;-</span> <span class="fl">4</span><span class="op">*</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span> <span class="co"># next four weeks to be predicted</span>
-  <span class="va">MLpolBlock</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">MLpolBlock</span>, newexperts <span class="op">=</span> <span class="va">X</span><span class="op">[</span><span class="va">idx</span>, <span class="op">]</span>, newY <span class="op">=</span> <span class="va">Y</span><span class="op">[</span><span class="va">idx</span><span class="op">]</span>, online <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+  <span class="va">MLpolBlock</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">MLpolBlock</span>, newexperts <span class="op">=</span> <span class="va">X</span><span class="op">[</span><span class="va">idx</span>, <span class="op">]</span>, newY <span class="op">=</span> <span class="va">Y</span><span class="op">[</span><span class="va">idx</span><span class="op">]</span>, online <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 <p>As we see below, the coefficients are updated every four lines only.</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="co">#&gt;           [,1]      [,2]      [,3]</span></span>
@@ -326,11 +322,11 @@
 </div>
 </div>
 </div>
-<div id="meta" class="section level1">
-<h1 class="hasAnchor">
-<a href="#meta" class="anchor"></a>Meta</h1>
+<div class="section level1">
+<h1 id="meta">Meta<a class="anchor" aria-label="anchor" href="#meta"></a>
+</h1>
 <ul>
-<li>Please <a href="https://github.com/dralliag/opera">report any issues or bugs</a>.</li>
+<li>Please <a href="https://github.com/dralliag/opera" class="external-link">report any issues or bugs</a>.</li>
 <li>License: LGPL</li>
 </ul>
 </div>
@@ -339,26 +335,44 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=opera">https://​cloud.r-project.org/​package=opera</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/dralliag/opera/">https://​github.com/​dralliag/​opera/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/dralliag/opera/issues">https://​github.com/​dralliag/​opera/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=opera" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/dralliag/opera/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/dralliag/opera/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>LGPL</li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing opera</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Pierre Gaillard <br><small class="roles"> Maintainer </small>  </li>
+</ul>
+</div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://CRAN.R-project.org/package=opera" class="external-link"><img src="https://www.r-pkg.org/badges/version/opera" alt="version"></a></li>
+<li><a href="https://CRAN.R-project.org/package=opera" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/opera" alt="cranlogs"></a></li>
+<li><a href="https://cranchecks.info/pkgs/opera" class="external-link"><img src="https://cranchecks.info/badges/worst/opera" alt="cran checks"></a></li>
+<li><a href="https://codecov.io/github/Dralliag/opera?branch=master" class="external-link"><img src="https://img.shields.io/codecov/c/github/Dralliag/opera/master.svg" alt="Coverage Status"></a></li>
+<li><a href="https://github.com/Dralliag/opera/actions" class="external-link"><img src="https://github.com/Dralliag/opera/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
 </ul>
 </div>
 
@@ -367,11 +381,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Pierre Gaillard.</p>
+  <p></p>
+<p>Developed by Pierre Gaillard.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -379,6 +395,8 @@
 
   
 
+
+  
 
   </body>
 </html>
