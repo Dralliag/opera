@@ -11,7 +11,7 @@
 #' 
 #' 
 #' @name opera-package
-#' @import Rcpp RcppEigen
+#' @import Rcpp
 #' @importFrom Rcpp sourceCpp
 #' @useDynLib opera
 #' @aliases opera-package opera

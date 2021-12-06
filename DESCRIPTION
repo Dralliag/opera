@@ -22,7 +22,6 @@ LinkingTo:
     RcppEigen
 Imports: 
     Rcpp,
-    RcppEigen,
     htmltools,
     rAmCharts,
     htmlwidgets,
@@ -46,5 +45,5 @@ Suggests:
 RdMacros: Rdpack
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Encoding: UTF-8

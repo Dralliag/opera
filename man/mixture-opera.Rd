@@ -94,7 +94,7 @@ The learning rates are automatically calibrated.}
      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
      \item{list}{ List with field \code{name} equal to the loss name. If using pinball loss, field \code{tau} equal to the required quantile in [0,1];}
      \item{function}{ A custom loss as a function of two parameters (prediction, observation). 
-     For exemple, $f(x,y) = abs(x-y)/y$ for the Mean absolute percentage error or $f(x,y) = (x-y)^2$ for the squared loss.}
+     For example, $f(x,y) = abs(x-y)/y$ for the Mean absolute percentage error or $f(x,y) = (x-y)^2$ for the squared loss.}
 }}
 
 \item{loss.gradient}{\code{boolean, function} (TRUE). 
@@ -313,7 +313,7 @@ print(head(MLpolBlock$weights))
 See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.
 }
 \author{
-Pierre Gaillard <pierre@gaillard.me>
+Pierre Gaillard <pierre@gaillard.me> Yannig Goude <yannig.goude@edf.fr>
 }
 \keyword{~models}
 \keyword{~ts}
