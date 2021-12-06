@@ -45,12 +45,18 @@ matplot(cbind(Y, X), type = 'l', col = 1:6, ylab = 'Weekly load', xlab = 'Week')
 
 # How good are the expert? Look at the oracles
 oracle.convex <- oracle(Y = Y, experts = X, loss.type = 'square', model = 'convex')
-plot(oracle.convex)
+
+if(interactive()){
+  plot(oracle.convex)
+}
+
 oracle.convex
 
 # Is a single expert the best over time ? Are there breaks ?
 oracle.shift <- oracle(Y = Y, experts = X, loss.type = 'percentage', model = 'shifting')
-plot(oracle.shift)
+if(interactive()){
+  plot(oracle.shift)
+}
 oracle.shift
 
 # Online aggregation of the experts with BOA
@@ -78,8 +84,9 @@ identical(m1.BOA, m3.BOA)  # TRUE
 
 # Display the results
 summary(m3.BOA)
-plot(m1.BOA)
-
+if(interactive()){
+  plot(m1.BOA)
+}
 
 # Using d-dimensional time-series
 ##################################

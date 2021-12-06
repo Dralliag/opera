@@ -433,7 +433,6 @@ test_that("Dimension d>1 is ok",{
       }
       
       expect_output(summary(m), NA)
-      expect_error(plot(m), NA)
       expect_output(print(m))
       
       m$d <- d

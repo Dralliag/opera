@@ -142,7 +142,7 @@ test_that("Dimension d>1 is ok",{
     m$residuals <- seriesToBlock(m$residuals,d)
     m$experts <- seriesToBlock(m$experts,d)
     expect_output(summary(m), NA)
-    expect_error(plot(m), NA)
+    expect_error(plot(m, dynamic = FALSE), NA)
     expect_output(print(m))
     
     X <- seriesToBlock(X, d = d)
