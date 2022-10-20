@@ -767,7 +767,8 @@ boxplot_weights <- function(data,
   plt <- rAmCharts::amBoxplot(data_weight[, rev(names(data_weight))], col = rev(colors),
                               ylab = ifelse(is.null(ylab), "Weights", ylab), creditsPosition = "bottom-right", zoom = TRUE) %>>%
     rAmCharts::addTitle(text = ifelse(is.null(main), "Weights associated with the experts", main)) %>>%
-    rAmCharts::setCategoryAxis(autoGridCount = FALSE, gridCount = ncol(data_weight), labelRotation = 90, labelOffset = 5, title = xlab) %>>%
+    rAmCharts::setCategoryAxis(autoGridCount = FALSE, gridCount = ncol(data_weight), labelRotation = 90, 
+                               labelOffset = 5, title = ifelse(!is.null(xlab), xlab, "")) %>>%
     rAmCharts::setExport(position = "top-right") # %>>% 
   # rAmCharts::setLegend(useGraphSettings = TRUE, valueText = "", position = "right")
   
@@ -968,7 +969,9 @@ plot_avg_loss <- function(data,
     rAmCharts::addTitle(text = ifelse(is.null(main), "Average loss suffered by the experts", main)) %>>%
     rAmCharts::setExport(position = "top-right") %>>% 
     rAmCharts::setChartCursor() %>>%
-    rAmCharts::setCategoryAxis(autoGridCount = FALSE, gridCount = nrow(data_plot), title = xlab, labelRotation = 90, labelColorField = "cols", labelOffset = 5)
+    rAmCharts::setCategoryAxis(autoGridCount = FALSE, gridCount = nrow(data_plot), 
+                               title = ifelse(!is.null(xlab), xlab, ""), 
+                               labelRotation = 90, labelColorField = "cols", labelOffset = 5)
   
   return(plt)
 }
@@ -1043,7 +1046,8 @@ plot_contrib <- function(data,
                        creditsPosition = "bottom-right",
                        thousandsSeparator = " ",
                        precision = round) %>>%
-    rAmCharts::addValueAxis(maximum = max(data_weight$pred), useScientificNotation = T, title = ylab)
+    rAmCharts::addValueAxis(maximum = max(data_weight$pred), useScientificNotation = T, 
+                            title = ifelse(!is.null(ylab), ylab, ""))
   
   for (index in 1:length(names_weights)) {
     if (index == 1) {
