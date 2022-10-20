@@ -406,9 +406,10 @@ plot.mixture <- function(x,
         par(mar = c(l.names, 3, 2.5,l.names/2), mgp = c(1, 0.5, 0))
       }
       
+      loss_name <- tryCatch(paste(x$loss.type$name, "loss"), error = function(e) "loss")
       plot(x$loss.experts[idx.sorted], xlab = "", ylab = "", main = "Average loss suffered by the experts", 
            axes = F, pch = my.pch, col = tmp_cols, lwd = 2, type='b')
-      mtext(side = 2, text = paste(x$loss.type$name,"loss"), line = 1.8, cex = 1)
+      mtext(side = 2, text = loss_name, line = 1.8, cex = 1)
       axis(1, at = 1:(K + 2), labels = FALSE)
       mtext(at = 1:length(x$loss.experts), text = c(names(x$loss.experts), "Uniform", x$model)[idx.sorted],
             side = 1, las = 2, col = tmp_cols, line = 0.8,cex = .7)
@@ -897,12 +898,13 @@ plot_avg_loss <- function(data,
     data_plot <- data_plot[order(data_loss[max(1, ncol(data$weight) - max_experts + 1):nrow(data_plot)]), ]
   }
   
+  loss_name <- tryCatch(paste(data$loss.type$name, "loss"), error = function(e) "loss")
   plt <- amSerialChart(dataProvider = data_plot,
                        categoryField = "names", 
                        creditsPosition = "bottom-right",
                        thousandsSeparator = " ",
                        precision = round) %>>%
-    rAmCharts::addValueAxis(title = "Square loss") %>>%
+    rAmCharts::addValueAxis(title = loss_name) %>>%
     rAmCharts::addGraph(title = "lines", id = "lines",
                         valueField = "values", valueAxis = "names", 
                         type = "line", lineColor = "black",
