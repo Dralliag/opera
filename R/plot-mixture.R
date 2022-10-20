@@ -64,6 +64,8 @@ plot.mixture <- function(x,
   }
   
   def.par <- par(no.readonly = TRUE) # save default, for resetting...
+  on.exit(par(def.par))
+  
   if (pause) par(ask=TRUE)
   K <- ncol(x$experts)
   w.order <- order(colMeans(x$weights),decreasing = FALSE)
@@ -469,7 +471,6 @@ plot.mixture <- function(x,
     }
   }
   
-  par(def.par, new = FALSE) 
   if (! dynamic) {
     return(invisible(NULL))
   } else {
