@@ -178,6 +178,9 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
                             use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = TRUE) {
   
   # checks
+  if(any(is.na(Y))){
+    stop("Missing value not allowed in Y")
+  }
   experts <- check_matrix(experts, "experts")
   awake <- check_matrix(awake, "awake")
   
