@@ -186,6 +186,11 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
   
   loss.type <- check_loss(loss.type = loss.type, loss.gradient = loss.gradient, use_cpp = use_cpp)
   
+  if(any(c("integer", "numeric") %in% mode(coefficients))){
+    if(any(coefficients == 0 | coefficients == 0L)){
+      stop("We cannot initialize weights to 0. Change 'coefficients' input")
+    }
+  }
   
   object <- list(model = model, loss.type = loss.type, loss.gradient = loss.gradient, 
                  coefficients = coefficients, parameters = parameters, Y = NULL, experts = NULL, 
