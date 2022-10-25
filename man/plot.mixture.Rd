@@ -13,6 +13,9 @@
   type = "all",
   max_experts = 50,
   col_by_weight = TRUE,
+  xlab = NULL,
+  ylab = NULL,
+  main = NULL,
   ...
 )
 }
@@ -37,6 +40,12 @@ their residuals and cumulative losses are computed by using the predictions of t
 \item{max_experts}{\code{integer}. Maximum number of experts to be displayed (only the more influencial).}
 
 \item{col_by_weight}{\code{boolean}. If TRUE (default), colors are ordered by weights of each expert, else by column}
+
+\item{xlab}{\code{character}. Custom x-axis label (individual plot only)}
+
+\item{ylab}{\code{character}. Custom y-axis label (individual plot only)}
+
+\item{main}{\code{character}. Custom title (individual plot only)}
 
 \item{...}{additional plotting parameters}
 }

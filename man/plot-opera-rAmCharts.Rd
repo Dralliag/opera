@@ -10,19 +10,75 @@
 \alias{plot_contrib}
 \title{Functions to render dynamic mixture graphs using rAmCharts}
 \usage{
-plot_ridge_weights(data, colors = NULL, max_experts = 50, round = 3)
+plot_ridge_weights(
+  data,
+  colors = NULL,
+  max_experts = 50,
+  round = 3,
+  xlab = NULL,
+  ylab = NULL,
+  main = NULL
+)
 
-plot_weights(data, colors = NULL, max_experts = 50, round = 3)
+plot_weights(
+  data,
+  colors = NULL,
+  max_experts = 50,
+  round = 3,
+  xlab = NULL,
+  ylab = NULL,
+  main = NULL
+)
 
-boxplot_weights(data, colors = NULL, max_experts = 50)
+boxplot_weights(
+  data,
+  colors = NULL,
+  max_experts = 50,
+  xlab = NULL,
+  ylab = NULL,
+  main = NULL
+)
 
-plot_dyn_avg_loss(data, colors = NULL, max_experts = 50, round = 3)
+plot_dyn_avg_loss(
+  data,
+  colors = NULL,
+  max_experts = 50,
+  round = 3,
+  xlab = NULL,
+  ylab = NULL,
+  main = NULL
+)
 
-plot_cumul_res(data, colors = NULL, max_experts = 50, round = 3)
+plot_cumul_res(
+  data,
+  colors = NULL,
+  max_experts = 50,
+  round = 3,
+  xlab = NULL,
+  ylab = NULL,
+  main = NULL
+)
 
-plot_avg_loss(data, colors = NULL, max_experts = 50, round = 3)
+plot_avg_loss(
+  data,
+  colors = NULL,
+  max_experts = 50,
+  round = 3,
+  xlab = NULL,
+  ylab = NULL,
+  main = NULL
+)
 
-plot_contrib(data, colors = NULL, alpha = 0.1, max_experts = 50, round = 3)
+plot_contrib(
+  data,
+  colors = NULL,
+  alpha = 0.1,
+  max_experts = 50,
+  round = 3,
+  xlab = NULL,
+  ylab = NULL,
+  main = NULL
+)
 }
 \arguments{
 \item{data}{\code{mixture object}. Displays graphs.}
