@@ -129,12 +129,8 @@
 #'    returned (and used to form the predictions) are averaged over the past. It leads to more stability on the time evolution of the weights but needs
 #'    more regularity assumption on the underlying process generating the data (i.i.d. for instance). }
 #' }
-#' 
-#' @param use_cpp \code{boolean}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
-#' with the use of custom loss function. Note that cpp implementation corresponds to an earlier version of the code and may be outdated. 
-#' Use \code{options(opera_use_cpp = TRUE)} to change the default value.
-#' 
 #' @param quiet \code{boolean}. Whether or not to display progress bars.
+#' @param ... \code{boolean}. Don't use.
 #' 
 #' @return An object of class mixture that can be used to perform new predictions. 
 #' It contains the parameters \code{model}, \code{loss.type}, \code{loss.gradient},
@@ -169,13 +165,18 @@
 #' 
 mixture <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square", 
                     loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list(),
-                    use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = TRUE) UseMethod("mixture")
+                    quiet = TRUE, ...) UseMethod("mixture")
 
 
 #' @export 
 mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type = "square", 
                             loss.gradient = TRUE, coefficients = "Uniform", awake = NULL, parameters = list(),
-                            use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = TRUE) {
+                            quiet = TRUE, ...) {
+  
+  l <- list(...)
+  if("use_cpp" %in% names(l)){
+    warning("`use_cpp` argument is deprecated since 1.2.1 and will be remove in next version.")
+  }
   
   # checks
   if(any(is.na(Y))){
@@ -184,7 +185,7 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
   experts <- check_matrix(experts, "experts")
   awake <- check_matrix(awake, "awake")
   
-  loss.type <- check_loss(loss.type = loss.type, loss.gradient = loss.gradient, use_cpp = use_cpp)
+  loss.type <- check_loss(loss.type = loss.type, loss.gradient = loss.gradient)
   
   if(any(c("integer", "numeric") %in% mode(coefficients))){
     if(any(coefficients == 0 | coefficients == 0L)){
@@ -241,7 +242,7 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
     }
     object$d <- d
     object <- predict(object, newY = Y, newexperts = experts, awake = awake, 
-                      type = "model", use_cpp = use_cpp, quiet = quiet)
+                      type = "model", quiet = quiet)
     
   }
   return(object)

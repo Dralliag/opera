@@ -1,6 +1,5 @@
 
-ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
-                  use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = FALSE) {
+ridge <- function(y, experts, lambda, w0 = NULL, training = NULL, quiet = FALSE) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -24,25 +23,18 @@ ridge <- function(y, experts, lambda, w0 = NULL, training = NULL,
     bt <- matrix(lambda * w0, nrow = N)
   }
   
-  if (use_cpp){
-    error_code<-computeRidgeCPP(experts,w,At,bt,y, quiet = quiet)
-    if (error_code != 0){
-      stop("matrix is not invertible")
-    }
-  }
-  else {
-    if (!quiet) steps <- init_progress(T)
+  if (!quiet) steps <- init_progress(T)
+  
+  for (t in 1:T) {
+    if (!quiet) update_progress(t, steps)
     
-    for (t in 1:T) {
-      if (!quiet) update_progress(t, steps)
-      
-      w[t, ] <- At %*% bt
-      a <- At %*% experts[t, ]
-      At <- At - a %*% t(a) / c(1 + experts[t,] %*% a)
-      bt <- bt + y[t] * experts[t, ]
-    }
-    if (! quiet) end_progress()
+    w[t, ] <- At %*% bt
+    a <- At %*% experts[t, ]
+    At <- At - a %*% t(a) / c(1 + experts[t,] %*% a)
+    bt <- bt + y[t] * experts[t, ]
   }
+  if (! quiet) end_progress()
+  
   
   object <- list(model = "Ridge", loss.type = list(name = "square"), coefficients = At%*%bt)
   

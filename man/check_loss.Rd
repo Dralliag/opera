@@ -4,13 +4,7 @@
 \alias{check_loss}
 \title{Function to check validy of provided loss function}
 \usage{
-check_loss(
-  loss.type,
-  loss.gradient,
-  Y = NULL,
-  model = NULL,
-  use_cpp = getOption("opera_use_cpp", default = FALSE)
-)
+check_loss(loss.type, loss.gradient, Y = NULL, model = NULL)
 }
 \arguments{
 \item{loss.type}{\code{character, list or function}. 
@@ -31,8 +25,6 @@ check_loss(
 \item{Y}{\code{numeric} (NULL). (Optional) Target values (to perform some checks).}
 
 \item{model}{\code{character} (NULL). (Optional) Model used (to perform some checks).}
-
-\item{use_cpp}{\code{boolean}. Whether or not to use cpp function to increase perf.}
 }
 \value{
 loss.type

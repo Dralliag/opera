@@ -255,7 +255,7 @@ test_that("Quantile mixture are ok", {
 })
 
 # test of predict function
-test_that("Predict method is ok, with and without awake, use_cpp or not", {
+test_that("Predict method is ok, with and without awake", {
   for (model in c("MLpol", "MLprod", "MLewa", "FS", "Ridge", "BOA", "EWA")) {
     for (possible_loss in c("percentage", "absolute", "square", "pinball")) {
       cur_loss <- list("name" = possible_loss)
@@ -269,64 +269,44 @@ test_that("Predict method is ok, with and without awake, use_cpp or not", {
       
       # with awake
       # single online prediction and sequential prediction return similar models
-      m1_cpp <- predict(m, newY = Y, newexperts = X, type = "m", awake = awake, quiet = TRUE, use_cpp = TRUE)
-      m2_cpp <- m
-      for (t in 1:n) {
-        m2_cpp <- predict(m2_cpp, newY = Y[t], newexperts = X[t, ], online = TRUE, type = "model",
-                      awake = awake[t, ], quiet = TRUE, use_cpp = TRUE)
-      }
-      expect_equal(m1_cpp, m2_cpp)
-      
-      m1_r <- predict(m, newY = Y, newexperts = X, type = "m", awake = awake, quiet = TRUE, use_cpp = FALSE)
+      m1_r <- predict(m, newY = Y, newexperts = X, type = "m", awake = awake, quiet = TRUE)
       m2_r <- m
       for (t in 1:n) {
         m2_r <- predict(m2_r, newY = Y[t], newexperts = X[t, ], online = TRUE, type = "model",
-                      awake = awake[t, ], quiet = TRUE, use_cpp = FALSE)
+                      awake = awake[t, ], quiet = TRUE)
       }
       expect_equal(m1_r, m2_r)
       
-      expect_equal(m1_r, m1_cpp) 
-      
       # batch prediction is ok
-      m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, awake = awake, quiet = TRUE, use_cpp = TRUE)
-      expect_equal(m1$coefficients, m2_cpp$coefficients)
+      m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, awake = awake, quiet = TRUE)
+      expect_equal(m1$coefficients, m2_r$coefficients)
       
-      expect_warning(m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = awake, quiet = TRUE, use_cpp = TRUE))
+      expect_warning(m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = awake, quiet = TRUE))
       expect_equal(m1$prediction, m2)
       
       
       # without awake
       # single online prediction and sequential prediction return similar models
-      m1_cpp <- predict(m, newY = Y, newexperts = X, type = "m", awake = NULL, quiet = TRUE, use_cpp = TRUE)
-      m2_cpp <- m
-      for (t in 1:n) {
-        m2_cpp <- predict(m2_cpp, newY = Y[t], newexperts = X[t, ], online = TRUE, type = "model",
-                          awake = NULL, quiet = TRUE, use_cpp = TRUE)
-      }
-      expect_equal(m1_cpp, m2_cpp)
-      
-      m1_r <- predict(m, newY = Y, newexperts = X, type = "m", awake = NULL, quiet = TRUE, use_cpp = FALSE)
+      m1_r <- predict(m, newY = Y, newexperts = X, type = "m", awake = NULL, quiet = TRUE)
       m2_r <- m
       for (t in 1:n) {
         m2_r <- predict(m2_r, newY = Y[t], newexperts = X[t, ], online = TRUE, type = "model",
-                        awake = NULL, quiet = TRUE, use_cpp = FALSE)
+                        awake = NULL, quiet = TRUE)
       }
       expect_equal(m1_r, m2_r)
       
-      expect_equal(m1_r, m1_cpp) 
-      
       # batch prediction is ok
-      m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, awake = NULL, quiet = TRUE, use_cpp = TRUE)
-      expect_equal(m1$coefficients, m2_cpp$coefficients)
+      m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, awake = NULL, quiet = TRUE)
+      expect_equal(m1$coefficients, m2_r$coefficients)
       
-      expect_warning(m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = NULL, quiet = TRUE, use_cpp = TRUE))
+      expect_warning(m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = NULL, quiet = TRUE))
       expect_equal(m1$prediction, m2)
     }
   }
 })
 
 # test of predict function on FTRL
-test_that("Predict FTRL is ok, use_cpp or not", {
+test_that("Predict FTRL is ok", {
   model <- "FTRL"
   
   for (possible_loss in c("percentage", "absolute", "square", "pinball")) {
@@ -336,38 +316,22 @@ test_that("Predict FTRL is ok, use_cpp or not", {
     
     # without awake
     # single online prediction and sequential prediction return similar models
-    m1_cpp <- predict(m, newY = Y, newexperts = X, type = "m", quiet = TRUE, use_cpp = TRUE)
-    m2_cpp <- m
-    for (t in 1:n) {
-      m2_cpp <- predict(m2_cpp, newY = Y[t], newexperts = X[t, ], online = TRUE, type = "model",
-                        quiet = TRUE, use_cpp = TRUE)
-    }
-    expect_equal(m1_cpp[! which(names(m1_cpp) %in% c("training", "parameters"))], m2_cpp[! which(names(m2_cpp) %in% c("training", "parameters"))])
-    expect_equal(m1_cpp[[which(names(m1_cpp) == "training")]][c(1:2, 9:15)], m2_cpp[[which(names(m2_cpp) == "training")]][c(1:2, 9:15)])
-    expect_equal(m1_cpp[[which(names(m1_cpp) == "parameters")]][c(1:2, 5, 7)], m2_cpp[[which(names(m2_cpp) == "parameters")]][c(1:2, 5, 7)])
-    # /!\ environment is kept with function declaration
-    
-    m1_r <- predict(m, newY = Y, newexperts = X, type = "m", quiet = TRUE, use_cpp = FALSE)
+    m1_r <- predict(m, newY = Y, newexperts = X, type = "m", quiet = TRUE)
     m2_r <- m
     for (t in 1:n) {
       m2_r <- predict(m2_r, newY = Y[t], newexperts = X[t, ], online = TRUE, type = "model",
-                      quiet = TRUE, use_cpp = FALSE)
+                      quiet = TRUE)
     }
     expect_equal(m1_r[! which(names(m1_r) %in% c("training", "parameters"))], m2_r[! which(names(m2_r) %in% c("training", "parameters"))])
     expect_equal(m1_r[[which(names(m1_r) == "training")]][c(1:2, 9:15)], m2_r[[which(names(m2_r) == "training")]][c(1:2, 9:15)])
     expect_equal(m1_r[[which(names(m1_r) == "parameters")]][c(1:2, 5, 7)], m2_r[[which(names(m2_r) == "parameters")]][c(1:2, 5, 7)])
     # /!\ environment is kept with function declaration
     
-    expect_equal(m1_r[! which(names(m1_r) %in% c("training", "parameters"))], m1_cpp[! which(names(m1_cpp) %in% c("training", "parameters"))])
-    expect_equal(m1_r[[which(names(m1_r) == "training")]][c(1:2, 9:15)], m1_cpp[[which(names(m1_cpp) == "training")]][c(1:2, 9:15)])
-    expect_equal(m1_r[[which(names(m1_r) == "parameters")]][c(1:2, 5, 7)], m1_cpp[[which(names(m1_cpp) == "parameters")]][c(1:2, 5, 7)])
-    # /!\ environment is kept with function declaration
-    
     # batch prediction is ok
-    m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, quiet = TRUE, use_cpp = TRUE)
-    expect_equal(m1$coefficients, m2_cpp$coefficients)
+    m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, quiet = TRUE)
+    expect_equal(m1$coefficients, m2_r$coefficients)
     
-    expect_warning(m2 <- predict(m, newexperts = X, type = "r", online = FALSE, quiet = TRUE, use_cpp = TRUE))
+    expect_warning(m2 <- predict(m, newexperts = X, type = "r", online = FALSE, quiet = TRUE))
     expect_equal(m1$prediction, m2)
     
     # constraint is ok

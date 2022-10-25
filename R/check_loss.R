@@ -15,7 +15,6 @@
 #' }
 #' @param Y \code{numeric} (NULL). (Optional) Target values (to perform some checks).
 #' @param model \code{character} (NULL). (Optional) Model used (to perform some checks).
-#' @param use_cpp \code{boolean}. Whether or not to use cpp function to increase perf.
 #' 
 #' @importFrom methods formalArgs
 #' 
@@ -24,8 +23,7 @@
 check_loss <- function(loss.type, 
                        loss.gradient,
                        Y = NULL,
-                       model = NULL,
-                       use_cpp = getOption("opera_use_cpp", default = FALSE)) {
+                       model = NULL) {
   
   if (! is.function(loss.type)) {
     if (! is.logical(loss.gradient)) {
@@ -51,10 +49,7 @@ check_loss <- function(loss.type,
     }
   } 
   else {
-    if (use_cpp == TRUE && class(loss.type) == "function") {
-      stop("Custom loss functions are not yet available when use_cpp == TRUE.") 
-    }
-    
+
     args_loss <- formalArgs(loss.type)
     if (! length(args_loss) == 2) {
       stop("loss.type should be a function of 2 arguments.")

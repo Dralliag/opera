@@ -16,8 +16,8 @@ mixture(
   coefficients = "Uniform",
   awake = NULL,
   parameters = list(),
-  use_cpp = getOption("opera_use_cpp", default = FALSE),
-  quiet = TRUE
+  quiet = TRUE,
+  ...
 )
 
 \method{print}{mixture}(x, ...)
@@ -145,15 +145,11 @@ online. Possible parameters are:
    more regularity assumption on the underlying process generating the data (i.i.d. for instance). }
 }}
 
-\item{use_cpp}{\code{boolean}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
-with the use of custom loss function. Note that cpp implementation corresponds to an earlier version of the code and may be outdated. 
-Use \code{options(opera_use_cpp = TRUE)} to change the default value.}
-
 \item{quiet}{\code{boolean}. Whether or not to display progress bars.}
 
-\item{x}{An object of class mixture}
-
 \item{...}{Additional parameters}
+
+\item{x}{An object of class mixture}
 
 \item{object}{An object of class mixture}
 }

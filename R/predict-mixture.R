@@ -37,9 +37,6 @@
 #'    be obtained from the last rows of object$weights.}
 #'    \item{all}{return a list containing 'model', 'response', and 'weights'.}
 #'    }
-#'    
-#' @param use_cpp \code{boolean}. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
-#' with the use of custom loss function.
 #' 
 #' @param quiet \code{boolean}. Whether or not to display progress bars.
 #' 
@@ -51,8 +48,13 @@
 #' 
 #' @export 
 predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL, 
-                            online = TRUE, type = c("model", "response", "weights", "all"),
-                            use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = TRUE, ...) {
+                            online = TRUE, type = c("model", "response", "weights", "all"), 
+                            quiet = TRUE, ...) {
+  
+  l <- list(...)
+  if("use_cpp" %in% names(l)){
+    warning("`use_cpp` argument is deprecated since 1.2.1 and will be remove in next version.")
+  }
   
   # checks
   newexperts <- check_matrix(newexperts, "newexperts")
@@ -63,7 +65,7 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
   if ((d == 1) || (d == "unknown" && is.null(dim(newY)))) {
     object$d <- 1
     return(predictReal(object, newexperts, newY, awake, 
-                       online, type, use_cpp = use_cpp, quiet = quiet, ...))
+                       online, type, quiet = quiet, ...))
   } else {
     if (d == "unknown") {
       d = dim(newY)[2]
@@ -97,7 +99,7 @@ predict.mixture <- function(object, newexperts = NULL, newY = NULL, awake = NULL
         awakei <- awake[i,,]
       }
       result <- predictReal(result, newexperts = newexperts[i,,], newY = c(newY[i,]), awake = awakei,
-                            online = FALSE, type, use_cpp = use_cpp, quiet = quiet, ...)
+                            online = FALSE, type, quiet = quiet, ...)
     }
   }
   result$weights <- matrix(result$weights, nrow = result$T)

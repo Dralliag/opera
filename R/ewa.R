@@ -1,5 +1,5 @@
 ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-                w0 = NULL, training = NULL, use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = FALSE) {
+                w0 = NULL, training = NULL, quiet = FALSE) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -26,38 +26,29 @@ ewa <- function(y, experts, eta, awake = NULL, loss.type = "square", loss.gradie
     cumulativeLoss <- training$cumulativeLoss
   }
   
-  if (use_cpp){
-    loss_tau <- ifelse(! is.null(loss.type$tau), loss.type$tau, 0)
-    loss_name <- loss.type$name
-    cumulativeLoss<-computeEWAEigen(
-      awake, experts,weights,y,pred, 
-      R.w0,eta,cumulativeLoss,
-      loss_name,loss_tau,loss.gradient, quiet = quiet);
-  } 
-  else {
-    if (! quiet) steps <- init_progress(T)
+  if (! quiet) steps <- init_progress(T)
+  
+  for (t in 1:T) {
+    if (! quiet) update_progress(t, steps)
     
-    for (t in 1:T) {
-      if (! quiet) update_progress(t, steps)
-      
-      # Weight update
-      idx = awake[t,] > 0 # index of active experts
-      R.aux <- eta * R.w0
-      R.max = max(R.aux[idx]) # max of active experts
-      weights[t,idx] <- t(exp(R.aux[idx] - R.max)) * t(awake[t,idx]) 
-      weights[t,idx] <- weights[t,idx]/sum(weights[t,idx])
-      
-      # Prediction and losses
-      pred[t] <- experts[t, ] %*% weights[t, ]
-      cumulativeLoss <- cumulativeLoss + loss(x = pred[t], y = y[t], loss.type = loss.type)
-      lpred <- loss(pred[t], y[t], pred[t], loss.type, loss.gradient)
-      lexp <- loss(experts[t, ], y[t], pred[t], loss.type, loss.gradient)
-      
-      # Regret update
-      R.w0 <- R.w0 + awake[t, ] * (c(c(lpred) - lexp))
-    }
-    if (! quiet) end_progress()
+    # Weight update
+    idx = awake[t,] > 0 # index of active experts
+    R.aux <- eta * R.w0
+    R.max = max(R.aux[idx]) # max of active experts
+    weights[t,idx] <- t(exp(R.aux[idx] - R.max)) * t(awake[t,idx]) 
+    weights[t,idx] <- weights[t,idx]/sum(weights[t,idx])
+    
+    # Prediction and losses
+    pred[t] <- experts[t, ] %*% weights[t, ]
+    cumulativeLoss <- cumulativeLoss + loss(x = pred[t], y = y[t], loss.type = loss.type)
+    lpred <- loss(pred[t], y[t], pred[t], loss.type, loss.gradient)
+    lexp <- loss(experts[t, ], y[t], pred[t], loss.type, loss.gradient)
+    
+    # Regret update
+    R.w0 <- R.w0 + awake[t, ] * (c(c(lpred) - lexp))
   }
+  if (! quiet) end_progress()
+  
   R.aux <- eta * R.w0
   R.max <- max(R.aux)
   w <- t(exp(R.aux - R.max)) / sum(exp(R.aux - R.max))

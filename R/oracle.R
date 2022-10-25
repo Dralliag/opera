@@ -79,7 +79,7 @@ oracle.default <- function(Y, experts, model = "convex", loss.type = "square", a
   # checks
   experts <- check_matrix(experts, "experts")
   awake <- check_matrix(awake, "awake")
-  loss.type <- check_loss(loss.type = loss.type, loss.gradient = FALSE, model = model, use_cpp = FALSE)
+  loss.type <- check_loss(loss.type = loss.type, loss.gradient = FALSE, model = model)
   
   # Test that Y and experts have correct dimensions
   if (is.null(Y) || is.null(experts)) {

@@ -11,10 +11,7 @@
 #' 
 #' 
 #' @name opera-package
-#' @import Rcpp
-#' @importFrom Rcpp sourceCpp
 #' @importFrom Rdpack reprompt
-#' @useDynLib opera
 #' @aliases opera-package opera
 #' @docType package
 #' @author Pierre Gaillard <pierre@@gaillard.me>

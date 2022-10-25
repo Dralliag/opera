@@ -1,6 +1,6 @@
 # Ridge aggregation rule with automatic calibration of smoothing parameters
 ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, gamma = 2, 
-                       training = NULL, use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = FALSE) {
+                       training = NULL, quiet = FALSE) {
   experts <- as.matrix(experts)
   
   N <- ncol(experts)  # Number of experts
@@ -54,27 +54,18 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, gamma = 2,
     
     # Weights, prediction formed by Ridge(lambda[t]) where lambda[t] is the learning
     # rate calibrated online
-    if (use_cpp){
-      bestlambda<-RidgeCalibStep1(t,bestlambda,
-                                  experts, weights,
-                                  wlambda, w0,
-                                  bt, 
-                                  grid.lambda,  
-                                  y, lambda,
-                                  cumulativeLoss, prediction)
-    }
-    else{
-      weights[t, ] <- wlambda[, bestlambda]
-      prediction[t] <- experts[t, ] %*% weights[t, ]
-      lambda[t] <- grid.lambda[bestlambda]
-      
-      # Weights, predictions formed by each Ridge(lambda) for lambda in the grid
-      # 'grid.lambda'
-      cumulativeLoss <- cumulativeLoss + c(experts[t, ] %*% wlambda - y[t])^2
-      # Grid update **************
-      bestlambda <- order(cumulativeLoss)[1]  # find the best smoothing rate lambda in the grid
-      bt <- bt + y[t] * experts[t, ]
-    }
+    
+    weights[t, ] <- wlambda[, bestlambda]
+    prediction[t] <- experts[t, ] %*% weights[t, ]
+    lambda[t] <- grid.lambda[bestlambda]
+    
+    # Weights, predictions formed by each Ridge(lambda) for lambda in the grid
+    # 'grid.lambda'
+    cumulativeLoss <- cumulativeLoss + c(experts[t, ] %*% wlambda - y[t])^2
+    # Grid update **************
+    bestlambda <- order(cumulativeLoss)[1]  # find the best smoothing rate lambda in the grid
+    bt <- bt + y[t] * experts[t, ]
+    
     
     # Parameter update
     for (k in 1:nlambda){
@@ -88,7 +79,7 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, gamma = 2,
       grid.lambda <- c(grid.lambda, newlambda)
       for (k in 1:length(newlambda)) {
         perfnewlambda <- tryCatch(ridge(y = c(training$oldY, y[1:t]), experts = rbind(training$oldexperts, 
-                                                                                      matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0, use_cpp = use_cpp, quiet = TRUE), 
+                                                                                      matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0, quiet = TRUE), 
                                   error = function(e) {
                                     list(prediction = rep(0, t))
                                   })
@@ -105,7 +96,7 @@ ridgeCalib <- function(y, experts, grid.lambda = 1, w0 = NULL, gamma = 2,
       for (k in 1:length(newlambda)) {
         grid.lambda <- c(newlambda[k], grid.lambda)
         perfnewlambda <- tryCatch(ridge(c(training$oldY, y[1:t]), experts = rbind(training$oldexperts, 
-                                                                                  matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0, use_cpp = use_cpp, quiet = TRUE), 
+                                                                                  matrix(experts[1:t, ], ncol = N)), lambda = newlambda[k], w0 = w0, quiet = TRUE), 
                                   error = function(e) {
                                     list(prediction = rep(NA, t))
                                   })

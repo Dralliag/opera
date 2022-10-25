@@ -1,7 +1,7 @@
 Package: opera
 Type: Package
 Title: Online Prediction by Expert Aggregation
-Version: 1.2.0
+Version: 1.2.1
 Author: Pierre Gaillard [cre, aut],
   Yannig Goude [aut],
   Laurent Plagne [ctb],
@@ -17,11 +17,7 @@ URL: http://pierre.gaillard.me/opera.html
 BugReports: https://github.com/dralliag/opera/issues
 Depends:
     R (>= 3.5.0)
-LinkingTo: 
-    Rcpp,
-    RcppEigen
 Imports: 
-    Rcpp,
     htmltools,
     rAmCharts,
     htmlwidgets,

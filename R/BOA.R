@@ -1,6 +1,6 @@
 
 BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = TRUE, 
-                w0 = NULL, training = NULL, use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = FALSE) {
+                w0 = NULL, training = NULL, quiet = FALSE) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -37,49 +37,42 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
     V <- training$V
   }
   
-  if (use_cpp){
-    loss_tau <- ifelse(! is.null(loss.type$tau), loss.type$tau, 0) 
-    loss_name <- loss.type$name
-    computeBOAEigen(awake,eta,experts,weights,y,prediction,
-                    w,w0,R,R.reg,B,V,loss_name,loss_tau,loss.gradient, quiet = quiet);
-  }
-  else{
-    if (! quiet) steps <- init_progress(T)
+  if (! quiet) steps <- init_progress(T)
+  
+  for (t in 1:T) {
+    if (! quiet) update_progress(t, steps)
     
-    for (t in 1:T) {
-      if (! quiet) update_progress(t, steps)
-      
-      idx <- awake[t,] > 0
-      R.aux <- log(eta[t,]) + log(w0) + eta[t, ] * R.reg
-      R.max <- max(R.aux[idx])
-      w <- numeric(N)
-      w[idx] <- exp(R.aux[idx] - R.max)
-      
-      p <- awake[t, ]  * w /sum(awake[t, ] * w) 
-      pred <- experts[t, ] %*% p
-      
-      weights[t, ] <- p
-      prediction[t] <- pred
-      
-      lpred <- loss(pred, y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
-      lexp <- loss(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
-      
-      # Instantaneous regret
-      r <-  awake[t, ] * c(c(lpred) - lexp)
-      
-      # Update the learning rates
-      B <- pmax(B, abs(r))
-      B2 <- 2^ceiling(log(B,2))
-      V <- V + r^2
-      eta[t + 1, ] <- pmin(1/B2, sqrt(log(1/w0)/V))
-      
-      # Update the regret and the regularized regret used by BOA
-      r.reg <- 1/2 * (r - eta[t+1, ] * r^2 + B2 * (eta[t+1,] * r > 1/2))
-      R <- R + r
-      R.reg <- R.reg + r.reg
-    }
-    if (! quiet) end_progress()
+    idx <- awake[t,] > 0
+    R.aux <- log(eta[t,]) + log(w0) + eta[t, ] * R.reg
+    R.max <- max(R.aux[idx])
+    w <- numeric(N)
+    w[idx] <- exp(R.aux[idx] - R.max)
+    
+    p <- awake[t, ]  * w /sum(awake[t, ] * w) 
+    pred <- experts[t, ] %*% p
+    
+    weights[t, ] <- p
+    prediction[t] <- pred
+    
+    lpred <- loss(pred, y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
+    lexp <- loss(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
+    
+    # Instantaneous regret
+    r <-  awake[t, ] * c(c(lpred) - lexp)
+    
+    # Update the learning rates
+    B <- pmax(B, abs(r))
+    B2 <- 2^ceiling(log(B,2))
+    V <- V + r^2
+    eta[t + 1, ] <- pmin(1/B2, sqrt(log(1/w0)/V))
+    
+    # Update the regret and the regularized regret used by BOA
+    r.reg <- 1/2 * (r - eta[t+1, ] * r^2 + B2 * (eta[t+1,] * r > 1/2))
+    R <- R + r
+    R.reg <- R.reg + r.reg
   }
+  if (! quiet) end_progress()
+  
   
   R.aux <- log(eta[T+1,]) + log(w0) + eta[T + 1, ] * R.reg
   R.max <- max(R.aux)

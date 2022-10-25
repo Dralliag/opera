@@ -1,6 +1,5 @@
 predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL, 
-                        online = TRUE, type = c("model", "response", "weights", "all"),
-                        use_cpp = getOption("opera_use_cpp", default = FALSE), quiet = FALSE, ...) {
+                        online = TRUE, type = c("model", "response", "weights", "all"), quiet = FALSE, ...) {
   
   type <- match.arg(type)
   
@@ -95,18 +94,18 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
       if (is.null(object$parameters$lambda) || !is.null(object$parameters$grid.lambda)) {
         newobject <- ridgeCalib(y = newY, experts = newexperts, w0 = object$coefficients, 
                                 gamma = object$parameters$gamma, grid.lambda = object$parameters$grid.lambda, 
-                                training = object$training, use_cpp = use_cpp, quiet = quiet)
+                                training = object$training, quiet = quiet)
         newobject$parameters$lambda <- c(object$parameters$lambda, newobject$parameters$lambda)
       } else {
         newobject <- ridge(y = newY, experts = newexperts, lambda = object$parameters$lambda, 
-                           w0 = object$coefficients, training = object$training, use_cpp = use_cpp, quiet = quiet)
+                           w0 = object$coefficients, training = object$training, quiet = quiet)
       }
       newobject$loss.gradient = FALSE
     }
     
     if (object$model == "MLpol") {
       newobject <- MLpol(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
-                         loss.gradient = object$loss.gradient, training = object$training, use_cpp = use_cpp, quiet = quiet)
+                         loss.gradient = object$loss.gradient, training = object$training, quiet = quiet)
       newobject$parameters <- list(eta = rbind(object$parameters$eta, newobject$parameters$eta))
     }
     
@@ -123,12 +122,12 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
       algo <- eval(parse(text = object$model))
       if (object$model != "MLewa")  {
         newobject <- algo(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
-                          loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training,
-                          use_cpp = use_cpp, quiet = quiet) 
+                          loss.gradient = object$loss.gradient, w0 = object$coefficients, 
+                          training = object$training, quiet = quiet) 
       } else {
         newobject <- algo(y = newY, experts = newexperts, awake = awake, loss.type = object$loss.type, 
-                          loss.gradient = object$loss.gradient, w0 = object$coefficients, training = object$training,
-                          quiet = quiet)
+                          loss.gradient = object$loss.gradient, w0 = object$coefficients, 
+                          training = object$training, quiet = quiet)
       }
       newobject$parameters <- list(eta = rbind(object$parameters$eta, newobject$parameters$eta))
     }
@@ -138,12 +137,12 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
         newobject <- ewaCalib(y = newY, experts = newexperts, awake = awake, 
                               loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
                               w0 = object$coefficients, gamma = object$parameters$gamma, grid.eta = sort(object$parameters$grid.eta), 
-                              training = object$training, use_cpp = use_cpp, quiet = quiet)
+                              training = object$training, quiet = quiet)
         newobject$parameters$eta <- c(object$parameters$eta, newobject$parameters$eta)
       } else {
         newobject <- ewa(y = newY, experts = newexperts, eta = object$parameters$eta, 
                          awake = awake, loss.type = object$loss.type, loss.gradient = object$loss.gradient, 
-                         w0 = object$coefficients, training = object$training, use_cpp = use_cpp, quiet = quiet)
+                         w0 = object$coefficients, training = object$training, quiet = quiet)
       }
     }
     
