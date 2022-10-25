@@ -24,7 +24,7 @@ a weight to each expert and by combining the expert advice."><!-- mathjax --><sc
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">opera</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.1</span>
       </span>
     </div>
 
@@ -33,7 +33,7 @@ a weight to each expert and by combining the expert advice."><!-- mathjax --><sc
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -77,24 +77,24 @@ a weight to each expert and by combining the expert advice.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">mixture</span><span class="op">(</span>
-  Y <span class="op">=</span> <span class="cn">NULL</span>,
-  experts <span class="op">=</span> <span class="cn">NULL</span>,
-  model <span class="op">=</span> <span class="st">"MLpol"</span>,
-  loss.type <span class="op">=</span> <span class="st">"square"</span>,
-  loss.gradient <span class="op">=</span> <span class="cn">TRUE</span>,
-  coefficients <span class="op">=</span> <span class="st">"Uniform"</span>,
-  awake <span class="op">=</span> <span class="cn">NULL</span>,
-  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  use_cpp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"opera_use_cpp"</span>, default <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,
-  quiet <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span>
-
-<span class="co"># S3 method for mixture</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="co"># S3 method for mixture</span>
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">mixture</span><span class="op">(</span></span>
+<span>  Y <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  experts <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"MLpol"</span>,</span>
+<span>  loss.type <span class="op">=</span> <span class="st">"square"</span>,</span>
+<span>  loss.gradient <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  coefficients <span class="op">=</span> <span class="st">"Uniform"</span>,</span>
+<span>  awake <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for mixture</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for mixture</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -102,12 +102,16 @@ a weight to each expert and by combining the expert advice.</p>
     <dl><dt>Y</dt>
 <dd><p>A matrix with T rows and d columns. Each row <code>Y[t,]</code> contains a d-dimensional 
 observation to be predicted sequentially.</p></dd>
+
+
 <dt>experts</dt>
 <dd><p>An array of dimension <code>c(T,d,K)</code>, where <code>T</code> is the length of the data-set, 
 <code>d</code> the dimension of the observations, and <code>K</code> is the number of experts. It contains the expert
 forecasts. Each vector <code>experts[t,,k]</code> corresponds to the d-dimensional prediction of <code>Y[t,]</code> 
 proposed by expert k at time \(t=1,\dots,T\).
 In the case of real prediction (i.e., \(d = 1\)), <code>experts</code> is a matrix with <code>T</code> rows and <code>K</code> columns.</p></dd>
+
+
 <dt>model</dt>
 <dd><p>A character string specifying the aggregation rule to use. 
 Currently available aggregation rules are:</p><dl><dt>'EWA'</dt>
@@ -181,6 +185,8 @@ The learning rates are automatically calibrated.</p></dd>
 
 
 </dl></dd>
+
+
 <dt>loss.type</dt>
 <dd><p><code>character, list, or function</code> ("square").</p><dl><dt>character</dt>
 <dd><p>Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');</p></dd>
@@ -194,6 +200,8 @@ The learning rates are automatically calibrated.</p></dd>
 
 
 </dl></dd>
+
+
 <dt>loss.gradient</dt>
 <dd><p><code>boolean, function</code> (TRUE).</p><dl><dt>boolean</dt>
 <dd><p>If TRUE, the aggregation rule will not be directly applied to the loss function at hand,
@@ -206,9 +214,13 @@ The learning rates are automatically calibrated.</p></dd>
 
 
 </dl></dd>
+
+
 <dt>coefficients</dt>
 <dd><p>A probability vector of length K containing the prior weights of the experts
 (not possible for 'MLpol'). The weights must be non-negative and sum to 1.</p></dd>
+
+
 <dt>awake</dt>
 <dd><p>A matrix specifying the
 activation coefficients of the experts. Its entries lie in <code>[0,1]</code>.
@@ -217,6 +229,8 @@ prediction. If the expert number <code>k</code> at instance <code>t</code> does 
 form any prediction of observation <code>Y_t</code>, we can put
 <code>awake[t,k]=0</code> so that the mixture does not consider expert <code>k</code> in
 the mixture to predict <code>Y_t</code>.</p></dd>
+
+
 <dt>parameters</dt>
 <dd><p>A list that contains optional parameters for the aggregation rule. 
 If no parameters are provided, the aggregation rule is fully calibrated
@@ -261,42 +275,56 @@ online. Possible parameters are:</p><dl><dt>eta</dt>
 
 
 </dl></dd>
-<dt>use_cpp</dt>
-<dd><p><code>boolean</code>. Whether or not to use cpp optimization to fasten the computations. This option is not yet compatible
-with the use of custom loss function. Note that cpp implementation corresponds to an earlier version of the code and may be outdated. 
-Use <code>options(opera_use_cpp = TRUE)</code> to change the default value.</p></dd>
+
+
 <dt>quiet</dt>
 <dd><p><code>boolean</code>. Whether or not to display progress bars.</p></dd>
-<dt>x</dt>
-<dd><p>An object of class mixture</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional parameters</p></dd>
+
+
+<dt>x</dt>
+<dd><p>An object of class mixture</p></dd>
+
+
 <dt>object</dt>
 <dd><p>An object of class mixture</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An object of class mixture that can be used to perform new predictions. 
+    
+
+<p>An object of class mixture that can be used to perform new predictions. 
 It contains the parameters <code>model</code>, <code>loss.type</code>, <code>loss.gradient</code>,
 <code>experts</code>, <code>Y</code>, <code>awake</code>, and the fields</p>
 <dl><dt>coefficients</dt>
 <dd><p>A vector of coefficients 
 assigned to each expert to perform the next prediction.</p></dd>
+
+
 <dt>weights </dt>
 <dd><p>A matrix of dimension <code>c(T,K)</code>, with
 <code>T</code> the number of instances to be predicted and <code>K</code> the number of
 experts.  Each row contains the convex combination to form the predictions</p></dd>
+
 <dt>prediction </dt>
 <dd><p>A matrix with <code>T</code> rows and <code>d</code> columns that contains the
 predictions outputted by the aggregation rule.</p></dd>
+ 
 <dt>loss</dt>
 <dd><p>The average loss (as stated by parameter <code>loss.type</code>) suffered
 by the aggregation rule.</p></dd>
+
 <dt>parameters</dt>
 <dd><p>The learning parameters chosen by the aggregation rule or by the user.</p></dd>
+
 <dt>training</dt>
 <dd><p>A list that contains useful temporary information of the 
 aggregation rule to be updated and to perform predictions.</p></dd>
+
 </dl></div>
     <div id="references">
     <h2>References</h2>
@@ -325,62 +353,62 @@ In <em>Proceedings of the 20th international conference on machine learning (icm
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://pierre.gaillard.me/opera.html" class="external-link">'opera'</a></span><span class="op">)</span>  <span class="co"># load the package</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Example: find the best one week ahead forecasting strategy (weekly data)</span></span>
-<span class="r-in"><span class="co"># packages</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">mgcv</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://pierre.gaillard.me/opera.html" class="external-link">'opera'</a></span><span class="op">)</span>  <span class="co"># load the package</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Example: find the best one week ahead forecasting strategy (weekly data)</span></span></span>
+<span class="r-in"><span><span class="co"># packages</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">mgcv</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: nlme</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> This is mgcv 1.8-38. For overview type 'help("mgcv-package")'.</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># import data</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">idx_data_test</span> <span class="op">&lt;-</span> <span class="fl">620</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">data_train</span> <span class="op">&lt;-</span> <span class="va">electric_load</span><span class="op">[</span><span class="op">-</span><span class="va">idx_data_test</span>, <span class="op">]</span></span>
-<span class="r-in"><span class="va">data_test</span> <span class="op">&lt;-</span> <span class="va">electric_load</span><span class="op">[</span><span class="va">idx_data_test</span>, <span class="op">]</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Build the expert forecasts </span></span>
-<span class="r-in"><span class="co"># ##########################</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># 1) A generalized additive model</span></span>
-<span class="r-in"><span class="va">gam.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">Load</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">IPI</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Temp</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Time</span>, k<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="op">+</span> </span>
-<span class="r-in">                 <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Load1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">NumWeek</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data_train</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">gam.forecast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">gam.fit</span>, newdata <span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># 2) An online autoregressive model on the residuals of a medium term model</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Medium term model to remove trend and seasonality (using generalized additive model)</span></span>
-<span class="r-in"><span class="va">detrend.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">Load</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Time</span>,k<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">NumWeek</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Temp</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">IPI</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data_train</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">electric_load</span><span class="op">$</span><span class="va">Trend</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">detrend.fit</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">detrend.fit</span>,newdata <span class="op">=</span> <span class="va">data_test</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">electric_load</span><span class="op">$</span><span class="va">Load.detrend</span> <span class="op">&lt;-</span> <span class="va">electric_load</span><span class="op">$</span><span class="va">Load</span> <span class="op">-</span> <span class="va">electric_load</span><span class="op">$</span><span class="va">Trend</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Residual analysis</span></span>
-<span class="r-in"><span class="va">ar.forecast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">idx_data_test</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="va">idx_data_test</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  <span class="va">ar.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/ar.html" class="external-link">ar</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">$</span><span class="va">Load.detrend</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">idx_data_test</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">ar.forecast</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">ar.fit</span><span class="op">)</span><span class="op">$</span><span class="va">pred</span><span class="op">)</span> <span class="op">+</span> <span class="va">electric_load</span><span class="op">$</span><span class="va">Trend</span><span class="op">[</span><span class="va">idx_data_test</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Aggregation of experts</span></span>
-<span class="r-in"><span class="co">###########################</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">gam.forecast</span>, <span class="va">ar.forecast</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'gam'</span>, <span class="st">'ar'</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">Y</span> <span class="op">&lt;-</span> <span class="va">data_test</span><span class="op">$</span><span class="va">Load</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">Y</span>, <span class="va">X</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">'l'</span>, col <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, ylab <span class="op">=</span> <span class="st">'Weekly load'</span>, xlab <span class="op">=</span> <span class="st">'Week'</span><span class="op">)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> This is mgcv 1.8-40. For overview type 'help("mgcv-package")'.</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># import data</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">idx_data_test</span> <span class="op">&lt;-</span> <span class="fl">620</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">data_train</span> <span class="op">&lt;-</span> <span class="va">electric_load</span><span class="op">[</span><span class="op">-</span><span class="va">idx_data_test</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">data_test</span> <span class="op">&lt;-</span> <span class="va">electric_load</span><span class="op">[</span><span class="va">idx_data_test</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Build the expert forecasts </span></span></span>
+<span class="r-in"><span><span class="co"># ##########################</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 1) A generalized additive model</span></span></span>
+<span class="r-in"><span><span class="va">gam.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">Load</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">IPI</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Temp</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Time</span>, k<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="op">+</span> </span></span>
+<span class="r-in"><span>                 <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Load1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">NumWeek</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data_train</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gam.forecast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">gam.fit</span>, newdata <span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 2) An online autoregressive model on the residuals of a medium term model</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Medium term model to remove trend and seasonality (using generalized additive model)</span></span></span>
+<span class="r-in"><span><span class="va">detrend.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">Load</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Time</span>,k<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">NumWeek</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Temp</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">IPI</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data_train</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">electric_load</span><span class="op">$</span><span class="va">Trend</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">detrend.fit</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">detrend.fit</span>,newdata <span class="op">=</span> <span class="va">data_test</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">electric_load</span><span class="op">$</span><span class="va">Load.detrend</span> <span class="op">&lt;-</span> <span class="va">electric_load</span><span class="op">$</span><span class="va">Load</span> <span class="op">-</span> <span class="va">electric_load</span><span class="op">$</span><span class="va">Trend</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Residual analysis</span></span></span>
+<span class="r-in"><span><span class="va">ar.forecast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">idx_data_test</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="va">idx_data_test</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">ar.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/ar.html" class="external-link">ar</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">$</span><span class="va">Load.detrend</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">idx_data_test</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">ar.forecast</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">ar.fit</span><span class="op">)</span><span class="op">$</span><span class="va">pred</span><span class="op">)</span> <span class="op">+</span> <span class="va">electric_load</span><span class="op">$</span><span class="va">Trend</span><span class="op">[</span><span class="va">idx_data_test</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Aggregation of experts</span></span></span>
+<span class="r-in"><span><span class="co">###########################</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">gam.forecast</span>, <span class="va">ar.forecast</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'gam'</span>, <span class="st">'ar'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">Y</span> <span class="op">&lt;-</span> <span class="va">data_test</span><span class="op">$</span><span class="va">Load</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">Y</span>, <span class="va">X</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">'l'</span>, col <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, ylab <span class="op">=</span> <span class="st">'Weekly load'</span>, xlab <span class="op">=</span> <span class="st">'Week'</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="mixture-opera-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># How good are the expert? Look at the oracles</span></span>
-<span class="r-in"><span class="va">oracle.convex</span> <span class="op">&lt;-</span> <span class="fu"><a href="oracle.html">oracle</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, experts <span class="op">=</span> <span class="va">X</span>, loss.type <span class="op">=</span> <span class="st">'square'</span>, model <span class="op">=</span> <span class="st">'convex'</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">oracle.convex</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">oracle.convex</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># How good are the expert? Look at the oracles</span></span></span>
+<span class="r-in"><span><span class="va">oracle.convex</span> <span class="op">&lt;-</span> <span class="fu"><a href="oracle.html">oracle</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, experts <span class="op">=</span> <span class="va">X</span>, loss.type <span class="op">=</span> <span class="st">'square'</span>, model <span class="op">=</span> <span class="st">'convex'</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">oracle.convex</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">oracle.convex</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> oracle.default(Y = Y, experts = X, model = "convex", loss.type = "square")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -392,46 +420,46 @@ In <em>Proceedings of the 20th international conference on machine learning (icm
 <span class="r-out co"><span class="r-pr">#&gt;</span> Best expert oracle:   1480 0.0202</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Uniform combination:  1480 0.0206</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Best convex oracle:   1450 0.0200</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Is a single expert the best over time ? Are there breaks ?</span></span>
-<span class="r-in"><span class="va">oracle.shift</span> <span class="op">&lt;-</span> <span class="fu"><a href="oracle.html">oracle</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, experts <span class="op">=</span> <span class="va">X</span>, loss.type <span class="op">=</span> <span class="st">'percentage'</span>, model <span class="op">=</span> <span class="st">'shifting'</span><span class="op">)</span></span>
-<span class="r-in"><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">oracle.shift</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"><span class="va">oracle.shift</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Is a single expert the best over time ? Are there breaks ?</span></span></span>
+<span class="r-in"><span><span class="va">oracle.shift</span> <span class="op">&lt;-</span> <span class="fu"><a href="oracle.html">oracle</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, experts <span class="op">=</span> <span class="va">X</span>, loss.type <span class="op">=</span> <span class="st">'percentage'</span>, model <span class="op">=</span> <span class="st">'shifting'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">oracle.shift</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="va">oracle.shift</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> oracle.default(Y = Y, experts = X, model = "shifting", loss.type = "percentage")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       0 shifts 28 shifts 55 shifts 83 shifts 111 shifts</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> mape:   0.0202    0.0159    0.0154    0.0154     0.0154</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Online aggregation of the experts with BOA</span></span>
-<span class="r-in"><span class="co">#############################################</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Initialize the aggregation rule</span></span>
-<span class="r-in"><span class="va">m0.BOA</span> <span class="op">&lt;-</span> <span class="fu">mixture</span><span class="op">(</span>model <span class="op">=</span> <span class="st">'BOA'</span>, loss.type <span class="op">=</span> <span class="st">'square'</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Perform online prediction using BOA There are 3 equivalent possibilities 1)</span></span>
-<span class="r-in"><span class="co"># start with an empty model and update the model sequentially</span></span>
-<span class="r-in"><span class="va">m1.BOA</span> <span class="op">&lt;-</span> <span class="va">m0.BOA</span></span>
-<span class="r-in"><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">  <span class="va">m1.BOA</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m1.BOA</span>, newexperts <span class="op">=</span> <span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span>, newY <span class="op">=</span> <span class="va">Y</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># 2) perform online prediction directly from the empty model</span></span>
-<span class="r-in"><span class="va">m2.BOA</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m0.BOA</span>, newexpert <span class="op">=</span> <span class="va">X</span>, newY <span class="op">=</span> <span class="va">Y</span>, online <span class="op">=</span> <span class="cn">TRUE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># 3) perform the online aggregation directly</span></span>
-<span class="r-in"><span class="va">m3.BOA</span> <span class="op">&lt;-</span> <span class="fu">mixture</span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, experts <span class="op">=</span> <span class="va">X</span>, model <span class="op">=</span> <span class="st">'BOA'</span>, loss.type <span class="op">=</span> <span class="st">'square'</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># These predictions are equivalent:</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">m1.BOA</span>, <span class="va">m2.BOA</span><span class="op">)</span>  <span class="co"># TRUE</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Online aggregation of the experts with BOA</span></span></span>
+<span class="r-in"><span><span class="co">#############################################</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Initialize the aggregation rule</span></span></span>
+<span class="r-in"><span><span class="va">m0.BOA</span> <span class="op">&lt;-</span> <span class="fu">mixture</span><span class="op">(</span>model <span class="op">=</span> <span class="st">'BOA'</span>, loss.type <span class="op">=</span> <span class="st">'square'</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Perform online prediction using BOA There are 3 equivalent possibilities 1)</span></span></span>
+<span class="r-in"><span><span class="co"># start with an empty model and update the model sequentially</span></span></span>
+<span class="r-in"><span><span class="va">m1.BOA</span> <span class="op">&lt;-</span> <span class="va">m0.BOA</span></span></span>
+<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">m1.BOA</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m1.BOA</span>, newexperts <span class="op">=</span> <span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span>, newY <span class="op">=</span> <span class="va">Y</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 2) perform online prediction directly from the empty model</span></span></span>
+<span class="r-in"><span><span class="va">m2.BOA</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m0.BOA</span>, newexpert <span class="op">=</span> <span class="va">X</span>, newY <span class="op">=</span> <span class="va">Y</span>, online <span class="op">=</span> <span class="cn">TRUE</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 3) perform the online aggregation directly</span></span></span>
+<span class="r-in"><span><span class="va">m3.BOA</span> <span class="op">&lt;-</span> <span class="fu">mixture</span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, experts <span class="op">=</span> <span class="va">X</span>, model <span class="op">=</span> <span class="st">'BOA'</span>, loss.type <span class="op">=</span> <span class="st">'square'</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># These predictions are equivalent:</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">m1.BOA</span>, <span class="va">m2.BOA</span><span class="op">)</span>  <span class="co"># TRUE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">m1.BOA</span>, <span class="va">m3.BOA</span><span class="op">)</span>  <span class="co"># TRUE</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">m1.BOA</span>, <span class="va">m3.BOA</span><span class="op">)</span>  <span class="co"># TRUE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Display the results</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m3.BOA</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Display the results</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m3.BOA</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Aggregation rule: BOA </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Loss function:  squareloss </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Gradient trick:  TRUE </span>
@@ -446,45 +474,45 @@ In <em>Proceedings of the 20th international conference on machine learning (icm
 <span class="r-out co"><span class="r-pr">#&gt;</span>         rmse   mape</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> BOA     1480 0.0203</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Uniform 1480 0.0206</span>
-<span class="r-in"><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">m1.BOA</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Using d-dimensional time-series</span></span>
-<span class="r-in"><span class="co">##################################</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Consider the above exemple of electricity consumption </span></span>
-<span class="r-in"><span class="co">#  to be predicted every four weeks</span></span>
-<span class="r-in"><span class="va">YBlock</span> <span class="op">&lt;-</span> <span class="fu"><a href="seriesToBlock.html">seriesToBlock</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">Y</span>, d <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">XBlock</span> <span class="op">&lt;-</span> <span class="fu"><a href="seriesToBlock.html">seriesToBlock</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">X</span>, d <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># The four-week-by-four-week predictions can then be obtained </span></span>
-<span class="r-in"><span class="co"># by directly using the `mixture` function as we did earlier. </span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">MLpolBlock</span> <span class="op">&lt;-</span> <span class="fu">mixture</span><span class="op">(</span>Y <span class="op">=</span> <span class="va">YBlock</span>, experts <span class="op">=</span> <span class="va">XBlock</span>, model <span class="op">=</span> <span class="st">"MLpol"</span>, loss.type <span class="op">=</span> <span class="st">"square"</span>, </span>
-<span class="r-in">                      quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># The predictions can finally be transformed back to a </span></span>
-<span class="r-in"><span class="co"># regular one dimensional time-series by using the function `blockToSeries`.</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">prediction</span> <span class="op">&lt;-</span> <span class="fu"><a href="seriesToBlock.html">blockToSeries</a></span><span class="op">(</span><span class="va">MLpolBlock</span><span class="op">$</span><span class="va">prediction</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">#### Using the `online = FALSE` option</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Equivalent solution is to use the `online = FALSE` option in the predict function. </span></span>
-<span class="r-in"><span class="co"># The latter ensures that the model coefficients are not </span></span>
-<span class="r-in"><span class="co"># updated between the next four weeks to forecast.</span></span>
-<span class="r-in"><span class="va">MLpolBlock</span> <span class="op">&lt;-</span> <span class="fu">mixture</span><span class="op">(</span>model <span class="op">=</span> <span class="st">"BOA"</span>, loss.type <span class="op">=</span> <span class="st">"square"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">d</span> <span class="op">=</span> <span class="fl">4</span></span>
-<span class="r-in"><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">/</span><span class="va">d</span></span>
-<span class="r-in"><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">0</span><span class="op">:</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span> </span>
-<span class="r-in">  <span class="va">idx</span> <span class="op">&lt;-</span> <span class="fl">4</span><span class="op">*</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span> <span class="co"># next four weeks to be predicted</span></span>
-<span class="r-in">  <span class="va">MLpolBlock</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">MLpolBlock</span>, newexperts <span class="op">=</span> <span class="va">X</span><span class="op">[</span><span class="va">idx</span>, <span class="op">]</span>, newY <span class="op">=</span> <span class="va">Y</span><span class="op">[</span><span class="va">idx</span><span class="op">]</span>, online <span class="op">=</span> <span class="cn">FALSE</span>, </span>
-<span class="r-in">                        quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">MLpolBlock</span><span class="op">$</span><span class="va">weights</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">m1.BOA</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Using d-dimensional time-series</span></span></span>
+<span class="r-in"><span><span class="co">##################################</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Consider the above exemple of electricity consumption </span></span></span>
+<span class="r-in"><span><span class="co">#  to be predicted every four weeks</span></span></span>
+<span class="r-in"><span><span class="va">YBlock</span> <span class="op">&lt;-</span> <span class="fu"><a href="seriesToBlock.html">seriesToBlock</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">Y</span>, d <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">XBlock</span> <span class="op">&lt;-</span> <span class="fu"><a href="seriesToBlock.html">seriesToBlock</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">X</span>, d <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># The four-week-by-four-week predictions can then be obtained </span></span></span>
+<span class="r-in"><span><span class="co"># by directly using the `mixture` function as we did earlier. </span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">MLpolBlock</span> <span class="op">&lt;-</span> <span class="fu">mixture</span><span class="op">(</span>Y <span class="op">=</span> <span class="va">YBlock</span>, experts <span class="op">=</span> <span class="va">XBlock</span>, model <span class="op">=</span> <span class="st">"MLpol"</span>, loss.type <span class="op">=</span> <span class="st">"square"</span>, </span></span>
+<span class="r-in"><span>                      quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># The predictions can finally be transformed back to a </span></span></span>
+<span class="r-in"><span><span class="co"># regular one dimensional time-series by using the function `blockToSeries`.</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">prediction</span> <span class="op">&lt;-</span> <span class="fu"><a href="seriesToBlock.html">blockToSeries</a></span><span class="op">(</span><span class="va">MLpolBlock</span><span class="op">$</span><span class="va">prediction</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">#### Using the `online = FALSE` option</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Equivalent solution is to use the `online = FALSE` option in the predict function. </span></span></span>
+<span class="r-in"><span><span class="co"># The latter ensures that the model coefficients are not </span></span></span>
+<span class="r-in"><span><span class="co"># updated between the next four weeks to forecast.</span></span></span>
+<span class="r-in"><span><span class="va">MLpolBlock</span> <span class="op">&lt;-</span> <span class="fu">mixture</span><span class="op">(</span>model <span class="op">=</span> <span class="st">"BOA"</span>, loss.type <span class="op">=</span> <span class="st">"square"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">d</span> <span class="op">=</span> <span class="fl">4</span></span></span>
+<span class="r-in"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">/</span><span class="va">d</span></span></span>
+<span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">0</span><span class="op">:</span><span class="op">(</span><span class="va">n</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span> </span></span>
+<span class="r-in"><span>  <span class="va">idx</span> <span class="op">&lt;-</span> <span class="fl">4</span><span class="op">*</span><span class="va">i</span> <span class="op">+</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span> <span class="co"># next four weeks to be predicted</span></span></span>
+<span class="r-in"><span>  <span class="va">MLpolBlock</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">MLpolBlock</span>, newexperts <span class="op">=</span> <span class="va">X</span><span class="op">[</span><span class="va">idx</span>, <span class="op">]</span>, newY <span class="op">=</span> <span class="va">Y</span><span class="op">[</span><span class="va">idx</span><span class="op">]</span>, online <span class="op">=</span> <span class="cn">FALSE</span>, </span></span>
+<span class="r-in"><span>                        quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">MLpolBlock</span><span class="op">$</span><span class="va">weights</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           [,1]      [,2]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.5000000 0.5000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.5000000 0.5000000</span>
@@ -492,7 +520,7 @@ In <em>Proceedings of the 20th international conference on machine learning (icm
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 0.5000000 0.5000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [5,] 0.5243539 0.4756461</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [6,] 0.5243539 0.4756461</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -507,7 +535,7 @@ In <em>Proceedings of the 20th international conference on machine learning (icm
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

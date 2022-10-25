@@ -19,7 +19,7 @@ by the predictions in x to predict the observation in y."><!-- mathjax --><scrip
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">opera</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.1</span>
       </span>
     </div>
 
@@ -28,7 +28,7 @@ by the predictions in x to predict the observation in y."><!-- mathjax --><scrip
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -67,39 +67,50 @@ by the predictions in <code>x</code> to predict the observation in <code>y</code
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">loss</span><span class="op">(</span>
-  <span class="va">x</span>,
-  <span class="va">y</span>,
-  pred <span class="op">=</span> <span class="cn">NULL</span>,
-  loss.type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"square"</span><span class="op">)</span>,
-  loss.gradient <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">loss</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">y</span>,</span>
+<span>  pred <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  loss.type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"square"</span><span class="op">)</span>,</span>
+<span>  loss.gradient <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>x</dt>
 <dd><p><code>numeric</code>. A vector of length <code>T</code> containing the sequence of prediction to be evaluated.</p></dd>
+
+
 <dt>y</dt>
 <dd><p><code>numeric</code>. A vector of length <code>T</code> that contains the observations to be predicted.</p></dd>
+
+
 <dt>pred</dt>
 <dd><p><code>numeric</code>. A vector of length <code>T</code> containing the sequence of real values.</p></dd>
+
+
 <dt>loss.type</dt>
 <dd><p><code>character, list or function</code> ("square").</p><ul><li><p>character Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');</p></li>
 <li><p>list List with field <code>name</code> equal to the loss name. If using pinball loss, field <code>tau</code> 
      equal to the required quantile in [0,1];</p></li>
 <li><p>function A custom loss as a function of two parameters.</p></li>
 </ul></dd>
+
+
 <dt>loss.gradient</dt>
 <dd><p><code>boolean, function</code> (TRUE).</p><ul><li><p>boolean If TRUE, the aggregation rule will not be directly applied to the loss function at hand,
      but to a gradient version of it. The aggregation rule is then similar to gradient descent aggregation rule.</p></li>
 <li><p>function If loss.type is a function, the derivative should be provided to be used (it is not automatically 
      computed).</p></li>
 </ul></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A vector of length <code>T</code> containing the sequence of
+    
+
+<p>A vector of length <code>T</code> containing the sequence of
 instantaneous losses suffered by the expert previsions (x) or the gradient computed on the aggregated previsions (pred).</p>
     </div>
     <div id="author">
@@ -119,7 +130,7 @@ instantaneous losses suffered by the expert previsions (x) or the gradient compu
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">opera</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.1</span>
       </span>
     </div>
 
@@ -32,7 +32,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -75,47 +75,65 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">FTRL</span><span class="op">(</span>
-  <span class="va">y</span>,
-  <span class="va">experts</span>,
-  eta <span class="op">=</span> <span class="cn">NULL</span>,
-  fun_reg <span class="op">=</span> <span class="cn">NULL</span>,
-  fun_reg_grad <span class="op">=</span> <span class="cn">NULL</span>,
-  constr_eq <span class="op">=</span> <span class="cn">NULL</span>,
-  constr_eq_jac <span class="op">=</span> <span class="cn">NULL</span>,
-  constr_ineq <span class="op">=</span> <span class="cn">NULL</span>,
-  constr_ineq_jac <span class="op">=</span> <span class="cn">NULL</span>,
-  loss.type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"square"</span><span class="op">)</span>,
-  loss.gradient <span class="op">=</span> <span class="cn">TRUE</span>,
-  w0 <span class="op">=</span> <span class="cn">NULL</span>,
-  max_iter <span class="op">=</span> <span class="fl">50</span>,
-  obj_tol <span class="op">=</span> <span class="fl">0.01</span>,
-  training <span class="op">=</span> <span class="cn">NULL</span>,
-  default <span class="op">=</span> <span class="cn">FALSE</span>,
-  quiet <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">FTRL</span><span class="op">(</span></span>
+<span>  <span class="va">y</span>,</span>
+<span>  <span class="va">experts</span>,</span>
+<span>  eta <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  fun_reg <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  fun_reg_grad <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  constr_eq <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  constr_eq_jac <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  constr_ineq <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  constr_ineq_jac <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  loss.type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"square"</span><span class="op">)</span>,</span>
+<span>  loss.gradient <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  w0 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  max_iter <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  obj_tol <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  training <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  default <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>y</dt>
 <dd><p><code>vector</code>. Real observations.</p></dd>
+
+
 <dt>experts</dt>
 <dd><p><code>matrix</code>. Matrix of experts previsions.</p></dd>
+
+
 <dt>eta</dt>
 <dd><p><code>numeric</code>. Regularization parameter.</p></dd>
+
+
 <dt>fun_reg</dt>
 <dd><p><code>function</code> (NULL). Regularization function to be applied during the optimization.</p></dd>
+
+
 <dt>fun_reg_grad</dt>
 <dd><p><code>function</code> (NULL). Gradient of the regularization function (to speed up the computations).</p></dd>
+
+
 <dt>constr_eq</dt>
 <dd><p><code>function</code> (NULL). Constraints (equalities) to be applied during the optimization.</p></dd>
+
+
 <dt>constr_eq_jac</dt>
 <dd><p><code>function</code> (NULL). Jacobian of the equality constraints (to speed up the computations).</p></dd>
+
+
 <dt>constr_ineq</dt>
 <dd><p><code>function</code> (NULL). Constraints (inequalities) to be applied during the optimization (... &gt; 0).</p></dd>
+
+
 <dt>constr_ineq_jac</dt>
 <dd><p><code>function</code> (NULL). Jacobian of the inequality constraints (to speed up the computations).</p></dd>
+
+
 <dt>loss.type</dt>
 <dd><p><code>character, list or function</code> ("square").</p><dl><dt>character</dt>
 <dd><p>Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');</p></dd>
@@ -128,6 +146,8 @@
 
 
 </dl></dd>
+
+
 <dt>loss.gradient</dt>
 <dd><p><code>boolean, function</code> (TRUE).</p><dl><dt>boolean</dt>
 <dd><p>If TRUE, the aggregation rule will not be directly applied to the loss function at hand,
@@ -139,23 +159,38 @@
 
 
 </dl></dd>
+
+
 <dt>w0</dt>
 <dd><p><code>numeric</code> (NULL). Vector of initialization for the weights.</p></dd>
+
+
 <dt>max_iter</dt>
 <dd><p><code>integer</code> (50). Maximum number of iterations of the optimization algorithm per round.</p></dd>
+
+
 <dt>obj_tol</dt>
 <dd><p><code>numeric</code> (1e-2). Tolerance over objective function between two iterations of the optimization.</p></dd>
+
+
 <dt>training</dt>
 <dd><p><code>list</code> (NULL). List of previous parameters.</p></dd>
+
+
 <dt>default</dt>
 <dd><p><code>boolean</code> (FALSE). Whether or not to use default parameters for fun_reg, constr_eq, constr_ineq and their grad/jac, 
 which values are ALL ignored when TRUE.</p></dd>
+
+
 <dt>quiet</dt>
 <dd><p><code>boolean</code> (FALSE). Whether or not to display progress bars.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>object of class mixture.</p>
+    
+
+<p>object of class mixture.</p>
     </div>
     <div id="references">
     <h2>References</h2>
@@ -178,7 +213,7 @@ which values are ALL ignored when TRUE.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

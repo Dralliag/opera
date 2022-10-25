@@ -22,7 +22,7 @@ that can shift a few times."><!-- mathjax --><script src="https://cdnjs.cloudfla
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">opera</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.1</span>
       </span>
     </div>
 
@@ -31,7 +31,7 @@ that can shift a few times."><!-- mathjax --><script src="https://cdnjs.cloudfla
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -73,16 +73,16 @@ that can shift a few times.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">oracle</span><span class="op">(</span>
-  <span class="va">Y</span>,
-  <span class="va">experts</span>,
-  model <span class="op">=</span> <span class="st">"convex"</span>,
-  loss.type <span class="op">=</span> <span class="st">"square"</span>,
-  awake <span class="op">=</span> <span class="cn">NULL</span>,
-  lambda <span class="op">=</span> <span class="cn">NULL</span>,
-  niter <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">oracle</span><span class="op">(</span></span>
+<span>  <span class="va">Y</span>,</span>
+<span>  <span class="va">experts</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"convex"</span>,</span>
+<span>  loss.type <span class="op">=</span> <span class="st">"square"</span>,</span>
+<span>  awake <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lambda <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  niter <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -90,10 +90,14 @@ that can shift a few times.</p>
     <dl><dt>Y</dt>
 <dd><p>A vector containing the observations
 to be predicted.</p></dd>
+
+
 <dt>experts</dt>
 <dd><p>A matrix containing the experts
 forecasts. Each column corresponds to the predictions proposed by an expert
 to predict <code>Y</code>.  It has as many columns as there are experts.</p></dd>
+
+
 <dt>model</dt>
 <dd><p>A character string specifying the oracle to use or a list with a component <code>name</code> specifying the oracle and any additional parameter needed.
 Currently available oracles are:</p><dl><dt>'expert'</dt>
@@ -112,6 +116,8 @@ best to predict the sequence of observations in <code>Y</code>.</p></dd>
 
 
 </dl></dd>
+
+
 <dt>loss.type</dt>
 <dd><p><code>character, list or function</code>.</p><dl><dt>character</dt>
 <dd><p>Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');</p></dd>
@@ -124,6 +130,8 @@ best to predict the sequence of observations in <code>Y</code>.</p></dd>
 
 
 </dl></dd>
+
+
 <dt>awake</dt>
 <dd><p>A matrix specifying the
 activation coefficients of the experts. Its entries lie in <code>[0,1]</code>.
@@ -134,23 +142,32 @@ form any prediction of observation <code>Y_t</code>, we can put
 the mixture to predict <code>Y_t</code>. Remark that to compute the best expert oracle, 
 the performance of unactive (or partially active) experts is computed by using 
 the prediction of the uniform average of active experts.</p></dd>
+
+
 <dt>lambda</dt>
 <dd><p>A positive number used by the 'linear' oracle only. 
 A possible $L_2$ regularization parameter for computing the linear oracle 
 (if the design matrix is not identifiable)</p></dd>
+
+
 <dt>niter</dt>
 <dd><p>A positive integer for 'convex' and 'linear' oracles 
 if direct computation of the oracle is not implemented. 
 It defines the number of optimization steps to perform in 
 order to approximate the oracle (default value is 3).</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional parameters
 that are passed to <code><a href="https://rdrr.io/r/stats/optim.html" class="external-link">optim</a></code> function is order to perform convex optimization 
 (see parameter <code>niter</code>).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An object of class 'oracle' that contains:</p>
+    
+
+<p>An object of class 'oracle' that contains:</p>
 <dl><dt>loss</dt>
 <dd><p>The average loss suffered by the oracle. For the 'shifting' oracle,
 it is a vector of length <code>T</code> where
@@ -159,14 +176,18 @@ sequence <code>Y</code>). The value of $loss(m)$ is the loss
 (determined by the parameter <code>loss.type</code>) suffered by the
 best sequence of expert with at
 most $m-1$ shifts.</p></dd>
+
 <dt>coefficients</dt>
 <dd><p>Not for the 'shifting' oracle. A vector containing the best weight vector corresponding to the oracle.</p></dd>
+
 <dt>prediction</dt>
 <dd><p>Not for the 'shifting' oracle. A vector containing the
 predictions of the oracle.</p></dd>
+
 <dt>rmse</dt>
 <dd><p>If loss.type is the square loss (default) only.
 The root mean square error (i.e., it is the square root of <code>loss</code>.</p></dd>
+
 </dl></div>
     <div id="author">
     <h2>Author</h2>
@@ -185,7 +206,7 @@ The root mean square error (i.e., it is the square root of <code>loss</code>.</p
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
