@@ -30,26 +30,28 @@ test_that("Best expert oracle is ok", {
   expect_warning(oracle(Y = Y, experts = X, model = "expert", niter = 3), "Unused niter parameter")
 })
 
-test_that("Best convex oracle is ok", {
-  m <- oracle(Y = Y, experts = X, model = "convex")
-  expect_equal(m$coefficients[1], 0.6)
-  expect_equal(sum(m$coefficients), 1)
-  expect_equal(m$loss, 0)
-  expect_true(sum(abs(m$prediction - Y)) < 1e-10)
-  expect_equal(m$rmse, 0)
-  
-  # expect_warning(m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "percentage"))
-  expect_true(abs(m$coefficients[1] - 0.6) < 1e-04)
-  expect_true(m$loss < 1e-04)
-  expect_true(sum(abs(m$prediction - Y)) < 1e-04)
-  
-  m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "absolute", awake = awake)
-  expect_true(abs(m$coefficients[1] - 0.6) < 0.1)
-  l <- getAnywhere(lossConv)$objs[[1]]
-  expect_equal(mean(loss(x = m$prediction, y = Y, loss.type = list(name = "absolute"))), l(m$coefficients, Y, X, 
-    awake, list(name = "absolute")))
-  expect_equal(m$loss, mean(loss(x = m$prediction, y = Y, loss.type = list(name = "absolute"))))
-})
+if (requireNamespace("quadprog", quietly = TRUE)){
+  test_that("Best convex oracle is ok", {
+    m <- oracle(Y = Y, experts = X, model = "convex")
+    expect_equal(m$coefficients[1], 0.6)
+    expect_equal(sum(m$coefficients), 1)
+    expect_equal(m$loss, 0)
+    expect_true(sum(abs(m$prediction - Y)) < 1e-10)
+    expect_equal(m$rmse, 0)
+    
+    # expect_warning(m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "percentage"))
+    expect_true(abs(m$coefficients[1] - 0.6) < 1e-04)
+    expect_true(m$loss < 1e-04)
+    expect_true(sum(abs(m$prediction - Y)) < 1e-04)
+    
+    m <- oracle(Y = Y, experts = X, model = "convex", loss.type = "absolute", awake = awake)
+    expect_true(abs(m$coefficients[1] - 0.6) < 0.1)
+    l <- getAnywhere(lossConv)$objs[[1]]
+    expect_equal(mean(loss(x = m$prediction, y = Y, loss.type = list(name = "absolute"))), l(m$coefficients, Y, X, 
+                                                                                             awake, list(name = "absolute")))
+    expect_equal(m$loss, mean(loss(x = m$prediction, y = Y, loss.type = list(name = "absolute"))))
+  })
+}
 
 test_that("Best linear oracle is ok", {
   m <- oracle(Y = Y, experts = X, model = "linear")
@@ -112,44 +114,48 @@ test_that("Best shifting oracle is ok", {
 # test multi-dimensional data
 
 test_that("Dimension d>1 is ok",{
-  set.seed(1)
+  set.seed(123)
   # load some basic data to perform tests
   n <- 10
   d <- 3
-  for (model in c("expert", "convex", "linear")) {
+  if (requireNamespace("quadprog", quietly = TRUE)){
+    test_model <- c("expert", "convex", "linear")
+  } else {
+    test_model <- c("expert", "linear")
+  }
+  for (model in test_model) {
     for (l in c("square", "pinball", "percentage", "absolute")) {
-    
-    # Une petite fonction pour creer les prévisions de la base canonique
-    base_predictions = function(d,n) {
-      decimals <- c(0:(2^d-1))
-      m <- cbind(diag(d),-diag(d))
-      return(t(matrix(rep(t(m),n),nrow = 2*d)))
-    }
-    X <- base_predictions(d,n) # X is the canonical basis
-    theta.star <- sign(rnorm(d)) * runif(d) # point to be predicted
-    theta.star <- runif(1) * theta.star / sum(abs(theta.star))  # the target point is in the L1 unit ball
-    if (l == "percentage") {
-      X <- abs(X)
-      theta.star <- abs(theta.star)
-    }
-    Y <- rep(theta.star, n)
-    
-    # cat(model, l, "\n")
-    m <- suppressWarnings({oracle(Y = Y,experts = X, model = model, loss.type = l)})
-    m$d <- d
-    m$prediction <- seriesToBlock(m$prediction,d)
-    m$Y <- seriesToBlock(m$Y,d)
-    m$residuals <- seriesToBlock(m$residuals,d)
-    m$experts <- seriesToBlock(m$experts,d)
-    expect_output(summary(m), NA)
-    expect_error(plot(m, dynamic = FALSE), NA)
-    expect_output(print(m))
-    
-    X <- seriesToBlock(X, d = d)
-    Y <- seriesToBlock(Y, d = d)
-    m1 <- suppressWarnings({oracle(Y = Y, experts= X, model = model, loss.type = l)})
-    expect_equal(m$experts,m1$experts)
-    expect_true(mean(abs(m$prediction - m1$prediction)) < mean(abs(Y))/10)
+      # Une petite fonction pour creer les prévisions de la base canonique
+      base_predictions = function(d,n) {
+        decimals <- c(0:(2^d-1))
+        m <- cbind(diag(d),-diag(d))
+        return(t(matrix(rep(t(m),n),nrow = 2*d)))
+      }
+      X <- base_predictions(d,n) # X is the canonical basis
+      theta.star <- sign(rnorm(d)) * runif(d) # point to be predicted
+      theta.star <- runif(1) * theta.star / sum(abs(theta.star))  # the target point is in the L1 unit ball
+      if (l == "percentage") {
+        X <- abs(X)
+        theta.star <- abs(theta.star)
+      }
+      Y <- rep(theta.star, n)
+      
+      # cat(model, l, "\n")
+      m <- suppressWarnings({oracle(Y = Y,experts = X, model = model, loss.type = l)})
+      m$d <- d
+      m$prediction <- seriesToBlock(m$prediction,d)
+      m$Y <- seriesToBlock(m$Y,d)
+      m$residuals <- seriesToBlock(m$residuals,d)
+      m$experts <- seriesToBlock(m$experts,d)
+      expect_output(summary(m), NA)
+      expect_error(plot(m, dynamic = FALSE), NA)
+      expect_output(print(m))
+      
+      X <- seriesToBlock(X, d = d)
+      Y <- seriesToBlock(Y, d = d)
+      m1 <- suppressWarnings({oracle(Y = Y, experts= X, model = model, loss.type = l)})
+      expect_equal(m$experts,m1$experts)
+      expect_true(mean(abs(m$prediction - m1$prediction)) < mean(abs(Y))/10) # to check
     }
   }
 })
