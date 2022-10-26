@@ -89,6 +89,12 @@ plot_contrib(
 
 \item{round}{\code{integer}. Precision of the displayed values.}
 
+\item{xlab}{\code{character}. Custom x-axis label (individual plot only)}
+
+\item{ylab}{\code{character}. Custom y-axis label (individual plot only)}
+
+\item{main}{\code{character}. Custom title (individual plot only)}
+
 \item{alpha}{\code{numeric}. Smoothing parameter for contribution plot (parameter 'f' of function \code{\link[stats]{lowess}}).}
 }
 \value{

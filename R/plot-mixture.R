@@ -610,7 +610,10 @@ addPoly<-function(x,y,col)
 #' @param max_experts \code{integer}. Maximum number of experts to be displayed (only the more influencial).
 #' @param round \code{integer}. Precision of the displayed values.
 #' @param alpha \code{numeric}. Smoothing parameter for contribution plot (parameter 'f' of function \code{\link[stats]{lowess}}).
-#'
+#' @param xlab \code{character}. Custom x-axis label (individual plot only)
+#' @param ylab \code{character}. Custom y-axis label (individual plot only) 
+#' @param main \code{character}. Custom title (individual plot only)
+#' 
 #' @return a \code{rAmCharts} plot
 #' 
 #' @import pipeR
@@ -624,7 +627,9 @@ plot_ridge_weights <- function(data,
                                colors = NULL,
                                max_experts = 50,
                                round = 3, 
-                               xlab = NULL, ylab = NULL, main = NULL) {
+                               xlab = NULL, 
+                               ylab = NULL, 
+                               main = NULL) {
   
   
   K <- ncol(data$experts)
