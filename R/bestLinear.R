@@ -7,7 +7,7 @@ bestLinear <- function(y, experts, lambda = 0, loss.type = list(name = "square")
   
   coefficients <- NULL
   
-  if (! class(loss.type) == "function") {
+  if (! "function" %in% class(loss.type)) {
     if (loss.type$name == "square") {
       coefficients <- 
         tryCatch(

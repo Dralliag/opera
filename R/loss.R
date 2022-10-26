@@ -36,7 +36,7 @@ loss <- function(x, y, pred = NULL, loss.type = list(name = "square"), loss.grad
   args <- list("x" = if (! is.function(loss.gradient) && loss.gradient == FALSE) {x} else {pred},
                "y" = y)
   
-  if (! class(loss.type) == "function") {
+  if (! "function" %in% class(loss.type)) {
     args <- c(args, if (length(loss.type) > 1) {loss.type[setdiff(names(loss.type), "name")]}  else {NULL})
     
     if (loss.gradient) {
