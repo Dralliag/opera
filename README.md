@@ -15,8 +15,7 @@ Pierre Gaillard, Yannig Goude
 
 [![version](https://www.r-pkg.org/badges/version/opera)](https://CRAN.R-project.org/package=opera)
 [![cranlogs](https://cranlogs.r-pkg.org/badges/opera)](https://CRAN.R-project.org/package=opera)
-[![cran
-checks](https://cranchecks.info/badges/worst/opera)](https://cranchecks.info/pkgs/opera)
+[![cran checks](https://badges.cranchecks.info/worst/opera.svg)](https://cran.r-project.org/web/checks/check_results_opera.html)
 [![Coverage
 Status](https://img.shields.io/codecov/c/github/Dralliag/opera/master.svg)](https://codecov.io/github/Dralliag/opera?branch=master)
 [![R build
