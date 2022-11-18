@@ -265,7 +265,7 @@ test_that("Predict method is ok, with and without awake", {
         awake <- NULL
       }
       m <- mixture(model = model, loss.type = cur_loss, quiet = TRUE)
-      expect_warning(predict(m, quiet = TRUE))
+      # expect_warning(predict(m, quiet = TRUE))
       
       # with awake
       # single online prediction and sequential prediction return similar models
@@ -281,7 +281,7 @@ test_that("Predict method is ok, with and without awake", {
       m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, awake = awake, quiet = TRUE)
       expect_equal(m1$coefficients, m2_r$coefficients)
       
-      expect_warning(m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = awake, quiet = TRUE))
+      m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = awake, quiet = TRUE)
       expect_equal(m1$prediction, m2)
       
       
@@ -299,7 +299,7 @@ test_that("Predict method is ok, with and without awake", {
       m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, awake = NULL, quiet = TRUE)
       expect_equal(m1$coefficients, m2_r$coefficients)
       
-      expect_warning(m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = NULL, quiet = TRUE))
+      m2 <- predict(m, newexperts = X, type = "r", online = FALSE, awake = NULL, quiet = TRUE)
       expect_equal(m1$prediction, m2)
     }
   }
@@ -312,7 +312,7 @@ test_that("Predict FTRL is ok", {
   for (possible_loss in c("percentage", "absolute", "square", "pinball")) {
     cur_loss <- list("name" = possible_loss)
     m <- mixture(model = model, loss.type = cur_loss, quiet = TRUE)
-    expect_warning(predict(m, quiet = TRUE))
+    # expect_warning(predict(m, quiet = TRUE))
     
     # without awake
     # single online prediction and sequential prediction return similar models
@@ -331,7 +331,7 @@ test_that("Predict FTRL is ok", {
     m1 <- predict(m, newY = Y, newexperts = X, type = "m", online = FALSE, quiet = TRUE)
     expect_equal(m1$coefficients, m2_r$coefficients)
     
-    expect_warning(m2 <- predict(m, newexperts = X, type = "r", online = FALSE, quiet = TRUE))
+    m2 <- predict(m, newexperts = X, type = "r", online = FALSE, quiet = TRUE)
     expect_equal(m1$prediction, m2)
     
     # constraint is ok

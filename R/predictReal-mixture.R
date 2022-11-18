@@ -17,7 +17,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
     newexperts <- matrix(newexperts, ncol = N)
     T <- nrow(newexperts)
   } else {
-    warning("You should provide observations to train non trivial model")
+    # warning("You should provide observations to train non trivial model")
     N <- ncol(newexperts)
     T <- nrow(newexperts)
     
@@ -39,11 +39,6 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
   idx.na <- which(is.na(newexperts))
   awake[idx.na] <- 0
   newexperts[idx.na] <- 0
-  
-  if (is.null(object$training) && (object$coefficients[1] != "Uniform") && (object$model == 
-                                                                            "MLpol")) {
-    stop(paste(object$model, "cannot handle non-uniform prior weight vector"))
-  }
   
   init = FALSE
   if (object$coefficients[1] == "Uniform") {

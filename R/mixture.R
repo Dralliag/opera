@@ -185,6 +185,12 @@ mixture.default <- function(Y = NULL, experts = NULL, model = "MLpol", loss.type
   experts <- check_matrix(experts, "experts")
   awake <- check_matrix(awake, "awake")
   
+  model <- match.arg(model, c("EWA", "FS", "Ridge", "MLpol", "MLewa", "MLprod", "BOA", "OGD", "FTRL"))
+  
+  if ((coefficients[1] != "Uniform") && (model == "MLpol")) {
+    stop("MLpol cannot handle non-uniform prior weight vector")
+  }
+  
   loss.type <- check_loss(loss.type = loss.type, loss.gradient = loss.gradient)
   
   if(any(c("integer", "numeric") %in% mode(coefficients))){
