@@ -112,7 +112,7 @@ plot.mixture <- function(x,
   
   x$Y <- c(t(x$Y))
   x$prediction <- c(t(x$prediction))
-  x$weights <- data.frame(x$weights)
+  x$weights <- data.frame(x$weights, check.names = FALSE)
   T <- x$T
   d <- x$d
   
@@ -631,14 +631,12 @@ plot_ridge_weights <- function(data,
                                ylab = NULL, 
                                main = NULL) {
   
-  
   K <- ncol(data$experts)
   data <- data$weights
   K <- ncol(data$experts)
   if (is.null(colors)) {
     colors <- rev(RColorBrewer::brewer.pal(n = max(min(ncol(data),11),4),name = "Spectral"))[1:min(K,11)]
   }
-  
   
   if (ncol(data) > max_experts + 2) {
     colors <- colors[-c(1:(ncol(data) - max_experts - 2))]
@@ -690,6 +688,7 @@ plot_weights <- function(data,
                          round = 3, 
                          xlab = NULL, ylab = NULL, main = NULL) {
   
+
   if (is.null(colors)) {
     colors <- RColorBrewer::brewer.pal(n = min(max(3, ncol(data$experts)), 9), name = "Spectral")
   }
@@ -700,12 +699,13 @@ plot_weights <- function(data,
     data_weight <- cbind(rowSums(data_weight[1:(N - max_experts)]), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight)])
     names(data_weight)[1] <- "others"
     colors <- colors[-c(2:(ncol(data$weights) - max_experts))]
+    N = ncol(data_weight)
   }
   
   names_weights <- colnames(data_weight)
-  data_weight <- data.frame("timestamp" = 1:data$`T`, t(apply(data_weight, 1, cumsum)), round(data_weight, round))
+  data_weight <- data.frame("timestamp" = 1:data$`T`, t(apply(data_weight, 1, cumsum)), round(data_weight, round), check.names = FALSE)
   
-  max_weight = max(data_weight[,N+1])
+  max_weight = round(max(data_weight[,N+1]), 0)
   plt <- amSerialChart(dataProvider = data_weight,
                        categoryField = c("timestamp"), 
                        creditsPosition = "bottom-right",
@@ -794,11 +794,12 @@ plot_dyn_avg_loss <- function(data,
     colors <- RColorBrewer::brewer.pal(n = min(ncol(data$experts), 9), name = "Spectral")
   }
   
-  pred.experts <- data.frame(data$experts * data$awake + data$prediction * (1-data$awake))
+  pred.experts <- data.frame(data$experts * data$awake + data$prediction * (1-data$awake), check.names = FALSE)
   cumul.losses <- apply(loss(x = pred.experts, y = data$Y, loss.type = data$loss.type), 2, cumsum)[seq(data$d, data$T*data$d, by = data$d), ] / 1:data$T
   cumul.exploss <- cumsum(loss(x = data$prediction, y = data$Y, loss.type = data$loss.type))[seq(data$d, data$T*data$d, by = data$d)] / 1:data$T
+
   
-  data_loss <- data.frame(cbind(cumul.losses, cumul.exploss))
+  data_loss <- data.frame(cbind(cumul.losses, cumul.exploss), check.names = FALSE)
   data_loss$timestamp <- 1:nrow(data_loss)
   data_loss[, c(names(data$weights), "cumul.exploss", "timestamp")]
   
@@ -863,11 +864,11 @@ plot_cumul_res <- function(data,
     colors <- RColorBrewer::brewer.pal(n = min(ncol(data$experts), 9), name = "Spectral")
   }
   
-  pred.experts <- data.frame(data$experts * data$awake + data$prediction * (1-data$awake))
+  pred.experts <- data.frame(data$experts * data$awake + data$prediction * (1-data$awake), check.names = FALSE)
   cumul.residuals <- apply(data$Y - pred.experts, 2, cumsum)[seq(data$d, data$T*data$d, by = data$d),]
   cumul.expres <- cumsum(data$Y - data$prediction)[seq(data$d, data$T*data$d, by = data$d)]
   
-  data_res <- data.frame(cbind(cumul.residuals, cumul.expres))
+  data_res <- data.frame(cbind(cumul.residuals, cumul.expres), check.names = FALSE)
   data_res$timestamp <- 1:nrow(data_res)
   data_res[, c(names(data$weights), "cumul.expres", "timestamp")]
   
