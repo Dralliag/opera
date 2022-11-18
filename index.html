@@ -97,7 +97,8 @@
 <h2 id="setting-when-is-the-package-opera-useful">Setting: when is the package <code>opera</code> useful?<a class="anchor" aria-label="anchor" href="#setting-when-is-the-package-opera-useful"></a>
 </h2>
 <p>Consider a sequence of real bounded observations <em>y</em><sub>1</sub>, …, <em>y</em><sub><em>n</em></sub> to be predicted step by step. Suppose that you have at your disposal a finite set of methods <em>k</em> = 1, …, <em>K</em> (henceforth referred to as experts) that provide you before each time step <em>t</em> = 1, …, <em>n</em> predictions <em>x</em><sub><em>k</em>, <em>t</em></sub> of the next observation <em>y</em><sub><em>t</em></sub>. You can form your prediction <em>ŷ</em><sub><em>t</em></sub> by using only the knowledge of the past observations <em>y</em><sub>1</sub>, …, <em>y</em><sub><em>t</em> − 1</sub> and past and current expert forecasts <em>x</em><sub><em>k</em>, 1</sub>, …, <em>x</em><sub><em>k</em>, <em>t</em></sub> for <em>k</em> = 1, …, <em>K</em>. The package <a href="#">opera</a> implements several algorithms of the online learning literature that form predictions <em>ŷ</em><sub><em>t</em></sub> by combining the expert forecasts according to their past performance. That is,</p>
-<p align="center"><img src="reference/figures/formula.png" width="20%" style="display: block; margin: auto;"></p>
+<p align="center">
+<img src="reference/figures/formula.png" width="20%" style="display: block; margin: auto;"></p>
 <p>These algorithms come with finite time worst-case guarantees. The monograph of <a href="https://ii.uni.wroc.pl/~lukstafi/pmwiki/uploads/AGT/Prediction_Learning_and_Games.pdf" class="external-link">Cesa-Bianchi and Lugisi (2006)</a> gives a complete introduction to the setting of prediction of arbitrary sequences with the help of expert advice.</p>
 <div class="section level3">
 <h3 id="what-are-the-most-important-functions">What are the most important functions?<a class="anchor" aria-label="anchor" href="#what-are-the-most-important-functions"></a>
@@ -137,25 +138,32 @@
 <p>The data is displayed in the following figures.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">Load</span>, type <span class="op">=</span> <span class="st">"l"</span>, main <span class="op">=</span> <span class="st">"The electric Load"</span><span class="op">)</span></span></code></pre></div>
-<p align="center"><img src="reference/figures/Load-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p align="center">
+<img src="reference/figures/Load-1.png" width="50%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">Temp</span>, <span class="va">Load</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, main <span class="op">=</span> <span class="st">"Temperature vs Load"</span><span class="op">)</span></span></code></pre></div>
-<p align="center"><img src="reference/figures/Temp-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p align="center">
+<img src="reference/figures/Temp-1.png" width="50%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">NumWeek</span>, <span class="va">Load</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, main <span class="op">=</span> <span class="st">"Annual seasonality"</span><span class="op">)</span></span></code></pre></div>
-<p align="center"><img src="reference/figures/NumWeek-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p align="center">
+<img src="reference/figures/NumWeek-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="first-build-the-expert-forecasts">First: build the expert forecasts<a class="anchor" aria-label="anchor" href="#first-build-the-expert-forecasts"></a>
 </h3>
 <p>Here, we build three base forecasting methods to be combined later.</p>
-<ul><li>A generalized additive model using the <code>mgcv</code> package:</li></ul>
+<ul>
+<li>A generalized additive model using the <code>mgcv</code> package:</li>
+</ul>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">mgcv</span><span class="op">)</span></span>
 <span><span class="va">gam.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">Load</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">IPI</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Temp</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Time</span>, k<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>                 <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Load1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">NumWeek</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data_train</span><span class="op">)</span></span>
 <span><span class="va">gam.forecast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">gam.fit</span>, newdata <span class="op">=</span> <span class="va">data_test</span><span class="op">)</span></span></code></pre></div>
-<ul><li>A medium term generalized additive model followed by an autoregressive short-term correction.</li></ul>
+<ul>
+<li>A medium term generalized additive model followed by an autoregressive short-term correction.</li>
+</ul>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># medium term model</span></span>
 <span><span class="va">medium.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/gam.html" class="external-link">gam</a></span><span class="op">(</span><span class="va">Load</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Time</span>,k<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">NumWeek</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">Temp</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/mgcv/man/s.html" class="external-link">s</a></span><span class="op">(</span><span class="va">IPI</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data_train</span><span class="op">)</span></span>
@@ -168,7 +176,9 @@
 <span>  <span class="va">ar.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/ar.html" class="external-link">ar</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">$</span><span class="va">Residuals</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">idx_data_test</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span>  <span class="va">ar.forecast</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">ar.fit</span><span class="op">)</span><span class="op">$</span><span class="va">pred</span><span class="op">)</span> <span class="op">+</span> <span class="va">electric_load</span><span class="op">$</span><span class="va">Medium</span><span class="op">[</span><span class="va">idx_data_test</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<ul><li>A gradient boosting model using <code>caret</code> package</li></ul>
+<ul>
+<li>A gradient boosting model using <code>caret</code> package</li>
+</ul>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/topepo/caret/" class="external-link">caret</a></span><span class="op">)</span></span>
 <span><span class="va">gbm.fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/train.html" class="external-link">train</a></span><span class="op">(</span><span class="va">Load</span> <span class="op">~</span> <span class="va">IPI</span> <span class="op">+</span> <span class="va">IPI_CVS</span> <span class="op">+</span> <span class="va">Temp</span> <span class="op">+</span> <span class="va">Temp1</span> <span class="op">+</span> <span class="va">Time</span> <span class="op">+</span> <span class="va">Load1</span> <span class="op">+</span> <span class="va">NumWeek</span>, data <span class="op">=</span> <span class="va">data_train</span>, method <span class="op">=</span> <span class="st">"gbm"</span><span class="op">)</span></span>
@@ -179,7 +189,8 @@
 <span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">gam.forecast</span>, <span class="va">ar.forecast</span>, <span class="va">gbm.forecast</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">Y</span>, <span class="va">X</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"l"</span>, col <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, ylab <span class="op">=</span> <span class="st">"Weekly load"</span>, </span>
 <span>        xlab <span class="op">=</span> <span class="st">"Week"</span>, main <span class="op">=</span> <span class="st">"Expert forecasts and observations"</span><span class="op">)</span></span></code></pre></div>
-<p align="center"><img src="reference/figures/loadAndForecasts-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p align="center">
+<img src="reference/figures/loadAndForecasts-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="how-good-are-the-experts-look-at-the-oracles">How good are the experts? Look at the oracles<a class="anchor" aria-label="anchor" href="#how-good-are-the-experts-look-at-the-oracles"></a>
@@ -189,7 +200,8 @@
 <code class="sourceCode R"><span><span class="va">oracle.convex</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/oracle.html">oracle</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, experts <span class="op">=</span> <span class="va">X</span>, loss.type <span class="op">=</span> <span class="st">"square"</span>, model <span class="op">=</span> <span class="st">"convex"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">oracle.convex</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">oracle.convex</span><span class="op">)</span></span></code></pre></div>
-<p align="center"></p>
+<p align="center">
+</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; oracle.default(Y = Y, experts = X, model = "convex", loss.type = "square")</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
@@ -237,10 +249,14 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">MLpol</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/MLpol-1.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-2.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-3.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-4.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-5.png" width="50%" style="display: block; margin: auto;"><img src="reference/figures/MLpol-6.png" width="50%" style="display: block; margin: auto;"></p>
 <p>The same results can be obtained more directly:</p>
-<ul><li>by giving the whole time series to <code>predict</code> specifying <code>online = TRUE</code> to perform online prediction.</li></ul>
+<ul>
+<li>by giving the whole time series to <code>predict</code> specifying <code>online = TRUE</code> to perform online prediction.</li>
+</ul>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MLpol</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">MLpol0</span>, newexpert <span class="op">=</span> <span class="va">X</span>, newY <span class="op">=</span> <span class="va">Y</span>, online <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<ul><li>or directly to the function mixture, when building the aggregation rule</li></ul>
+<ul>
+<li>or directly to the function mixture, when building the aggregation rule</li>
+</ul>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MLpol</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mixture-opera.html">mixture</a></span><span class="op">(</span>Y <span class="op">=</span> <span class="va">Y</span>, experts <span class="op">=</span> <span class="va">X</span>, model <span class="op">=</span> <span class="st">"MLpol"</span>, loss.type <span class="op">=</span> <span class="st">"square"</span><span class="op">)</span></span></code></pre></div>
 </div>
