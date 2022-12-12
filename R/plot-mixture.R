@@ -134,6 +134,10 @@ plot.mixture <- function(x,
   
   x$weights <- x$weights[, w.order]
   x$experts <- x$experts[, w.order]
+  x$awake <- x$awake[, w.order]
+  x$coefficients <- x$coefficients[w.order]
+  x$names.experts <- x$names.experts[w.order]
+  x$loss.experts <- x$loss.experts[w.order]
   
   if (dynamic) {
     list_plt <- list()
