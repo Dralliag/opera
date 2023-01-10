@@ -700,7 +700,7 @@ plot_weights <- function(data,
   data_weight <- data$weights
   N = ncol(data_weight)
   if (N > max_experts + 2) {
-    data_weight <- cbind(rowSums(data_weight[1:(N - max_experts)]), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight)])
+    data_weight <- cbind(rowSums(data_weight[1:(N - max_experts)]), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight), drop = FALSE])
     names(data_weight)[1] <- "others"
     colors <- colors[-c(2:(ncol(data$weights) - max_experts))]
     N = ncol(data_weight)
@@ -1026,7 +1026,7 @@ plot_contrib <- function(data,
   data_weight <- as.data.frame(mat)
   
   if (ncol(data_weight) > max_experts + 2) {
-    data_weight <- cbind(rowSums(data_weight[1:(ncol(data_weight) - max_experts)]), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight)])
+    data_weight <- cbind(rowSums(data_weight[1:(ncol(data_weight) - max_experts)]), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight), drop = FALSE])
     names(data_weight)[1] <- "others"
     colors <- colors[-c(2:(ncol(mat) - max_experts))]
   }
