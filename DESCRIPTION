@@ -37,7 +37,8 @@ Suggests:
     knitr,
     gbm,
     rmarkdown,
-    magrittr
+    magrittr,
+    covr
 RdMacros: Rdpack
 LazyData: true
 VignetteBuilder: knitr
