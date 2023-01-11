@@ -188,7 +188,7 @@ plot.mixture <- function(x,
       if (ncol(x$weights) > max_experts) {
         tmp_weights <- x$weights[]
         tmp_weights <- cbind(rowSums(tmp_weights[1:(ncol(tmp_weights) - max_experts)]), 
-                             tmp_weights[, (ncol(tmp_weights) - max_experts + 1):ncol(tmp_weights)])
+                             tmp_weights[, (ncol(tmp_weights) - max_experts + 1):ncol(tmp_weights), drop = FALSE])
         names(tmp_weights)[1] <- "others"
         tmp_K <- min(K, max_experts + 1)
         tmp_cols <- c(rev(col)[1:(tmp_K-1)], "grey")
@@ -209,7 +209,7 @@ plot.mixture <- function(x,
         y.idx <- c(0, w.summed, rep(0, T))
         polygon(x = x.idx, y = y.idx, col = tmp_cols[i], border=NA)
         w.summed.old <- w.summed
-        w.summed <- w.summed - tmp_weights[, rev(names(tmp_weights))][, i]
+        w.summed <- w.summed - tmp_weights[, rev(names(tmp_weights)), drop = FALSE][, i]
         i.remaining[i] <- FALSE
         writeLegend(f = w.summed.old,w.summed,name = rev(colnames(tmp_weights))[i])
       }
@@ -219,8 +219,8 @@ plot.mixture <- function(x,
       names.toWrite <- rev(colnames(tmp_weights))
       names.toWrite[-(1:min(tmp_K,15))] <- ""
       mtext(side = 4, text = names.toWrite,
-            at = (1-cumsum(c(tmp_weights[, rev(names(tmp_weights))][T,])))  + 
-              tmp_weights[, rev(names(tmp_weights))][T,]/2, las = 2, col = tmp_cols, cex= 0.5, line = 0.3)
+            at = (1-cumsum(c(tmp_weights[, rev(names(tmp_weights)), drop = FALSE][T,])))  + 
+              tmp_weights[, rev(names(tmp_weights)), drop = FALSE][T,]/2, las = 2, col = tmp_cols, cex= 0.5, line = 0.3)
       
     } else {
       list_plt[[length(list_plt) + 1]] <- 
@@ -318,8 +318,8 @@ plot.mixture <- function(x,
         colnames(cumul.losses)[1:2] <- c("worst_others", "best_others")
         tmp_col <- col[-c(2:(ncol(x$weights) - max_experts - 1))]
       } else {
-        cumul.losses <- cumul.losses[, max(1, ncol(cumul.losses) - max_experts + 1):ncol(cumul.losses)]
-        tmp_col <- col
+        cumul.losses <- cumul.losses[, max(1, ncol(cumul.losses) - max_experts + 1):ncol(cumul.losses), drop = FALSE]
+        tmp_col <- rev(col)
       }
       
       if (type == "all") {
@@ -334,7 +334,8 @@ plot.mixture <- function(x,
       mtext(side = 2, text = ifelse(!is.null(ylab), ylab, "Cumulative loss"), line = 1.8, cex = 1)
       # mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)
       mtext(side = 4, text = colnames(cumul.losses), 
-            at = cumul.losses[T,], las = 2, col = makeTransparent(tmp_col), cex= 0.5, line = 0.3)
+            at = cumul.losses[T,], las = 2, 
+            col = makeTransparent(tmp_col[1:ncol(cumul.losses)]), cex= 0.5, line = 0.3)
       legend("topleft", c("Experts", x$model), bty = "n", lty = 1, col = c("gray", 1), lwd = c(1,2))
       
     } else {
@@ -366,8 +367,8 @@ plot.mixture <- function(x,
         colnames(cumul.residuals)[1:2] <- c("worst_others", "best_others")
         tmp_col <- col[-c(2:(ncol(x$weights) - max_experts - 1))]
       } else {
-        cumul.residuals <- cumul.residuals[, max(1, ncol(cumul.residuals) - max_experts + 1):ncol(cumul.residuals)]
-        tmp_col <- col
+        cumul.residuals <- cumul.residuals[, max(1, ncol(cumul.residuals) - max_experts + 1):ncol(cumul.residuals), drop = FALSE]
+        tmp_col <- rev(col)
       }
       
       if (type == "all") {
@@ -388,7 +389,7 @@ plot.mixture <- function(x,
         place = "bottomleft"
       }
       mtext(side = 4, text = colnames(cumul.residuals), 
-            at = cumul.residuals[T,], las = 2, col = tmp_col, cex= 0.5, line = 0.3)
+            at = cumul.residuals[T,], las = 2, col = tmp_col[1:ncol(cumul.residuals)], cex= 0.5, line = 0.3)
       legend(place, c("Experts", x$model), bty = "n", lty = 1, col = c("gray", 1), lwd = c(1,2))
       
     } else {
@@ -570,7 +571,7 @@ cumulativePlot<-function(W,X,Y,col.pal=NULL, smooth = FALSE, plot.Y = FALSE, alp
   }
   
   if (ncol(mat) > max_experts) {
-    colnames(mat)[1] <- "others"
+    colnames(mat)[1:(ncol(mat)-max_experts)] <- "others"
   }
   
   plot(x = NULL,y = NULL,col=col.pal[1], type='l', xaxt='n',ylim=Y.lim,lty='dotted',
@@ -699,7 +700,7 @@ plot_weights <- function(data,
   
   data_weight <- data$weights
   N = ncol(data_weight)
-  if (N > max_experts + 2) {
+  if (N > max_experts) {
     data_weight <- cbind(rowSums(data_weight[1:(N - max_experts)]), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight), drop = FALSE])
     names(data_weight)[1] <- "others"
     colors <- colors[-c(2:(ncol(data$weights) - max_experts))]
@@ -770,10 +771,10 @@ boxplot_weights <- function(data,
     names(data_weight)[1:2] <- c("worst_others", "best_others")
     colors <- colors[-c(2:(ncol(data$weights) - max_experts - 1))]
   } else {
-    data_weight <- data_weight[, max(1, ncol(data_weight) - max_experts):ncol(data_weight)]
+    data_weight <- data_weight[, max(1, ncol(data_weight) - (max_experts-1)):ncol(data_weight), drop = FALSE]
   }
   
-  plt <- rAmCharts::amBoxplot(data_weight[, rev(names(data_weight))], col = rev(colors),
+  plt <- rAmCharts::amBoxplot(data_weight[, rev(names(data_weight)), drop = FALSE], col = rev(colors),
                               ylab = ifelse(is.null(ylab), "Weights", ylab), creditsPosition = "bottom-right", zoom = TRUE) %>>%
     rAmCharts::addTitle(text = ifelse(is.null(main), "Weights associated with the experts", main)) %>>%
     rAmCharts::setCategoryAxis(autoGridCount = FALSE, gridCount = ncol(data_weight), labelRotation = 90, 
@@ -813,6 +814,7 @@ plot_dyn_avg_loss <- function(data,
     colors <- colors[-c(2:(ncol(data$weights) - max_experts - 1))]
   } else {
     data_loss <- data_loss[, max(1, ncol(data$weights) - max_experts + 1):ncol(data_loss)]
+    colors <- rev(colors)
   }
   
   names_experts  <- setdiff(names(data_loss), c("cumul.exploss", "timestamp"))
@@ -882,6 +884,7 @@ plot_cumul_res <- function(data,
     colors <- colors[-c(2:(ncol(data$weights) - max_experts - 1))]
   } else {
     data_res <- data_res[, max(1, ncol(data$weights) - max_experts + 1):ncol(data_res)]
+    colors <- rev(colors)
   }
   
   names_experts  <- setdiff(names(data_res), c("cumul.expres", "timestamp"))
@@ -1025,7 +1028,7 @@ plot_contrib <- function(data,
   
   data_weight <- as.data.frame(mat)
   
-  if (ncol(data_weight) > max_experts + 2) {
+  if (ncol(data_weight) > max_experts) {
     data_weight <- cbind(rowSums(data_weight[1:(ncol(data_weight) - max_experts)]), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight), drop = FALSE])
     names(data_weight)[1] <- "others"
     colors <- colors[-c(2:(ncol(mat) - max_experts))]
