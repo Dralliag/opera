@@ -318,7 +318,7 @@ plot.mixture <- function(x,
         colnames(cumul.losses)[1:2] <- c("worst_others", "best_others")
         tmp_col <- col[-c(2:(ncol(x$weights) - max_experts - 1))]
       } else {
-        cumul.losses <- cumul.losses[, max(1, ncol(cumul.losses) - max_experts + 1):ncol(cumul.losses), drop = FALSE]
+        cumul.losses <- cumul.losses[, rev(max(1, ncol(cumul.losses) - max_experts + 1):ncol(cumul.losses)), drop = FALSE]
         tmp_col <- rev(col)
       }
       
@@ -367,7 +367,7 @@ plot.mixture <- function(x,
         colnames(cumul.residuals)[1:2] <- c("worst_others", "best_others")
         tmp_col <- col[-c(2:(ncol(x$weights) - max_experts - 1))]
       } else {
-        cumul.residuals <- cumul.residuals[, max(1, ncol(cumul.residuals) - max_experts + 1):ncol(cumul.residuals), drop = FALSE]
+        cumul.residuals <- cumul.residuals[, rev(max(1, ncol(cumul.residuals) - max_experts + 1):ncol(cumul.residuals)), drop = FALSE]
         tmp_col <- rev(col)
       }
       
@@ -703,9 +703,11 @@ plot_weights <- function(data,
   if (N > max_experts) {
     data_weight <- cbind(rowSums(data_weight[1:(N - max_experts)]), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight), drop = FALSE])
     names(data_weight)[1] <- "others"
-    colors <- colors[-c(2:(ncol(data$weights) - max_experts))]
+    # colors <- colors[-c(2:(ncol(data$weights) - max_experts))]
+    tmp_K <- min(N, max_experts + 1)
+    colors <- c("grey", rev(colors)[rev(1:(tmp_K-1))])
     N = ncol(data_weight)
-  }
+  } 
   
   names_weights <- colnames(data_weight)
   data_weight <- data.frame("timestamp" = 1:data$`T`, t(apply(data_weight, 1, cumsum)), round(data_weight, round), check.names = FALSE)
@@ -813,7 +815,7 @@ plot_dyn_avg_loss <- function(data,
     names(data_loss)[1:2] <- c("worst_others", "best_others")
     colors <- colors[-c(2:(ncol(data$weights) - max_experts - 1))]
   } else {
-    data_loss <- data_loss[, max(1, ncol(data$weights) - max_experts + 1):ncol(data_loss)]
+    data_loss <- data_loss[, rev(max(1, ncol(data$weights) - max_experts + 1):ncol(data_loss)), drop = FALSE]
     colors <- rev(colors)
   }
   
@@ -883,7 +885,7 @@ plot_cumul_res <- function(data,
     names(data_res)[1:2] <- c("worst_others", "best_others")
     colors <- colors[-c(2:(ncol(data$weights) - max_experts - 1))]
   } else {
-    data_res <- data_res[, max(1, ncol(data$weights) - max_experts + 1):ncol(data_res)]
+    data_res <- data_res[, rev(max(1, ncol(data$weights) - max_experts + 1):ncol(data_res)), drop = FALSE]
     colors <- rev(colors)
   }
   
@@ -1027,11 +1029,13 @@ plot_contrib <- function(data,
   colnames(mat)<-colnames(X)[o]
   
   data_weight <- as.data.frame(mat)
-  
+  N <- ncol(data_weight)
   if (ncol(data_weight) > max_experts) {
     data_weight <- cbind(rowSums(data_weight[1:(ncol(data_weight) - max_experts)]), data_weight[, (ncol(data_weight) - max_experts + 1):ncol(data_weight), drop = FALSE])
     names(data_weight)[1] <- "others"
-    colors <- colors[-c(2:(ncol(mat) - max_experts))]
+    # colors <- colors[-c(2:(ncol(mat) - max_experts))]
+    tmp_K <- min(N, max_experts + 1)
+    colors <- c("grey", rev(colors)[rev(1:(tmp_K-1))])
   }
   
   names_weights <- colnames(data_weight)
