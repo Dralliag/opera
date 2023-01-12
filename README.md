@@ -25,6 +25,8 @@ status](https://github.com/Dralliag/opera/workflows/R-CMD-check/badge.svg)](http
 robust online prediction of time series with the help of expert advice.
 In this vignette, we provide an example of how to use the package.
 
+**Also available on python** : [let's go !](https://github.com/Dralliag/opera-python)
+
 ## Setting: when is the package `opera` useful?
 
 Consider a sequence of real bounded observations
