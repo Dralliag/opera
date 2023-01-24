@@ -18,6 +18,7 @@
 #' @param xlab \code{character}. Custom x-axis label (individual plot only)
 #' @param ylab \code{character}. Custom y-axis label (individual plot only) 
 #' @param main \code{character}. Custom title (individual plot only)
+#' @param subset \code{numeric}. Positive indices for subsetting data before plot.
 #' @param ... additional plotting parameters
 #' 
 #' 
@@ -51,6 +52,7 @@ plot.mixture <- function(x,
                          xlab = NULL, 
                          ylab = NULL, 
                          main = NULL,
+                         subset = NULL,
                          ...) {
   
   type <- tryCatch({
@@ -132,12 +134,21 @@ plot.mixture <- function(x,
     l.names <- max(nchar(colnames(x$experts))) / 3 + 1.7
   }
   
-  x$weights <- x$weights[, w.order]
-  x$experts <- x$experts[, w.order]
-  x$awake <- x$awake[, w.order]
+  if(is.null(subset)){
+    subset <- 1:nrow(x$experts)
+  } else {
+    subset <- subset[subset >=  1 & subset <= nrow(x$experts)]
+  }
+  T <- length(subset)
+  x$T <- length(subset)
+  x$weights <- x$weights[subset, w.order]
+  x$experts <- x$experts[subset, w.order]
+  x$awake <- x$awake[subset, w.order]
   x$coefficients <- x$coefficients[w.order]
   x$names.experts <- x$names.experts[w.order]
   x$loss.experts <- x$loss.experts[w.order]
+  x$prediction  <- x$prediction[subset]
+  x$Y  <- x$Y[subset]
   
   if (dynamic) {
     list_plt <- list()
@@ -692,7 +703,6 @@ plot_weights <- function(data,
                          max_experts = 50,
                          round = 3, 
                          xlab = NULL, ylab = NULL, main = NULL) {
-  
 
   if (is.null(colors)) {
     colors <- RColorBrewer::brewer.pal(n = min(max(3, ncol(data$experts)), 9), name = "Spectral")

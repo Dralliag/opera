@@ -16,6 +16,7 @@
   xlab = NULL,
   ylab = NULL,
   main = NULL,
+  subset = NULL,
   ...
 )
 }
@@ -46,6 +47,8 @@ their residuals and cumulative losses are computed by using the predictions of t
 \item{ylab}{\code{character}. Custom y-axis label (individual plot only)}
 
 \item{main}{\code{character}. Custom title (individual plot only)}
+
+\item{subset}{\code{numeric}. Positive indices for subsetting data before plot.}
 
 \item{...}{additional plotting parameters}
 }

@@ -88,6 +88,28 @@ if(interactive()){
   plot(m1.BOA)
 }
 
+# Plot options
+##################################
+
+# ?plot.mixture
+
+# static or dynamic : dynamic = F/T
+plot(m1.BOA, dynamic = FALSE)
+
+# just one plot with custom label ?
+# 'plot_weight', 'boxplot_weight', 'dyn_avg_loss', 
+# 'cumul_res', 'avg_loss', 'contrib'
+if(interactive()){
+  plot(m1.BOA, type = "plot_weight", 
+       main = "Poids", ylab = "Poids", xlab = "Temps" )
+}
+
+# subset rows / time 
+plot(m1.BOA, dynamic = FALSE, subset = 1:10)
+
+# plot best n expert
+plot(m1.BOA, dynamic = FALSE, max_experts = 1)
+
 # Using d-dimensional time-series
 ##################################
 
