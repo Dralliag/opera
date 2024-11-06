@@ -22,32 +22,34 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
   w <- w0[]
   weights <- matrix(0, ncol = N, nrow = T)
   prediction <- rep(0, T)
-  eta <- matrix(1, ncol = N, nrow = T + 1)
-  V <- rep(0, N)
-  B <- rep(2^{-20}, N)
+  eta_inv2 <- matrix(0, ncol = N, nrow = T + 1)
+  r.reg <- numeric(N)
+  
   
   if (!is.null(training)) {
     w0 <- training$w0
     R <- training$R
     R.reg <- training$R.reg
-    R.aux <- log(w0) + log(training$eta) + training$eta * R.reg
-    w <- exp(R.aux - max(R.aux))
-    eta[1, ] <- training$eta
-    B <- training$B
-    V <- training$V
+    eta_inv2[1, ] <- training$eta_inv2
   }
   
+  idx_nonzero <- eta_inv2[1, ] > 0
+  empty <- sum(idx_nonzero) == 0
+    
   if (! quiet) steps <- init_progress(T)
-  
+
   for (t in 1:T) {
     if (! quiet) update_progress(t, steps)
     
     idx <- awake[t,] > 0
-    R.aux <- log(eta[t,]) + log(w0) + eta[t, ] * R.reg
-    R.max <- max(R.aux[idx])
-    w <- numeric(N)
-    w[idx] <- exp(R.aux[idx] - R.max)
-    
+
+    w <- w0
+    if (!empty) {
+      R.aux <- -log(eta_inv2[t,idx_nonzero])/2 + log(w0[idx_nonzero]) + R.reg[idx_nonzero] / sqrt(eta_inv2[t, idx_nonzero])
+      R.max <- max(R.aux)
+      w[idx & idx_nonzero] <- sum(w0[idx & idx_nonzero]) *  exp(R.aux - R.max) / sum(exp(R.aux - R.max) )      
+    }
+
     p <- awake[t, ]  * w /sum(awake[t, ] * w) 
     pred <- experts[t, ] %*% p
     
@@ -60,32 +62,37 @@ BOA <- function(y, experts, awake = NULL, loss.type = "square", loss.gradient = 
     # Instantaneous regret
     r <-  awake[t, ] * c(c(lpred) - lexp)
     
+
     # Update the learning rates
-    B <- pmax(B, abs(r))
-    B2 <- 2^ceiling(log(B,2))
-    V <- V + r^2
-    eta[t + 1, ] <- pmin(1/B2, sqrt(log(1/w0)/V))
-    
+    eta_inv2[t + 1, ] <- eta_inv2[t, ] + 2.2 * r^2
+    idx_nonzero <- eta_inv2[t+1, ] > 0
+    if (empty) {
+      empty <- sum(idx_nonzero) == 0
+    }
     # Update the regret and the regularized regret used by BOA
-    r.reg <- 1/2 * (r - eta[t+1, ] * r^2 + B2 * (eta[t+1,] * r > 1/2))
+    if (!empty) {
+        r.reg[idx_nonzero] <- r[idx_nonzero] - r[idx_nonzero]^2 /sqrt(eta_inv2[t+1, idx_nonzero])
+    }
     R <- R + r
     R.reg <- R.reg + r.reg
   }
   if (! quiet) end_progress()
   
-  
-  R.aux <- log(eta[T+1,]) + log(w0) + eta[T + 1, ] * R.reg
-  R.max <- max(R.aux)
-  w <-  exp(R.aux - R.max) 
+  w <- w0
+  if (!empty) {
+    R.aux <- -log(eta_inv2[T+1,idx_nonzero])/2 + log(w0[idx_nonzero]) + R.reg[idx_nonzero] / sqrt(eta_inv2[T+1, idx_nonzero])
+    R.max <- max(R.aux)
+    w[idx_nonzero] <- sum(w0[idx_nonzero]) *  exp(R.aux - R.max) / sum(exp(R.aux - R.max) )      
+  }
   
   object <- list(model = "BOA", loss.type = loss.type, loss.gradient = loss.gradient, 
                  coefficients = w/sum(w))
   
-  object$parameters <- list(eta = eta[1:T, ])
+  object$parameters <- list(eta_inv2 = eta_inv2[1:T, ])
   object$weights <- weights
   object$prediction <- prediction
   
-  object$training <- list(eta = eta[T + 1, ], R = R, w0 = w0, R.reg = R.reg, V= V, B=B)
+  object$training <- list(eta_inv2 = eta_inv2[T + 1, ], R = R, w0 = w0, R.reg = R.reg)
   class(object) <- "mixture"
   
   return(object)

@@ -1,4 +1,4 @@
-OGD <- function(y, experts, loss.type = "square", training = NULL, alpha, simplex, w0 = NULL, quiet = FALSE) {
+OGD <- function(y, experts, loss.type = "square", training = NULL, alpha, simplex, w0 = NULL, quiet = FALSE, loss.gradient = TRUE) {
   
   experts <- as.matrix(experts)
   N <- ncol(experts)
@@ -44,7 +44,7 @@ OGD <- function(y, experts, loss.type = "square", training = NULL, alpha, simple
     prediction[t] <- pred
     
     # Observe losses
-    lexp <- loss(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = TRUE)
+    lexp <- loss(experts[t, ], y[t], pred, loss.type = loss.type, loss.gradient = loss.gradient)
     B <- max(B, sqrt(sum(lexp^2)))
     
     # Update the learning rate
@@ -58,7 +58,7 @@ OGD <- function(y, experts, loss.type = "square", training = NULL, alpha, simple
   }
   if (! quiet) end_progress()
   
-  object <- list(model = "OGD", loss.type = loss.type, loss.gradient = TRUE, 
+  object <- list(model = "OGD", loss.type = loss.type, loss.gradient = loss.gradient, 
                  coefficients = w)
   
   object$parameters <- list(alpha = alpha,

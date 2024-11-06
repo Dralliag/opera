@@ -135,12 +135,16 @@ plot.mixture <- function(x,
   }
   
   if(is.null(subset)){
-    subset <- 1:nrow(x$experts)
+    subset <- 1:T
   } else {
-    subset <- subset[subset >=  1 & subset <= nrow(x$experts)]
+    subset <- subset[subset >=  1 & subset <= T]
   }
   T <- length(subset)
   x$T <- length(subset)
+  
+  
+  
+  
   x$weights <- x$weights[subset, w.order]
   x$experts <- x$experts[subset, w.order]
   x$awake <- x$awake[subset, w.order]
@@ -149,6 +153,7 @@ plot.mixture <- function(x,
   x$loss.experts <- x$loss.experts[w.order]
   x$prediction  <- x$prediction[subset]
   x$Y  <- x$Y[subset]
+  
   
   if (dynamic) {
     list_plt <- list()

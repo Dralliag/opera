@@ -170,7 +170,7 @@ cov <- c(paste0('Load', c(".48", ".336")),
          paste0('T_', "national", '_s95'),
          paste0('T_', "national", '_s95_min'),
          paste0('T_', "national", '_s95_max'),
-         'toy', 'BH', 'tod', 'DLS', 'Summer_break', 'Christmas_break', 'res.48', 'res.336')
+         'toy', 'BH', 'DLS', 'Summer_break', 'Christmas_break', 'res.48', 'res.336')
 
 gterm <- paste0("gterms_", c(1:ncol(terms0)))
 cov <- paste0(c(cov, gterm), collapse = '+')
@@ -261,32 +261,32 @@ mape(y = Data1$Load[post_lockdown], ychap = agg$prediction[post_lockdown])
 
 ## Vectorial weights
 
-```{r}
+<!-- ```{r} -->
 
-reg_scale <- Data1[,  name_reg]
+<!-- reg_scale <- Data1[,  name_reg] -->
 
-m <- matrix(c(1,mean(Data0$Load)/colMeans(Data0[,name_reg])), 
-            nrow = nrow(Data1), ncol = length(name_reg) + 1, byrow = T)
-Y <- as.matrix(Data1[, c("Load", name_reg)]*m)
-experts2 <- array(0, dim = c(nrow(Data1), length(name_reg) + 1, 5))
-name <-  c("nat", name_reg)
-for(k in c(1:(length(name_reg)+1))){
-  experts2[,k,] <- experts[, grep(name[k], colnames(experts))]
-}
+<!-- m <- matrix(c(1,mean(Data0$Load)/colMeans(Data0[,name_reg])),  -->
+<!--             nrow = nrow(Data1), ncol = length(name_reg) + 1, byrow = T) -->
+<!-- Y <- as.matrix(Data1[, c("Load", name_reg)]*m) -->
+<!-- experts2 <- array(0, dim = c(nrow(Data1), length(name_reg) + 1, 5)) -->
+<!-- name <-  c("nat", name_reg) -->
+<!-- for(k in c(1:(length(name_reg)+1))){ -->
+<!--   experts2[,k,] <- experts[, grep(name[k], colnames(experts))] -->
+<!-- } -->
 
-agg_vector<- opera::mixture(Y = Y, experts = experts2)
+<!-- agg_vector<- opera::mixture(Y = Y, experts = experts2) -->
 
-plot(agg_vector, dynamic = FALSE)
-# plot(agg_vector)
+<!-- plot(agg_vector, dynamic = FALSE) -->
+<!-- # plot(agg_vector) -->
 
-mape(y = Data1$Load, ychap = agg_vector$prediction[,1]) 
-mape(y = Data1$Load[pre_covid], ychap = agg_vector$prediction[pre_covid,1])
-mape(y = Data1$Load[hard_lockdown], ychap = agg_vector$prediction[hard_lockdown,1])
-mape(y = Data1$Load[post_lockdown], ychap = agg_vector$prediction[post_lockdown,1])
+<!-- mape(y = Data1$Load, ychap = agg_vector$prediction[,1])  -->
+<!-- mape(y = Data1$Load[pre_covid], ychap = agg_vector$prediction[pre_covid,1]) -->
+<!-- mape(y = Data1$Load[hard_lockdown], ychap = agg_vector$prediction[hard_lockdown,1]) -->
+<!-- mape(y = Data1$Load[post_lockdown], ychap = agg_vector$prediction[post_lockdown,1]) -->
 
 
-```
-The performances are significantly better with vectorial weights before 2020, when the lockdown due to the COVID 19 affected the consumption. During the lockdown the performances are bad, meaning that the impact of the lockdown was not simular during the different regions. That can be partly explained as the impact of the pandemy on consumption really depends on social, demographyc and economic profile of the region. Furthermore, the dynamic of the pandemy was bot simultaneous between the regions.
+<!-- ``` -->
+The performances are significantly better with vectorial weights before 2020, when the lockdown due to the COVID 19 affected the consumption. During the lockdown the performances are bad, meaning that the impact of the lockdown was not similar during the different regions. That can be partly explained as the impact of the pandemy on consumption really depends on social, demographyc and economic profile of the region. Furthermore, the dynamic of the pandemy was bot simultaneous between the regions.
 
 
 # Forecasting at extended horizons 

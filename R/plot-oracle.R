@@ -131,7 +131,7 @@ plot.oracle <- function(x, sort = TRUE, col = NULL, dynamic = TRUE,  ...) {
   }
   
   
-  par(def.par, new = FALSE)
+  par(def.par)
   if (!dynamic) {
     return(invisible(NULL))
   } else {

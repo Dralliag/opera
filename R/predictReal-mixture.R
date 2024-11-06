@@ -109,7 +109,7 @@ predictReal <- function(object, newexperts = NULL, newY = NULL, awake = NULL,
       if (is.null(object$parameters$simplex)) {object$parameters$simplex = TRUE}
       newobject <- OGD(y = newY, experts = newexperts, loss.type = object$loss.type, 
                        training = object$training, alpha = object$parameters$alpha, simplex = object$parameters$simplex,
-                       w0 = object$coefficients, quiet = quiet)
+                       w0 = object$coefficients, quiet = quiet, loss.gradient = object$loss.gradient)
     }
     
     if ((object$model == "BOA") || (object$model == "MLewa") || (object$model == 
