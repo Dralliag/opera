@@ -1,13 +1,13 @@
 Package: opera
 Type: Package
 Title: Online Prediction by Expert Aggregation
-Version: 1.2.1
+Version: 1.2.2
 Author: Pierre Gaillard [cre, aut],
   Yannig Goude [aut],
   Laurent Plagne [ctb],
   Thibaut Dubois [ctb],
   Benoit Thieurmel [ctb]
-Maintainer: Pierre Gaillard <pierre@gaillard.me>
+Maintainer: Pierre Gaillard <pierre.gaillard@inria.fr>
 Copyright: EDF R&D 2012-2015
 Description: Misc methods to form online predictions, for regression-oriented 
     time-series, by combining a finite set of forecasts provided by the user. See 
@@ -42,5 +42,5 @@ Suggests:
 RdMacros: Rdpack
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.3.2
 Encoding: UTF-8

@@ -65,7 +65,7 @@
 #' \item{rmse}{If loss.type is the square loss (default) only.
 #' The root mean square error (i.e., it is the square root of \code{loss}.}
 #' 
-#' @author Pierre Gaillard <pierre@@gaillard.me>
+#' @author Pierre Gaillard <pierre.gaillard@@inria.fr>
 #' @export oracle
 
 oracle <- function(Y, experts, model = "convex", loss.type = "square", awake = NULL, 

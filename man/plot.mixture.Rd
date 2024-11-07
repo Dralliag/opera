@@ -33,7 +33,7 @@ their residuals and cumulative losses are computed by using the predictions of t
 \item{dynamic}{\code{boolean}. If TRUE, graphs are generated with \code{rAmCharts}, else with base R.}
 
 \item{type}{\code{char}.
-\itemize{
+\describe{
      \item{'all'}{ Display all the graphs ;}
      \item{'plot_weight', 'boxplot_weight', 'dyn_avg_loss', 'cumul_res', 'avg_loss', 'contrib'}{ Display the selected graph alone.}
 }}
@@ -65,7 +65,7 @@ provides different diagnostic plots for an aggregation procedure.
 See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.
 }
 \author{
-Pierre Gaillard <pierre@gaillard.me>
+Pierre Gaillard <pierre.gaillard@inria.fr>
 
 Yannig  Goude <yannig.goude@edf.fr>
 }

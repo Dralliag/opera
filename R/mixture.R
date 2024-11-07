@@ -60,7 +60,7 @@
 #'  on any bounded convex set that can be expressed with equality or inequality constraints.  Note that this method is still under development and a beta version.
 #'  
 #'  The user must provide (in the \strong{parameters}'s list):
-#'    \itemize{
+#'    \describe{
 #'      \item{'eta' }{The learning rate.}
 #'      \item{'fun_reg' }{The regularization function to be applied on the weigths. See \code{\link{auglag}}: fn.}
 #'      \item{'constr_eq' }{The equality constraints (e.g. sum(w) = 1). See \code{\link{auglag}}: heq.}
@@ -148,7 +148,7 @@
 #' \item{parameters}{The learning parameters chosen by the aggregation rule or by the user.}
 #' \item{training}{A list that contains useful temporary information of the 
 #' aggregation rule to be updated and to perform predictions.}
-#' @author Pierre Gaillard <pierre@@gaillard.me> Yannig Goude <yannig.goude@@edf.fr>
+#' @author Pierre Gaillard <pierre.gaillard@@inria.fr> Yannig Goude <yannig.goude@@edf.fr>
 #' @keywords ~models ~ts
 #' @seealso See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.
 #'  

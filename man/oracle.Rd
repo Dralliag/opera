@@ -89,5 +89,5 @@ combination rule, the best linear combination rule, or the best expert
 that can shift a few times.
 }
 \author{
-Pierre Gaillard <pierre@gaillard.me>
+Pierre Gaillard <pierre.gaillard@inria.fr>
 }

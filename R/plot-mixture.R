@@ -9,7 +9,7 @@
 #' @param alpha \code{numeric}. Smoothing parameter for contribution plot (parameter 'f' of function \code{\link[stats]{lowess}}).
 #' @param dynamic \code{boolean}. If TRUE, graphs are generated with \code{rAmCharts}, else with base R.
 #' @param type \code{char}.
-#' \itemize{
+#' \describe{
 #'      \item{'all'}{ Display all the graphs ;}
 #'      \item{'plot_weight', 'boxplot_weight', 'dyn_avg_loss', 'cumul_res', 'avg_loss', 'contrib'}{ Display the selected graph alone.}
 #' }
@@ -27,7 +27,7 @@
 #' expert's forecast in function of time, average loss suffered by the experts and the contribution of each expert to the aggregation 
 #' \eqn{p_{i,t}f_{i,t}} in function of time.
 #' 
-#' @author Pierre Gaillard <pierre@@gaillard.me>
+#' @author Pierre Gaillard <pierre.gaillard@@inria.fr>
 #' @author Yannig  Goude <yannig.goude@edf.fr>
 #' 
 #' @seealso See \code{\link{opera-package}} and opera-vignette for a brief example about how to use the package.

@@ -1,31 +1,29 @@
 #' Errors suffered by a sequence of predictions 
 #' 
-#' The
-#' function \code{loss} computes the sequence of instantaneous losses suffered
+#' The function \code{loss} computes the sequence of instantaneous losses suffered
 #' by the predictions in \code{x} to predict the observation in \code{y}.
 #' 
-#' @param x \code{numeric}. A vector of length \code{T} containing the sequence of prediction to be evaluated.
+#' @param x \code{numeric}. A vector of length \code{T} containing the sequence of predictions to be evaluated.
 #' @param y \code{numeric}. A vector of length \code{T} that contains the observations to be predicted.
 #' @param pred \code{numeric}. A vector of length \code{T} containing the sequence of real values.
 #' @param loss.type \code{character, list or function} ("square").
-#' \itemize{
-#'      \item{character}{ Name of the loss to be applied ('square', 'absolute', 'percentage', or 'pinball');}
-#'      \item{list}{ List with field \code{name} equal to the loss name. If using pinball loss, field \code{tau} 
-#'      equal to the required quantile in [0,1];}
-#'      \item{function}{ A custom loss as a function of two parameters.}
+#' \describe{
+#'      \item{character}{Name of the loss to be applied ("square", "absolute", "percentage", or "pinball").}
+#'      \item{list}{List with field \code{name} equal to the loss name. If using pinball loss, field \code{tau} 
+#'      specifies the quantile in [0,1].}
+#'      \item{function}{A custom loss function of two parameters.}
 #' }
 #' @param loss.gradient \code{boolean, function} (TRUE). 
-#' \itemize{
-#'      \item{boolean}{ If TRUE, the aggregation rule will not be directly applied to the loss function at hand,
-#'      but to a gradient version of it. The aggregation rule is then similar to gradient descent aggregation rule. }
-#'      \item{function}{ If loss.type is a function, the derivative should be provided to be used (it is not automatically 
-#'      computed).}
+#' \describe{
+#'      \item{boolean}{If TRUE, the aggregation rule will not be directly applied to the loss function,
+#'      but to a gradient version of it, similar to a gradient descent aggregation rule.}
+#'      \item{function}{If loss.type is a function, provide the derivative to be used (not computed automatically).}
 #' }
 #' 
 #' @return  A vector of length \code{T} containing the sequence of
-#' instantaneous losses suffered by the expert previsions (x) or the gradient computed on the aggregated previsions (pred).
+#' instantaneous losses suffered by the expert predictions (x) or the gradient computed on the aggregated predictions (pred).
 #' 
-#' @author Pierre Gaillard <pierre@@gaillard.me>
+#' @author Pierre Gaillard <pierre.gaillard@@inria.fr>
 #' @export
 loss <- function(x, y, pred = NULL, loss.type = list(name = "square"), loss.gradient = FALSE) {
   
