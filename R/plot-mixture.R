@@ -135,7 +135,8 @@ plot.mixture <- function(x,
     l.names <- max(nchar(colnames(x$experts))) / 3 + 1.7
   }
   
-  if(is.null(subset)){
+  nosubset = is.null(subset)
+  if(nosubset){
     subset <- 1:T
   } else {
     subset <- subset[subset >=  1 & subset <= T]
@@ -188,7 +189,11 @@ plot.mixture <- function(x,
       mtext(side = 2, text = ifelse(is.null(ylab), "Weights", ylab), line = 1.8, cex = 1)
       # mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)
       mtext(side = 4, text = colnames(tmp_weights), at = tmp_weights[T,], las = 2, col = col, cex= 0.5, line = 0.3)
-      axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(T*c(0.25,.5,.75))))
+      if (!nosubset){
+        axis(1)}
+      else{
+        axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(T*c(0.25,.5,.75))))
+      }
       axis(2)
       box()
       
@@ -239,7 +244,11 @@ plot.mixture <- function(x,
         i.remaining[i] <- FALSE
         writeLegend(f = w.summed.old,w.summed,name = rev(colnames(tmp_weights))[i])
       }
-      axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(T*c(0.25,.5,.75))))
+      if (!nosubset){
+        axis(1)}
+      else{
+        axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(T*c(0.25,.5,.75))))
+      }
       axis(2)
       box()
       names.toWrite <- rev(colnames(tmp_weights))
@@ -366,7 +375,11 @@ plot.mixture <- function(x,
             at = cumul.losses[T,], las = 2, 
             col = makeTransparent(tmp_col[1:ncol(cumul.losses)]), cex= 0.5, line = 0.3)
       legend("topleft", c("Experts", x$model), bty = "n", lty = 1, col = c("gray", 1), lwd = c(1,2))
-      axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(T*c(0.25,.5,.75))))
+      if (!nosubset){
+        axis(1)}
+      else{
+        axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(T*c(0.25,.5,.75))))
+      }
       axis(2)
       box()
     } else {
@@ -422,7 +435,11 @@ plot.mixture <- function(x,
       mtext(side = 4, text = colnames(cumul.residuals), 
             at = cumul.residuals[T,], las = 2, col = tmp_col[1:ncol(cumul.residuals)], cex= 0.5, line = 0.3)
       legend(place, c("Experts", x$model), bty = "n", lty = 1, col = c("gray", 1), lwd = c(1,2))
-      axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(T*c(0.25,.5,.75))))
+      if (!nosubset){
+        axis(1)}
+      else{
+        axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(T*c(0.25,.5,.75))))
+      }
       axis(2)
       box()
       
@@ -510,7 +527,11 @@ plot.mixture <- function(x,
       
       cumulativePlot(W = x$weights,X = x$experts, Y = x$Y,smooth = TRUE, alpha = alpha, 
                      plot.Y = TRUE, col.pal = col, max_experts = max_experts, xlab = xlab, ylab = ylab, main = main, axes = FALSE)
-      axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(d*T*c(0.25,.5,.75))))
+      if (!nosubset){
+        axis(1)}
+      else{
+        axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(d*T*c(0.25,.5,.75))))
+      }
       axis(2)
       box()
     } else {
