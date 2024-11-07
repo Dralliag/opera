@@ -9,7 +9,7 @@
   pause = FALSE,
   col = NULL,
   alpha = 0.01,
-  dynamic = T,
+  dynamic = FALSE,
   type = "all",
   max_experts = 50,
   col_by_weight = TRUE,

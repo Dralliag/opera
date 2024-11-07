@@ -4,7 +4,7 @@
 \alias{plot.oracle}
 \title{Plot an aggregation procedure}
 \usage{
-\method{plot}{oracle}(x, sort = TRUE, col = NULL, dynamic = TRUE, ...)
+\method{plot}{oracle}(x, sort = TRUE, col = NULL, dynamic = FALSE, ...)
 }
 \arguments{
 \item{x}{An object of class \code{oracle}.}
