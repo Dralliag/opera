@@ -81,6 +81,7 @@ test_that("Quantile oracles are ok", {
   m.best_expert <- oracle(Y = Y, experts = X, model = "expert", loss.type = l)
   expect_equal(which(m.best_expert$coefficients == 1), i)
   expect_equal(m.best_expert$loss, mean(loss(m.best_expert$prediction, Y, loss.type = l)))
+  expect_silent(plot(m.best_expert))
   
   # best convex oracle
   # expect_warning(m <- oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
@@ -88,13 +89,14 @@ test_that("Quantile oracles are ok", {
   expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.1)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   # expect_warning(oracle(Y = Y, experts = X[, c(1, K)], model = "convex", loss.type = l))
+  expect_silent(plot(m))
   
   # best linear oracle (with singular matrix)
   expect_warning(m <- oracle(Y = Y, experts = X[, c(1, K)], model = "linear", loss.type = l, niter = 10))
   expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.1)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_warning(oracle(Y = Y, experts = X[, c(1, K)], model = "linear", loss.type = l))
-  
+  expect_silent(plot(m))
   
   # best linear oracle (with direct computation using rq)
   X[n, ] <- 1
@@ -102,6 +104,7 @@ test_that("Quantile oracles are ok", {
   m <- oracle(Y = Y, experts = X[, c(1, K)], model = "linear", loss.type = l)
   expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.1)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
+  expect_silent(plot(m))
 })
 
 test_that("Best shifting oracle is ok", {
@@ -109,6 +112,7 @@ test_that("Best shifting oracle is ok", {
   expect_equal(m$loss[1], min(mean(loss(X[, 1], Y)), mean(loss(X[, 2], Y))))
   expect_equal(class(m), "oracle")
   expect_equal(class(summary(m)), "summary.oracle")
+  expect_silent(plot(m))
 }) 
 
 # test multi-dimensional data

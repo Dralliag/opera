@@ -41,6 +41,7 @@
 #' @export 
 #' 
 #'
+#'
 plot.mixture <- function(x, 
                          pause = FALSE, 
                          col = NULL, 
@@ -107,7 +108,7 @@ plot.mixture <- function(x,
     my.colors <- col
     col <- my.colors[w.order]
   }
-
+  
   if (!pause && type == "all") {
     layout(matrix(c(1,2,3,4,5,6),nrow = 3,ncol =  2, byrow = TRUE))  
   }
@@ -139,15 +140,21 @@ plot.mixture <- function(x,
   } else {
     subset <- subset[subset >=  1 & subset <= T]
   }
+  
   T <- length(subset)
+  
+  if (d > 1){
+    subset =c(t(replicate(d, (subset-1)*d))+ 1:d )
+    x$weights = x$weights[rep(1:nrow(x$weights), each = d), ]
+  }
+  
   x$T <- length(subset)
-  
-  
   
   
   x$weights <- x$weights[subset, w.order]
   x$experts <- x$experts[subset, w.order]
   x$awake <- x$awake[subset, w.order]
+  
   x$coefficients <- x$coefficients[w.order]
   x$names.experts <- x$names.experts[w.order]
   x$loss.experts <- x$loss.experts[w.order]
@@ -169,18 +176,21 @@ plot.mixture <- function(x,
       }
       
       if (ncol(x$weights) > max_experts + 2) {
-        tmp_weights <- x$weights[, c(1, max_experts, (ncol(x$weights) - max_experts + 1):ncol(x$weights))]
+        tmp_weights <- x$weights[d*(1:T), c(1, max_experts, (ncol(x$weights) - max_experts + 1):ncol(x$weights))]
         names(tmp_weights)[1:2] <- c("worst_others", "best_others")
       } else {
-        tmp_weights <- x$weights[, max(1, ncol(x$weights) - max_experts):ncol(x$weights)]
+        tmp_weights <- x$weights[d*(1:T), max(1, ncol(x$weights) - max_experts):ncol(x$weights)]
       }
       
       matplot(tmp_weights, type = "l", xlab = xlab, ylab = "", lty = 1:5, 
-              main = ifelse(is.null(main), "Weights associated with the experts", main), col = col, ...)
+              main = ifelse(is.null(main), "Weights associated with the experts", main), col = col, axes = F,...)
       
       mtext(side = 2, text = ifelse(is.null(ylab), "Weights", ylab), line = 1.8, cex = 1)
       # mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)
       mtext(side = 4, text = colnames(tmp_weights), at = tmp_weights[T,], las = 2, col = col, cex= 0.5, line = 0.3)
+      axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(T*c(0.25,.5,.75))))
+      axis(2)
+      box()
       
     } else {
       list_plt[[length(list_plt) + 1]] <- 
@@ -202,7 +212,7 @@ plot.mixture <- function(x,
         par(mar = c(3, 3, 2, l.names/2), mgp = c(1, 0.5, 0)) 
       } 
       if (ncol(x$weights) > max_experts) {
-        tmp_weights <- x$weights[]
+        tmp_weights <- x$weights[d*(1:T),]
         tmp_weights <- cbind(rowSums(tmp_weights[1:(ncol(tmp_weights) - max_experts)]), 
                              tmp_weights[, (ncol(tmp_weights) - max_experts + 1):ncol(tmp_weights), drop = FALSE])
         names(tmp_weights)[1] <- "others"
@@ -210,7 +220,7 @@ plot.mixture <- function(x,
         tmp_cols <- c(rev(col)[1:(tmp_K-1)], "grey")
         
       } else {
-        tmp_weights <- x$weights
+        tmp_weights <- x$weights[d*(1:T),]
         tmp_cols <- rev(col)
         tmp_K <- K
       }
@@ -229,7 +239,7 @@ plot.mixture <- function(x,
         i.remaining[i] <- FALSE
         writeLegend(f = w.summed.old,w.summed,name = rev(colnames(tmp_weights))[i])
       }
-      axis(1)
+      axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(T*c(0.25,.5,.75))))
       axis(2)
       box()
       names.toWrite <- rev(colnames(tmp_weights))
@@ -259,7 +269,9 @@ plot.mixture <- function(x,
   if (!is.null(x$awake)) {
     pond <- rowSums(x$awake[d*(1:T),])
     normalized.weights <- x$weights * pond / (K*x$awake[d*(1:T),])
-    normalized.weights[x$awake[d*(1:T),] == pond] <- NaN
+    if (length(normalized.weights[x$awake[d*(1:T),] == pond])>0){
+      normalized.weights[x$awake[d*(1:T),] == pond] <- NaN  
+    }
   } else {
     normalized.weights <- x$weights 
   }
@@ -344,16 +356,19 @@ plot.mixture <- function(x,
       
       matplot(cumul.losses, type = "l", lty = 1, xlab = ifelse(!is.null(xlab), xlab, ""), 
               ylab = "",
+              axes = FALSE,
               main = ifelse(!is.null(main), main, "Dynamic average loss"), 
               col = makeTransparent(tmp_col), ylim = range(c(cumul.losses,cumul.exploss)))
       lines(cumul.exploss, col = 1, lwd = 2)
-      mtext(side = 2, text = ifelse(!is.null(ylab), ylab, "Cumulative loss"), line = 1.8, cex = 1)
+      mtext(side = 2, text = ifelse(!is.null(ylab), ylab, "Average loss"), line = 1.8, cex = 1)
       # mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)
       mtext(side = 4, text = colnames(cumul.losses), 
             at = cumul.losses[T,], las = 2, 
             col = makeTransparent(tmp_col[1:ncol(cumul.losses)]), cex= 0.5, line = 0.3)
       legend("topleft", c("Experts", x$model), bty = "n", lty = 1, col = c("gray", 1), lwd = c(1,2))
-      
+      axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(T*c(0.25,.5,.75))))
+      axis(2)
+      box()
     } else {
       list_plt[[length(list_plt) + 1]] <- 
         {
@@ -361,7 +376,7 @@ plot.mixture <- function(x,
             plot_dyn_avg_loss(data = x, colors = col, 
                               max_experts = max_experts, round = 2, 
                               xlab = xlab, ylab = ylab, main = main
-
+                              
             )
           )
           html_p$height <- 322 + 22 * (min(K, max_experts) - 3)
@@ -395,7 +410,7 @@ plot.mixture <- function(x,
               xlab = ifelse(!is.null(xlab), xlab, ""), ylab = "",
               main = ifelse(!is.null(main), main, "Cumulative residuals"), 
               col = makeTransparent(tmp_col), 
-              ylim = range(c(cumul.residuals,cumul.expres)))
+              ylim = range(c(cumul.residuals,cumul.expres)), axes = FALSE)
       lines(cumul.expres, col = 1, lwd = 2)
       mtext(side = 2, text = ifelse(!is.null(ylab), ylab, "Cumulative residuals"), line = 1.8, cex = 1)
       # mtext(side = 1, text = "Time steps", line = 1.8, cex = 1)
@@ -407,6 +422,9 @@ plot.mixture <- function(x,
       mtext(side = 4, text = colnames(cumul.residuals), 
             at = cumul.residuals[T,], las = 2, col = tmp_col[1:ncol(cumul.residuals)], cex= 0.5, line = 0.3)
       legend(place, c("Experts", x$model), bty = "n", lty = 1, col = c("gray", 1), lwd = c(1,2))
+      axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(T*c(0.25,.5,.75))))
+      axis(2)
+      box()
       
     } else {
       list_plt[[length(list_plt) + 1]] <- {
@@ -423,7 +441,7 @@ plot.mixture <- function(x,
     } 
   }
   
-
+  
   # losses
   if (type == "all" || type == "avg_loss") {
     if (! dynamic) {
@@ -484,29 +502,17 @@ plot.mixture <- function(x,
   
   
   # cumulative plot of the series
-  if (type == "all" || type == "contrib") {
+  if (w.min>= 0 && (type == "all" || type == "contrib")) {
     if (! dynamic) {
-      if (x$d ==1) {
-        if (type == "all") {
-          par(mar = c(2, 3, 2.5,l.names/2), mgp = c(1, 0.5, 0))
-        }
-        
-        cumulativePlot(W = x$weights,X = x$experts, Y = x$Y,smooth = TRUE, alpha = alpha, 
-                       plot.Y = TRUE, col.pal = col, max_experts = max_experts, xlab = xlab, ylab = ylab, main = main)
-        
-      } else {
-        X <- apply(seriesToBlock(X = x$experts,d = x$d),c(1,3),mean)
-        Y <- rowMeans(seriesToBlock(x$Y,d = x$d))
-        colnames(X) <- names(x$weights)
-        
-        if (type == "all") {
-          par(mar = c(2, 3, 2.5,l.names/2), mgp = c(1, 0.5, 0))
-        }
-        
-        cumulativePlot(W = x$weights,X = X, Y = Y,smooth = TRUE,
-                       alpha = alpha,plot.Y = TRUE, col.pal = col,
-                       max_experts = max_experts)
+      if (type == "all") {
+        par(mar = c(2, 3, 2.5,l.names/2), mgp = c(1, 0.5, 0))
       }
+      
+      cumulativePlot(W = x$weights,X = x$experts, Y = x$Y,smooth = TRUE, alpha = alpha, 
+                     plot.Y = TRUE, col.pal = col, max_experts = max_experts, xlab = xlab, ylab = ylab, main = main, axes = FALSE)
+      axis(1,labels = subset[d*round(T *c(0.25,0.5,0.75))]/d, at = round(c(d*T*c(0.25,.5,.75))))
+      axis(2)
+      box()
     } else {
       list_plt[[length(list_plt) + 1]] <- 
         {
@@ -559,7 +565,7 @@ writeLegend <- function(f,g,name,Y.lim=c(0,1), ...) {
   }
 }
 
-cumulativePlot<-function(W,X,Y,col.pal=NULL, smooth = FALSE, plot.Y = FALSE, alpha = 0.1, max_experts = 50, xlab = NULL, ylab = NULL, main = NULL)
+cumulativePlot<-function(W,X,Y,col.pal=NULL, smooth = FALSE, plot.Y = FALSE, alpha = 0.1, max_experts = 50, xlab = NULL, ylab = NULL, main = NULL, axes = FALSE)
 {
   time<-c(1:nrow(X))
   active.experts<-which(colMeans(W)>0)
@@ -592,7 +598,7 @@ cumulativePlot<-function(W,X,Y,col.pal=NULL, smooth = FALSE, plot.Y = FALSE, alp
   
   plot(x = NULL,y = NULL,col=col.pal[1], type='l', xaxt='n',ylim=Y.lim,lty='dotted',
        yaxt='n',xlab=ifelse(!is.null(xlab), xlab, ""),ylab=ifelse(!is.null(ylab), ylab, ""),lwd=3,xlim = range(time),
-       main = ifelse(!is.null(main), main, "Contribution of each expert to prediction"))
+       main = ifelse(!is.null(main), main, "Contribution of each expert to prediction"), axes = axes)
   y.summed <- Agg
   for(i in rev(c(1:ncol(mat))))
   {
@@ -607,8 +613,6 @@ cumulativePlot<-function(W,X,Y,col.pal=NULL, smooth = FALSE, plot.Y = FALSE, alp
   }
   if (plot.Y && !smooth) lines(time,Y,col=1,lwd=2,lty='dotted')
   if (plot.Y && smooth) lines(lowess(x = time,y = Y,f = alpha)$y,col=1,lwd=2,lty='dotted')
-  axis(1)
-  axis(2)
 }
 
 
@@ -708,7 +712,7 @@ plot_weights <- function(data,
                          max_experts = 50,
                          round = 3, 
                          xlab = NULL, ylab = NULL, main = NULL) {
-
+  
   if (is.null(colors)) {
     colors <- RColorBrewer::brewer.pal(n = min(max(3, ncol(data$experts)), 9), name = "Spectral")
   }
@@ -817,9 +821,9 @@ plot_dyn_avg_loss <- function(data,
   }
   
   pred.experts <- data.frame(data$experts * data$awake + data$prediction * (1-data$awake), check.names = FALSE)
-  cumul.losses <- apply(loss(x = pred.experts, y = data$Y, loss.type = data$loss.type), 2, cumsum)[seq(data$d, data$T*data$d, by = data$d), ] / 1:data$T
-  cumul.exploss <- cumsum(loss(x = data$prediction, y = data$Y, loss.type = data$loss.type))[seq(data$d, data$T*data$d, by = data$d)] / 1:data$T
-
+  cumul.losses <- apply(loss(x = pred.experts, y = data$Y, loss.type = data$loss.type), 2, cumsum) / 1:data$T
+  cumul.exploss <- cumsum(loss(x = data$prediction, y = data$Y, loss.type = data$loss.type)) / 1:data$T
+  
   
   data_loss <- data.frame(cbind(cumul.losses, cumul.exploss), check.names = FALSE)
   data_loss$timestamp <- 1:nrow(data_loss)
@@ -888,8 +892,8 @@ plot_cumul_res <- function(data,
   }
   
   pred.experts <- data.frame(data$experts * data$awake + data$prediction * (1-data$awake), check.names = FALSE)
-  cumul.residuals <- apply(data$Y - pred.experts, 2, cumsum)[seq(data$d, data$T*data$d, by = data$d),]
-  cumul.expres <- cumsum(data$Y - data$prediction)[seq(data$d, data$T*data$d, by = data$d)]
+  cumul.residuals <- apply(data$Y - pred.experts, 2, cumsum)
+  cumul.expres <- cumsum(data$Y - data$prediction)
   
   data_res <- data.frame(cbind(cumul.residuals, cumul.expres), check.names = FALSE)
   data_res$timestamp <- 1:nrow(data_res)
@@ -1121,6 +1125,6 @@ plot_contrib <- function(data,
   if(!is.null(xlab)){
     plt <- plt %>>% rAmCharts::setCategoryAxis(title = xlab)
   }
-
+  
   plt
 }

@@ -52,7 +52,7 @@ test_that("EWA is ok", {
                          loss.type = cur_loss, coefficients = w0, quiet = TRUE)))
     idx.eta <- which(m$parameters$grid.eta == eta)
     expect_equal(m$training$grid.loss[idx.eta], mean(loss(m.fixed$prediction, Y,
-                                                              loss.type = cur_loss)))
+                                                          loss.type = cur_loss)))
     expect_equal(m.fixed$loss, m$training$grid.loss[idx.eta])
     expect_identical(as.numeric(m.fixed$weights[1, ]), w0)
     
@@ -71,8 +71,12 @@ test_that("EWA is ok", {
     expect_failure(expect_warning(
       m1 <- mixture(Y = Y[1:10], experts = X[1:10, ], model = "EWA", parameters = list(grid.eta = grid.eta),
                     awake = awake[1:10, ], quiet = TRUE)))
-      m1 <- predict(object = m1, newexperts = X[-c(1:10), ], newY = Y[-c(1:10)], awake = awake[-c(1:10),], online = TRUE, type = "model", quiet = TRUE)
+    m1 <- predict(object = m1, newexperts = X[-c(1:10), ], newY = Y[-c(1:10)], awake = awake[-c(1:10),], online = TRUE, type = "model", quiet = TRUE)
     expect_equal(m, m1)
+    expect_silent(plot(m))
+    expect_silent(plot(m, dynamic = TRUE))
+    expect_output(print(summary(m)))
+    expect_output(print(m))
   }
 })
 
@@ -99,7 +103,7 @@ test_that("Fixed-share is ok", {
     idx.eta <- which(m$parameters$grid.eta == eta)
     idx.alpha <- which(m$parameters$grid.alpha == alpha)
     expect_equal(m$training$grid.loss[idx.eta, idx.alpha], mean(loss(m.fixed$prediction,
-                                                                         Y, loss.type = cur_loss)))
+                                                                     Y, loss.type = cur_loss)))
     expect_equal(m.fixed$loss, m$training$grid.loss[idx.eta, idx.alpha])
     expect_identical(as.numeric(m.fixed$weights[1, ]), w0)
     
@@ -113,6 +117,9 @@ test_that("Fixed-share is ok", {
                                                                      grid.alpha = grid.alpha), awake = awake, quiet = TRUE)
     expect_equal(sum(!(grid.eta %in% m$parameters$grid.eta)), 0)
     expect_identical(grid.alpha, m$parameters$grid.alpha)
+    
+    expect_silent(plot(m))
+    expect_silent(plot(m, dynamic = TRUE))
   }
 })
 
@@ -130,7 +137,7 @@ test_that("Ridge is ok", {
                      coefficients = w0, quiet = TRUE)
   idx.lambda <- which(m$parameters$grid.lambda == lambda)
   expect_equal(m$training$grid.loss[idx.lambda], mean(loss(m.fixed$prediction,
-                                                               Y)))
+                                                           Y)))
   expect_equal(m.fixed$loss, m$training$grid.loss[idx.lambda])
   expect_identical(as.numeric(m.fixed$weights[1, ]), w0)
   
@@ -138,6 +145,8 @@ test_that("Ridge is ok", {
   m <- mixture(Y = Y, experts = X, model = "Ridge", parameters = list(grid.lambda = grid.lambda,
                                                                       gamma = 100), quiet = TRUE)
   expect_equal(sum(!(grid.lambda %in% m$parameters$grid.lambda)), 0)
+  expect_silent(plot(m))
+  expect_silent(plot(m, dynamic = TRUE))
 })
 
 # test of MLPol,...
@@ -189,6 +198,8 @@ test_that("MLpol, MLprod, MLewa, and BOA are ok", {
     m1 <- mixture(Y = Y, experts = X, model = "MLewa", awake = awake, quiet = TRUE)
     expect_equal(m, m1)
     
+    expect_silent(plot(m))
+    expect_silent(plot(m, dynamic = TRUE))
   }
 })
 
@@ -252,6 +263,9 @@ test_that("Quantile mixture are ok", {
   m <- mixture(Y = Y, experts = X[, c(1, K)], model = "BOA", loss.type = l, quiet = TRUE)
   expect_equal(m$loss, mean(loss(m$prediction, Y, loss.type = l)))
   expect_lt(abs(sum(X[1, c(1, K)] * m$coefficients) - X[1, i]), 0.8)
+  
+  expect_silent(plot(m))
+  expect_silent(plot(m, dynamic = TRUE))
 })
 
 # test of predict function
@@ -273,7 +287,7 @@ test_that("Predict method is ok, with and without awake", {
       m2_r <- m
       for (t in 1:n) {
         m2_r <- predict(m2_r, newY = Y[t], newexperts = X[t, ], online = TRUE, type = "model",
-                      awake = awake[t, ], quiet = TRUE)
+                        awake = awake[t, ], quiet = TRUE)
       }
       expect_equal(m1_r, m2_r)
       
@@ -311,6 +325,7 @@ test_that("Predict FTRL is ok", {
   
   for (possible_loss in c("percentage", "absolute", "square", "pinball")) {
     cur_loss <- list("name" = possible_loss)
+    m <- mixture(model = model, loss.type = cur_loss, quiet = FALSE)
     m <- mixture(model = model, loss.type = cur_loss, quiet = TRUE)
     # expect_warning(predict(m, quiet = TRUE))
     
@@ -341,6 +356,8 @@ test_that("Predict FTRL is ok", {
     m <- mixture(Y = Y, experts = X, model = model, loss.type = cur_loss, parameters = list(fun_reg = fun_reg, fun_reg_grad= fun_reg_grad))
     m <- mixture(Y = Y, experts = X, model = model, loss.type = cur_loss)
     
+    expect_silent(plot(m))
+    expect_silent(plot(m, dynamic = TRUE))
   }
 })
 
@@ -352,7 +369,9 @@ test_that("Regrets and Losses are coherent", {
       if (possible_loss == "pinball") {cur_loss$tau <- 0.5}
       
       m <- mixture(Y = Y, experts = X, model = "EWA", loss.type = cur_loss, loss.gradient = FALSE,parameters = list(eta = 1, alpha = 0.1), quiet = TRUE)
+      expect_silent(plot(m))
       o <- oracle(Y = Y, experts = X, model = "expert", loss.type = cur_loss)
+      expect_silent(plot(o))
       l1 <- m$loss*n - m$training$R
       l2 <- o$loss.experts*n
       l3 = colSums(apply(X, 2, function(x) loss(x,Y,loss.type=cur_loss)))
@@ -389,7 +408,7 @@ test_that("Dimension d>1 is ok",{
         theta.star <- abs(theta.star)
       }
       Y <- rep(theta.star, n)
-      
+      m <- mixture(model = algo, loss.type = cur_loss, quiet = FALSE)
       m <- mixture(model = algo, loss.type = cur_loss, quiet = TRUE)
       for (i in seq(1,n*d,by=d)) {
         idx = i + 0:(d-1)
@@ -398,6 +417,7 @@ test_that("Dimension d>1 is ok",{
       
       expect_output(summary(m), NA)
       expect_output(print(m))
+      expect_output(print(summary(m)))
       
       m$d <- d
       m$T <- m$T / d
@@ -409,9 +429,11 @@ test_that("Dimension d>1 is ok",{
       Y1 <- seriesToBlock(Y, d = d)
       m1 <- mixture(Y = Y1, experts= X1, model = algo, loss.type = cur_loss, quiet = TRUE)
       expect_equal(m,m1)
+      expect_silent(plot(m))
     }
   }
 })
+
 
 test_that("Names are correctly rendered",{
   colnames(X) <- c("bob","alice")
@@ -421,4 +443,33 @@ test_that("Names are correctly rendered",{
   m <- mixture()
   m <- predict(m,newY = Y[1],newexperts = X[1,], quiet = TRUE)
   expect_equal(m$names.experts,colnames(X))
+})
+
+test_that("Plots do not raise errors",{
+  set.seed(1)
+  N = 4
+  T = 10
+  X = matrix(runif(N*T), ncol = N, nrow = T)
+  beta = rnorm(N)
+  beta = beta / sum(beta)
+  Y = X %*% beta
+  
+  for (algo in c("BOA", "Ridge")){
+    for (possible_loss in c("square", "percentage")){
+      m = mixture(Y = Y,experts = X, model = algo,loss.type = possible_loss)
+      for (dynamic in c(FALSE, TRUE)){
+        for (alpha in c(0.1, 0.5)){
+          for (max_experts in c(2:5)){
+            for (type in c('all', 'plot_weight', 'boxplot_weight', 
+                           'dyn_avg_loss', 'cumul_res', 
+                           'avg_loss', 'contrib')){
+              def.par = par(no.readonly = TRUE)
+              expect_silent(plot(m,dynamic = dynamic, alpha = alpha, max_experts = max_experts, type = type))
+              expect_equal(def.par,par(no.readonly = TRUE))
+            }
+          }
+        }
+      }
+    }
+  }
 })
