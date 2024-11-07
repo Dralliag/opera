@@ -7,7 +7,7 @@
 #' @param ... additional arguments to function plot.
 #' @importFrom graphics axis box mtext par plot
 #' @export 
-plot.oracle <- function(x, sort = TRUE, col = NULL, dynamic = TRUE,  ...) {
+plot.oracle <- function(x, sort = TRUE, col = NULL, dynamic = FALSE,  ...) {
   def.par <- par(no.readonly = TRUE)
   
   ############# add checks on x$loss
