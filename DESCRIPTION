@@ -2,12 +2,13 @@ Package: opera
 Type: Package
 Title: Online Prediction by Expert Aggregation
 Version: 1.2.2
-Author: Pierre Gaillard [cre, aut],
-  Yannig Goude [aut],
-  Laurent Plagne [ctb],
-  Thibaut Dubois [ctb],
-  Benoit Thieurmel [ctb]
-Maintainer: Pierre Gaillard <pierre.gaillard@inria.fr>
+Authors@R: c(
+    person("Pierre", "Gaillard", email = "pierre.gaillard@inria.fr", role = c("cre", "aut")),
+    person("Yannig", "Goude", role = "aut"),
+    person("Laurent", "Plagne", role = "ctb"),
+    person("Thibaut", "Dubois", role = "ctb"),
+    person("Benoit", "Thieurmel", role = "ctb")
+    )
 Copyright: EDF R&D 2012-2015
 Description: Misc methods to form online predictions, for regression-oriented 
     time-series, by combining a finite set of forecasts provided by the user. See 
@@ -42,5 +43,5 @@ Suggests:
 RdMacros: Rdpack
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Encoding: UTF-8
