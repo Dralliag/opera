@@ -82,7 +82,7 @@
                         <h4 data-toc-skip class="author">Pierre Gaillard
 and Yannig Goude</h4>
             
-            <h4 data-toc-skip class="date">2024-11-07</h4>
+            <h4 data-toc-skip class="date">2026-03-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/dralliag/opera/blob/master/vignettes/opera-vignette.Rmd" class="external-link"><code>vignettes/opera-vignette.Rmd</code></a></small>
       <div class="hidden name"><code>opera-vignette.Rmd</code></div>
@@ -203,21 +203,21 @@ run the combining algorithms.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">Load</span>, type <span class="op">=</span> <span class="st">"l"</span>, main <span class="op">=</span> <span class="st">"The electric Load"</span><span class="op">)</span></span></code></pre></div>
 
 <p align="center">
-<img src="opera-vignette_files/figure-html/Load-1.png" width="50%"></p>
+<img src="opera-vignette_files/figure-html/Load-1.png" class="r-plt" alt="" width="50%"></p>
 <p align="center">
 </p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">Temp</span>, <span class="va">Load</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, main <span class="op">=</span> <span class="st">"Temperature vs Load"</span><span class="op">)</span></span></code></pre></div>
 
 <p align="center">
-<img src="opera-vignette_files/figure-html/Temp-1.png" width="50%"></p>
+<img src="opera-vignette_files/figure-html/Temp-1.png" class="r-plt" alt="" width="50%"></p>
 <p align="center">
 </p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">NumWeek</span>, <span class="va">Load</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span>, main <span class="op">=</span> <span class="st">"Annual seasonality"</span><span class="op">)</span></span></code></pre></div>
 
 <p align="center">
-<img src="opera-vignette_files/figure-html/NumWeek-1.png" width="50%"></p>
+<img src="opera-vignette_files/figure-html/NumWeek-1.png" class="r-plt" alt="" width="50%"></p>
 </div>
 <div class="section level4">
 <h4 id="first-build-the-expert-forecasts">First: build the expert forecasts<a class="anchor" aria-label="anchor" href="#first-build-the-expert-forecasts"></a>
@@ -277,7 +277,7 @@ be predicted online</p>
 <span>        xlab <span class="op">=</span> <span class="st">"Week"</span>, main <span class="op">=</span> <span class="st">"Expert forecasts and observations"</span><span class="op">)</span></span></code></pre></div>
 
 <p align="center">
-<img src="opera-vignette_files/figure-html/loadAndForecasts-1.png" width="50%"></p>
+<img src="opera-vignette_files/figure-html/loadAndForecasts-1.png" class="r-plt" alt="" width="50%"></p>
 <p align="center">
 </p>
 </div>
@@ -309,7 +309,7 @@ only for analysis and cannot be design online).</p>
 <span><span class="co">#&gt; Best expert oracle:   1480 0.0202</span></span>
 <span><span class="co">#&gt; Uniform combination:  1560 0.0198</span></span>
 <span><span class="co">#&gt; Best convex oracle:   1440 0.0193</span></span></code></pre>
-<img src="opera-vignette_files/figure-html/oracle-1.png" width="50%"><p>The parameter <code>loss.type</code> defines the evaluation
+<img src="opera-vignette_files/figure-html/oracle-1.png" class="r-plt" alt="" width="50%"><p>The parameter <code>loss.type</code> defines the evaluation
 criterion. It can be either the square loss, the percentage loss, the
 absolute loss, or the pinball loss to perform quantile regression.</p>
 <p>The parameter <code>model</code> defines the oracle to be calculated.
@@ -371,7 +371,7 @@ forms a new prediction and update the procedure.</p>
 <p align="center">
 </p>
 <p align="center">
-<img src="opera-vignette_files/figure-html/MLpol-1.png" width="50%"><img src="opera-vignette_files/figure-html/MLpol-2.png" width="50%"><img src="opera-vignette_files/figure-html/MLpol-3.png" width="50%"><img src="opera-vignette_files/figure-html/MLpol-4.png" width="50%"><img src="opera-vignette_files/figure-html/MLpol-5.png" width="50%"><img src="opera-vignette_files/figure-html/MLpol-6.png" width="50%"></p>
+<img src="opera-vignette_files/figure-html/MLpol-1.png" class="r-plt" alt="" width="50%"><img src="opera-vignette_files/figure-html/MLpol-2.png" class="r-plt" alt="" width="50%"><img src="opera-vignette_files/figure-html/MLpol-3.png" class="r-plt" alt="" width="50%"><img src="opera-vignette_files/figure-html/MLpol-4.png" class="r-plt" alt="" width="50%"><img src="opera-vignette_files/figure-html/MLpol-5.png" class="r-plt" alt="" width="50%"><img src="opera-vignette_files/figure-html/MLpol-6.png" class="r-plt" alt="" width="50%"></p>
 <p>The same results can be obtained more directly:</p>
 <ul>
 <li>by giving the whole time series to <code>predict</code> specifying
@@ -551,12 +551,12 @@ or bugs</a>.</li>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Pierre Gaillard.</p>
+<p>Developed by Pierre Gaillard, Yannig Goude.</p>
 </div>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

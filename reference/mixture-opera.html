@@ -117,7 +117,8 @@ In the case of real prediction (i.e., \(d = 1\)), <code>experts</code> is a matr
 <dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
 <dd><p>A character string specifying the aggregation rule to use.
 Currently available aggregation rules are:</p><dl><dt>'EWA'</dt>
-<dd><p>Exponentially weighted average aggregation rules cesa2006predictionopera. A positive learning rate <strong>eta</strong>
+<dd><p>Exponentially weighted average aggregation rules (Cesa-Bianchi and Lugosi 2006)
+. A positive learning rate <strong>eta</strong>
 can be chosen by the user. The
 bigger it is the faster the aggregation rule will learn from observations
 and experts performances. However, too high values lead to unstable weight
@@ -125,7 +126,8 @@ vectors and thus unstable predictions. If it is not specified, the learning rate
 A finite grid of potential learning rates to be optimized online can be specified with <strong>grid.eta</strong>.</p></dd>
 
    <dt>'FS'</dt>
-<dd><p>Fixed-share aggregation rule cesa2006predictionopera. As for <code>ewa</code>, a learning rate <strong>eta</strong>
+<dd><p>Fixed-share aggregation rule (Cesa-Bianchi and Lugosi 2006)
+. As for <code>ewa</code>, a learning rate <strong>eta</strong>
 can be chosen by the user or calibrated online. The main difference with <code>ewa</code> aggregation
 rule rely in the mixing rate <strong>alpha</strong>\(\in [0,1]\) which considers at
 each instance a small probability <code>alpha</code> to have a rupture in the
@@ -137,7 +139,8 @@ Finite grids of learning rates and mixing rates to be optimized can be specified
 parameters <strong>grid.eta</strong> and <strong>grid.alpha</strong>.</p></dd>
 
    <dt>'Ridge'</dt>
-<dd><p>Online Ridge regression cesa2006predictionopera. It minimizes at
+<dd><p>Online Ridge regression (Cesa-Bianchi and Lugosi 2006)
+. It minimizes at
 each instance a penalized criterion.  It forms at each instance linear
 combination of the experts' forecasts and can assign negative weights that
 not necessarily sum to one.  It is useful if the experts are biased or
@@ -147,21 +150,27 @@ A finite grid of coefficient to be optimized can be specified with a parameter <
 
    <dt>'MLpol', 'MLewa', 'MLprod'</dt>
 <dd><p>Aggregation rules with multiple learning rates that are
-theoretically calibrated GaillardStoltzEtAl2014opera.</p></dd>
+theoretically calibrated (Gaillard et al. 2014)
+.</p></dd>
 
    <dt>'BOA'</dt>
-<dd><p>Bernstein online Aggregation wintenberger2017optimalopera.
+<dd><p>Bernstein online Aggregation (Wintenberger 2017)
+.
 The learning rates are automatically calibrated.</p></dd>
 
 <dt>'OGD'</dt>
-<dd><p>Online Gradient descent zinkevich2003onlineopera. See also hazan2019introductionopera. The optimization is performed with a time-varying learning rate.
+<dd><p>Online Gradient descent (Zinkevich 2003)
+. See also (Hazan 2019)
+. The optimization is performed with a time-varying learning rate.
  At time step \(t \geq 1\), the learning rate is chosen to be \(t^{-\alpha}\), where \(\alpha\) is provided by alpha in the parameters argument.
  The algorithm may or not perform a projection step into the simplex space (non-negative weights that sum to one) according to
  the value of the parameter 'simplex' provided by the user.</p></dd>
 
  <dt>'FTRL'</dt>
-<dd><p>Follow The Regularized Leader shalev2007primalopera.
- Note that here, the linearized version of FTRL is implemented  (see Chap. 5 of hazan2019introductionopera).
+<dd><p>Follow The Regularized Leader (Shalev-Shwartz and Singer 2007)
+.
+ Note that here, the linearized version of FTRL is implemented  (see Chap. 5 of (Hazan 2019)
+).
  <code><a href="FTRL.html">FTRL</a></code> is the online counterpart of empirical risk minimization. It is a family of aggregation rules (including OGD) that uses at any time the empirical risk
  minimizer so far with an additional regularization. The online optimization can be performed
  on any bounded convex set that can be expressed with equality or inequality constraints.  Note that this method is still under development and a beta version.</p>
@@ -169,22 +178,22 @@ The learning rates are automatically calibrated.</p></dd>
 <dd><p>The learning rate.</p></dd>
 
      <dt>'fun_reg' </dt>
-<dd><p>The regularization function to be applied on the weigths. See <code>auglag</code>: fn.</p></dd>
+<dd><p>The regularization function to be applied on the weigths. See <code><a href="https://rdrr.io/pkg/alabama/man/auglag.html" class="external-link">auglag</a></code>: fn.</p></dd>
 
      <dt>'constr_eq' </dt>
-<dd><p>The equality constraints (e.g. sum(w) = 1). See <code>auglag</code>: heq.</p></dd>
+<dd><p>The equality constraints (e.g. sum(w) = 1). See <code><a href="https://rdrr.io/pkg/alabama/man/auglag.html" class="external-link">auglag</a></code>: heq.</p></dd>
 
      <dt>'constr_ineq' </dt>
-<dd><p>The inequality constraints (e.g. w &gt; 0). See <code>auglag</code>: hin.</p></dd>
+<dd><p>The inequality constraints (e.g. w &gt; 0). See <code><a href="https://rdrr.io/pkg/alabama/man/auglag.html" class="external-link">auglag</a></code>: hin.</p></dd>
 
      <dt>'fun_reg_grad' </dt>
-<dd><p>(optional) The gradient of the regularization function. See <code>auglag</code>: gr.</p></dd>
+<dd><p>(optional) The gradient of the regularization function. See <code><a href="https://rdrr.io/pkg/alabama/man/auglag.html" class="external-link">auglag</a></code>: gr.</p></dd>
 
      <dt>'constr_eq_jac' </dt>
-<dd><p>(optional) The Jacobian of the equality constraints. See <code>auglag</code>: heq.jac</p></dd>
+<dd><p>(optional) The Jacobian of the equality constraints. See <code><a href="https://rdrr.io/pkg/alabama/man/auglag.html" class="external-link">auglag</a></code>: heq.jac</p></dd>
 
      <dt>'constr_ineq_jac' </dt>
-<dd><p>(optional) The Jacobian of the inequality constraints. See <code>auglag</code>: hin.jac</p></dd>
+<dd><p>(optional) The Jacobian of the inequality constraints. See <code><a href="https://rdrr.io/pkg/alabama/man/auglag.html" class="external-link">auglag</a></code>: hin.jac</p></dd>
 
 
 </dl><p>or set <strong>default</strong> to TRUE. In the latter, <a href="FTRL.html">FTRL</a> is performed with Kullback regularization (<code>fun_reg(x) = sum(x log (x/w0))</code>
@@ -305,18 +314,16 @@ online. Possible parameters are:</p><dl><dt>eta</dt>
     <h2>Value</h2>
     <p>An object of class mixture that can be used to perform new predictions.
 It contains the parameters <code>model</code>, <code>loss.type</code>, <code>loss.gradient</code>,
-<code>experts</code>, <code>Y</code>, <code>awake</code>, and the fields</p>
-<dl><dt>coefficients</dt>
+<code>experts</code>, <code>Y</code>, <code>awake</code>, and the fields</p><dl><dt>coefficients</dt>
 <dd><p>A vector of coefficients
 assigned to each expert to perform the next prediction.</p></dd>
 
-
-<dt>weights </dt>
+<dt>weights</dt>
 <dd><p>A matrix of dimension <code>c(T,K)</code>, with
 <code>T</code> the number of instances to be predicted and <code>K</code> the number of
-experts.  Each row contains the convex combination to form the predictions</p></dd>
+experts.  Each row contains the convex combination to form the predictions.</p></dd>
 
-<dt>prediction </dt>
+<dt>prediction</dt>
 <dd><p>A matrix with <code>T</code> rows and <code>d</code> columns that contains the
 predictions outputted by the aggregation rule.</p></dd>
 
@@ -331,10 +338,23 @@ by the aggregation rule.</p></dd>
 <dd><p>A list that contains useful temporary information of the
 aggregation rule to be updated and to perform predictions.</p></dd>
 
+
 </dl></div>
     <div id="references">
     <h2>References</h2>
-    <p></p>
+    <p>Cesa-Bianchi N, Lugosi G (2006).
+<em>Prediction, learning, and games</em>.
+Cambridge university press.<br><br> Gaillard P, Stoltz G, van Erven T (2014).
+“A Second-order Bound with Excess Losses.”
+In <em>Proceedings of COLT'14</em>, volume 35, 176–196.<br><br> Hazan E (2019).
+“Introduction to online convex optimization.”
+<em>arXiv preprint arXiv:1909.05207</em>.<br><br> Shalev-Shwartz S, Singer Y (2007).
+“A primal-dual perspective of online learning algorithms.”
+<em>Machine Learning</em>, <b>69</b>(2), 115–142.<br><br> Wintenberger O (2017).
+“Optimal learning with Bernstein online aggregation.”
+<em>Machine Learning</em>, <b>106</b>(1), 119–141.<br><br> Zinkevich M (2003).
+“Online convex programming and generalized infinitesimal gradient ascent.”
+In <em>Proceedings of the 20th international conference on machine learning (icml-03)</em>, 928–936.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -354,7 +374,7 @@ aggregation rule to be updated and to perform predictions.</p></dd>
 <span class="r-in"><span><span class="co"># packages</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">mgcv</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: nlme</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> This is mgcv 1.9-3. For overview type 'help("mgcv-package")'.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># import data</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">electric_load</span><span class="op">)</span></span></span>
@@ -550,11 +570,11 @@ aggregation rule to be updated and to perform predictions.</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Pierre Gaillard.</p>
+  <p></p><p>Developed by Pierre Gaillard, Yannig Goude.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>
