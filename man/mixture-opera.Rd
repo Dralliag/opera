@@ -77,12 +77,12 @@ The learning rates are automatically calibrated.}
  The user must provide (in the \strong{parameters}'s list):
    \describe{
      \item{'eta' }{The learning rate.}
-     \item{'fun_reg' }{The regularization function to be applied on the weigths. See \code{\link{auglag}}: fn.}
-     \item{'constr_eq' }{The equality constraints (e.g. sum(w) = 1). See \code{\link{auglag}}: heq.}
-     \item{'constr_ineq' }{The inequality constraints (e.g. w > 0). See \code{\link{auglag}}: hin.}
-     \item{'fun_reg_grad' }{(optional) The gradient of the regularization function. See \code{\link{auglag}}: gr.}
-     \item{'constr_eq_jac' }{(optional) The Jacobian of the equality constraints. See \code{\link{auglag}}: heq.jac}
-     \item{'constr_ineq_jac' }{(optional) The Jacobian of the inequality constraints. See \code{\link{auglag}}: hin.jac}
+     \item{'fun_reg' }{The regularization function to be applied on the weigths. See \code{\link[alabama]{auglag}}: fn.}
+     \item{'constr_eq' }{The equality constraints (e.g. sum(w) = 1). See \code{\link[alabama]{auglag}}: heq.}
+     \item{'constr_ineq' }{The inequality constraints (e.g. w > 0). See \code{\link[alabama]{auglag}}: hin.}
+     \item{'fun_reg_grad' }{(optional) The gradient of the regularization function. See \code{\link[alabama]{auglag}}: gr.}
+     \item{'constr_eq_jac' }{(optional) The Jacobian of the equality constraints. See \code{\link[alabama]{auglag}}: heq.jac}
+     \item{'constr_ineq_jac' }{(optional) The Jacobian of the inequality constraints. See \code{\link[alabama]{auglag}}: hin.jac}
    } or set \strong{default} to TRUE. In the latter, \link{FTRL} is performed with Kullback regularization (\code{fun_reg(x) = sum(x log (x/w0))}
    on the simplex (\code{constr_eq(w) = sum(w) - 1} and \code{constr_ineq(w) = w}). 
    Parameters \strong{w0} (weight initialization), and \strong{max_iter} can also be provided.
@@ -154,22 +154,23 @@ online. Possible parameters are:
 \item{object}{An object of class mixture}
 }
 \value{
-An object of class mixture that can be used to perform new predictions. 
+An object of class mixture that can be used to perform new predictions.
 It contains the parameters \code{model}, \code{loss.type}, \code{loss.gradient},
 \code{experts}, \code{Y}, \code{awake}, and the fields
-\item{coefficients}{A vector of coefficients 
+\describe{
+\item{coefficients}{A vector of coefficients
 assigned to each expert to perform the next prediction.}
-
-\item{weights }{ A matrix of dimension \code{c(T,K)}, with
+\item{weights}{A matrix of dimension \code{c(T,K)}, with
 \code{T} the number of instances to be predicted and \code{K} the number of
-experts.  Each row contains the convex combination to form the predictions }
-\item{prediction }{ A matrix with \code{T} rows and \code{d} columns that contains the
-predictions outputted by the aggregation rule.  } 
-\item{loss}{ The average loss (as stated by parameter \code{loss.type}) suffered
+experts.  Each row contains the convex combination to form the predictions.}
+\item{prediction}{A matrix with \code{T} rows and \code{d} columns that contains the
+predictions outputted by the aggregation rule.}
+\item{loss}{The average loss (as stated by parameter \code{loss.type}) suffered
 by the aggregation rule.}
 \item{parameters}{The learning parameters chosen by the aggregation rule or by the user.}
-\item{training}{A list that contains useful temporary information of the 
+\item{training}{A list that contains useful temporary information of the
 aggregation rule to be updated and to perform predictions.}
+}
 }
 \description{
 The function \code{mixture} builds an
